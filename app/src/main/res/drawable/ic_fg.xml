@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Barbell with red, blue and yellow bumper plates (Push, Pull, Legs) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#E9ECF0" android:pathData="M26,51h56v6h-56z" />
+    <path android:fillColor="#D8342C" android:pathData="M30,34h7a2,2 0,0 1,2 2v36a2,2 0,0 1,-2 2h-7a2,2 0,0 1,-2 -2v-36a2,2 0,0 1,2 -2z" />
+    <path android:fillColor="#2A63D4" android:pathData="M41,39h5a2,2 0,0 1,2 2v26a2,2 0,0 1,-2 2h-5a2,2 0,0 1,-2 -2v-26a2,2 0,0 1,2 -2z" />
+    <path android:fillColor="#D8342C" android:pathData="M71,34h7a2,2 0,0 1,2 2v36a2,2 0,0 1,-2 2h-7a2,2 0,0 1,-2 -2v-36a2,2 0,0 1,2 -2z" />
+    <path android:fillColor="#2A63D4" android:pathData="M62,39h5a2,2 0,0 1,2 2v26a2,2 0,0 1,-2 2h-5a2,2 0,0 1,-2 -2v-26a2,2 0,0 1,2 -2z" />
+    <path android:fillColor="#E0A800" android:pathData="M50,44h8v20h-8z" />
+</vector>
