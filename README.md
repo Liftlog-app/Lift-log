@@ -14,3 +14,13 @@ Every push to `main` builds a new APK automatically (see the Actions tab).
 
 - Your workouts are saved on the phone. Uninstalling the app erases them, so use Settings > Copy all data as JSON to keep a backup.
 - The app page lives in `app/src/main/assets/index.html`.
+
+## iPhone
+
+iPhones can't install the APK. Use the web version instead:
+
+1. Open https://nheilmangoba1.github.io/Lift-log/ in **Safari**.
+2. Tap the **Share** button, then **Add to Home Screen**.
+3. Open Lift Log from the new icon. It runs full screen and saves workouts on the phone.
+
+The web version lives in the `docs` folder (served by GitHub Pages from `main` / `docs`).
