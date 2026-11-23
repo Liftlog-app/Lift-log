@@ -10,13 +10,27 @@ android {
         applicationId = "com.nheil.liftlog"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
+        versionCode = 3
         versionName = "2.0"
     }
 
+    // One fixed key so every new build installs over the old one (keeps your data).
+    signingConfigs {
+        create("liftlog") {
+            storeFile = file("liftlog.keystore")
+            storePassword = "liftlog123"
+            keyAlias = "liftlog"
+            keyPassword = "liftlog123"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("liftlog")
+        }
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("liftlog")
         }
     }
 
