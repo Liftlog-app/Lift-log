@@ -22,9 +22,10 @@ header{background:light-dark(#13161b,#0a0c10);color:#f1f3f6;padding:18px max(4vw
 h1{font-size:40px;line-height:1.05;margin:0;font-weight:800}
 .sub{color:#b9c0cb;font-size:16px;margin:2px 0 0}
 .strip{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:3px;margin-top:12px}
-.strip span{height:26px;border-radius:4px;display:grid;place-items:center;font:600 12px Barlow,sans-serif;color:#c9ced6}
+.strip button{height:30px;border:0;padding:0;border-radius:4px;display:grid;place-items:center;font:600 12px Barlow,sans-serif;color:#c9ced6;cursor:pointer}
 .strip .b1{background:#3a2626}.strip .b2{background:#232f45}.strip .b3{background:#3b3420}.strip .dl{opacity:.6}
 .strip .now{background:#f1f3f6;color:#13161b;opacity:1}
+.strip .sel{outline:2px solid #f1f3f6;outline-offset:1px;color:#fff;opacity:1}
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:#b9c0cb;margin-top:6px}
 nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;gap:4px;padding:6px max(4vw,14px);overflow-x:auto}
@@ -58,6 +59,7 @@ textarea{min-height:110px;padding:10px;font:13px/1.4 ui-monospace,monospace}
 .pill{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--field);color:var(--ink);font:600 15px Barlow,sans-serif;cursor:pointer}
 .sug{font-size:14px;margin:6px 0 2px;padding:7px 10px;border-radius:6px;border:1px solid var(--c);background:var(--field)}
 .sug b{font-size:16px}
+.weeknav{display:flex;justify-content:space-between;gap:8px;margin:0 0 12px}.weeknav .btn{flex:1}
 .ghost{grid-column:2/-1;font-size:13px;color:var(--mute);margin:-3px 0 4px}
 .ghost.win{color:var(--ok);font-weight:700}.ghost.lose{color:var(--push)}
 .race{text-align:center;font:800 22px "Barlow Condensed",sans-serif;margin:4px 0 10px}
@@ -115,7 +117,7 @@ label{display:block;font-weight:600;margin:14px 0 6px}
 .ttrack{position:absolute;left:0;right:0;top:-10px;height:4px;background:#2a313c}
 .tfill{height:100%;background:var(--ok);width:100%}
 .tbar.alarm{background:var(--ok)}
-@media(max-width:600px){h1{font-size:32px}.strip span{font-size:10px;height:22px}table{font-size:13px}.tpre .tlab{display:none}.tbar button{padding:0 9px;min-width:44px}}
+@media(max-width:600px){h1{font-size:32px}.strip button{font-size:11px;height:28px}table{font-size:13px}.tpre .tlab{display:none}.tbar button{padding:0 9px;min-width:44px}}
 @media(prefers-reduced-motion:no-preference){.chip{transition:background .15s}.tbar{transition:background .3s}}
 </style>
 </head>
@@ -395,7 +397,7 @@ function renderHeader(){
   if(needsSetup()){$('#sub').textContent='Pick a program to get started';$('#stripbox').innerHTML='';return}
   if(p.periodize){
     $('#sub').textContent=`${p.name} · Week ${wk} of 15 · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}${cyc>1?' · Cycle '+cyc:''}`;
-    $('#stripbox').innerHTML=`<div class="strip" aria-label="Week ${wk} of 15">${Array.from({length:15},(_,i)=>`<span class="b${blk(i+1)}${(i+1)%5===0?' dl':''}${i+1===wk?' now':''}">${i+1}</span>`).join('')}</div><div class="legend"><span>1–5 Hypertrophy</span><span>6–10 Strength</span><span>11–15 Peak</span><span>Faded = deload / test</span></div>`;
+    $('#stripbox').innerHTML=`<div class="strip" aria-label="Weeks 1 to 15. Tap a week to view it.">${(()=>{const VW=wOf(view.date||iso(today())),base=Math.floor((VW-1)/15)*15;return Array.from({length:15},(_,i)=>{const a=base+i+1;return `<button class="b${blk(i+1)}${(i+1)%5===0?' dl':''}${a===W?' now':''}${a===VW&&a!==W?' sel':''}" data-jw="${a}" aria-label="Week ${i+1}${a===W?', this week':''}">${i+1}</button>`}).join('')})()}</div><div class="legend"><span>1–5 Hypertrophy</span><span>6–10 Strength</span><span>11–15 Peak</span><span>Faded = deload / test</span></div>`;
   }else{$('#sub').textContent=`${p.name} · Week ${W}`;$('#stripbox').innerHTML=''}
 }
 
@@ -420,6 +422,8 @@ function renderToday(){
   let h=`<div class="chips">${p.days.map(d=>`<button class="chip${doneThisWeek(d.k,W)?' done':''}" style="--c:${d.c}" data-s="${esc(d.k)}" aria-pressed="${d.k===view.k}" aria-label="${esc(d.n)}${doneThisWeek(d.k,W)?', done this week':''}">${esc(d.n)}</button>`).join('')}</div>
   <div class="head"><div><h2>${esc(dn)}</h2><div class="meta">${p.periodize?`Week ${wk} · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}`:`Week ${W}`}${(()=>{const dw=doneThisWeek(view.k,W);return dw&&!saved?' · done '+fmtD(dw.date):view.k===nextDay()&&!saved&&view.date===iso(today())?' · up next':''})()}${saved&&saved.dur?` · ${saved.dur} min`:''}</div></div>
   <input type="date" id="wdate" value="${view.date}" aria-label="Workout date"></div>
+  <div class="weeknav"><button class="btn" data-wnav="-7" aria-label="Previous week">‹ Week ${Math.max(1,W-1)}</button>${view.date!==iso(today())?'<button class="btn" data-wtoday="1">Today</button>':''}<button class="btn" data-wnav="7" aria-label="Next week">Week ${W+1} ›</button></div>
+  ${view.date>iso(today())?`<div class="hint">You're looking ahead to Week ${p.periodize?wk:W} (${fmtD(view.date)}). Targets shown are what's planned. <button class="small" data-wtoday="1">Back to today</button></div>`:''}
   <p class="meta" style="margin:-4px 0 12px">RPE is how hard a set felt: 10 = no reps left, 9 = 1 left, 8 = 2 left. Leave weight blank to use the suggestion.</p>`;
   if(!P.length){$('#main').innerHTML=h+(p.periodize&&wk===15?`<div class="empty">Test week: no lifting on this day. Do light cardio or technique work.</div>`:`<div class="empty">No exercises on this day yet. Add some in the Program tab.</div>`);return}
   const rt=readyToday(),isToday=view.date===iso(today());
@@ -622,6 +626,9 @@ $('#tbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
 });
 
 /* ---------- events ---------- */
+$('#stripbox').addEventListener('click',e=>{const b=e.target.closest('[data-jw]');if(!b)return;unfocus();flush();
+  const target=+b.dataset.jw,cur=wOf(view.date||iso(today())),d=new Date((view.date||iso(today()))+'T00:00');d.setDate(d.getDate()+(target-cur)*7);
+  if(target===wOf(iso(today())))view.date=iso(today());else view.date=iso(d);view.tab='today';view.swap=null;render()});
 $('#main').addEventListener('keydown',e=>{const sp=e.target.closest&&e.target.closest('[data-pk]');if(sp&&(e.key==='Enter'||e.key===' ')){e.preventDefault();view.painSel=sp.dataset.pk;render()}});
 const unfocus=()=>{const a=document.activeElement;if(a&&a.blur&&a.matches&&a.matches('#main input,#main textarea'))a.blur()};
 document.addEventListener('focusout',()=>setTimeout(()=>{if(pendingRender)render()},0));
@@ -656,6 +663,8 @@ $('#main').addEventListener('click',async e=>{
   if(b.dataset.pdone){view.painSel=null;render();return}
   if(b.dataset.pedit){view.painSel=b.dataset.pedit;render();return}
   if(b.dataset.pclear){if(view.painSel===b.dataset.pclear)view.painSel=null;await setPain(b.dataset.pclear,0);return}
+  if(b.dataset.wnav){flush();const d=new Date(view.date+'T00:00');d.setDate(d.getDate()+(+b.dataset.wnav));view.date=iso(d);view.swap=null;render();return}
+  if(b.dataset.wtoday){flush();view.date=iso(today());view.k=null;view.swap=null;render();return}
   if(b.dataset.gobody){flush();view.tab='body';render();return}
   if(b.dataset.pover){flush();painOver[b.dataset.pover]=true;render();return}
   if(b.dataset.pick){view.pick=b.dataset.pick;view.per=null;render();return}
