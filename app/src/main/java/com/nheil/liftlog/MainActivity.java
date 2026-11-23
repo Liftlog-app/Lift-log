@@ -25,6 +25,7 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);   // keeps your logs (localStorage) on the phone
         s.setDatabaseEnabled(true);
         s.setAllowFileAccess(true);
+        s.setMediaPlaybackRequiresUserGesture(false);  // lets the rest timer beep
 
         web.setWebViewClient(new WebViewClient() {
             @Override

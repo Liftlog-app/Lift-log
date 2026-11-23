@@ -1,6 +1,6 @@
 # Lift Log
 
-A Push Pull Legs workout tracker for Android: a 15-week plan with Hypertrophy, Strength and Peak blocks, set logging that saves automatically, exercise swaps, and progress charts.
+A workout tracker for anyone: pick a program (Push Pull Legs with 15-week blocks, Upper/Lower, Full Body, Body-Part Split) or build your own, log sets with automatic saving, swap exercises, use the rest timer and workout clock, and track progress charts.
 
 ## Get the app
 
