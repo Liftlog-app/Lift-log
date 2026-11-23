@@ -4,3 +4,7 @@ app/build/
 local.properties
 *.apk
 .idea/
+LiftLog.xcodeproj/
+build/
+Payload/
+*.ipa

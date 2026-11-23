@@ -1,0 +1,34 @@
+name: LiftLog
+options:
+  bundleIdPrefix: com.nheil
+  deploymentTarget:
+    iOS: "15.0"
+targets:
+  LiftLog:
+    type: application
+    platform: iOS
+    sources:
+      - path: ios/LiftLog
+      - path: docs
+        type: folder
+        buildPhase: resources
+    info:
+      path: ios/LiftLog/Info.plist
+      properties:
+        CFBundleDisplayName: Lift Log
+        CFBundleShortVersionString: "2.4"
+        CFBundleVersion: "1"
+        UILaunchScreen:
+          UIColorName: ""
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIViewControllerBasedStatusBarAppearance: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIRequiresFullScreen: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nheil.liftlog
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_VERSION: "5.0"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
