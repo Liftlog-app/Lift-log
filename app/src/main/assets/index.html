@@ -290,6 +290,7 @@ function curPlan(){
   if(sv&&sv.ex){for(const n in sv.ex)if(!P.some(x=>x.n===n||x.orig===n||(x.porig===n&&!sv.ex[x.n])))P.push({n,sets:sv.ex[n].length,reps:'',rpe:null,extra:true})}
   return P;
 }
+const doneThisWeek=(k,W)=>Object.values(S.sessions).find(d=>d.s===k&&wOf(d.date)===W&&d.ex&&Object.keys(d.ex).length);
 function nextDay(){
   const days=prog().days;if(!days.length)return null;
   const td=Object.values(S.sessions).find(d=>d.date===iso(today())&&days.some(x=>x.k===d.s));if(td)return td.s;
@@ -416,8 +417,8 @@ function renderToday(){
   if(!view.k)view.k=nextDay();
   const id=sidFor(view.date,view.k),saved=S.sessions[id],P=curPlan(),u=unit(),W=wOf(view.date),wk=wkOf(W);
   const day=p.days.find(d=>d.k===view.k),c=dayColor(view.k),dn=day?day.n:(saved&&saved.dn)||'Workout';
-  let h=`<div class="chips">${p.days.map(d=>`<button class="chip${S.sessions[sidFor(view.date,d.k)]?' done':''}" style="--c:${d.c}" data-s="${esc(d.k)}" aria-pressed="${d.k===view.k}">${esc(d.n)}</button>`).join('')}</div>
-  <div class="head"><div><h2>${esc(dn)}</h2><div class="meta">${p.periodize?`Week ${wk} · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}`:`Week ${W}`}${view.k===nextDay()&&!saved?' · up next':''}${saved&&saved.dur?` · ${saved.dur} min`:''}</div></div>
+  let h=`<div class="chips">${p.days.map(d=>`<button class="chip${doneThisWeek(d.k,W)?' done':''}" style="--c:${d.c}" data-s="${esc(d.k)}" aria-pressed="${d.k===view.k}" aria-label="${esc(d.n)}${doneThisWeek(d.k,W)?', done this week':''}">${esc(d.n)}</button>`).join('')}</div>
+  <div class="head"><div><h2>${esc(dn)}</h2><div class="meta">${p.periodize?`Week ${wk} · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}`:`Week ${W}`}${(()=>{const dw=doneThisWeek(view.k,W);return dw&&!saved?' · done '+fmtD(dw.date):view.k===nextDay()&&!saved&&view.date===iso(today())?' · up next':''})()}${saved&&saved.dur?` · ${saved.dur} min`:''}</div></div>
   <input type="date" id="wdate" value="${view.date}" aria-label="Workout date"></div>
   <p class="meta" style="margin:-4px 0 12px">RPE is how hard a set felt: 10 = no reps left, 9 = 1 left, 8 = 2 left. Leave weight blank to use the suggestion.</p>`;
   if(!P.length){$('#main').innerHTML=h+(p.periodize&&wk===15?`<div class="empty">Test week: no lifting on this day. Do light cardio or technique work.</div>`:`<div class="empty">No exercises on this day yet. Add some in the Program tab.</div>`);return}
