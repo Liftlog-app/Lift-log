@@ -49,13 +49,15 @@ main{padding:16px max(4vw,14px) 150px}
 .tgt{font-weight:700}
 .hint{font-size:14px;margin:6px 0 8px;padding:6px 10px;border-radius:6px;background:var(--field)}
 .hint.up{background:light-dark(#e3f5ec,#143323);color:light-dark(#135c38,#8fe0b6)}
-.sets{display:grid;grid-template-columns:2.2em minmax(0,1fr) minmax(0,1fr);gap:6px 8px;align-items:center;margin-top:6px}
+.sets{display:grid;grid-template-columns:2em minmax(0,1.3fr) minmax(0,1fr) minmax(0,.8fr);gap:6px 8px;align-items:center;margin-top:6px}
 .sets .h{font-size:13px;color:var(--mute)}
 .sets .n{font:800 18px "Barlow Condensed",sans-serif;color:var(--mute);text-align:center}
 input,select,textarea{width:100%;min-height:44px;font:600 16px Barlow,sans-serif;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:0 10px}
 textarea{min-height:110px;padding:10px;font:13px/1.4 ui-monospace,monospace}
 .small{background:none;border:0;color:var(--mute);font:600 15px Barlow,sans-serif;min-height:40px;cursor:pointer;padding:0 4px}
 .pill{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--field);color:var(--ink);font:600 15px Barlow,sans-serif;cursor:pointer}
+.sug{font-size:14px;margin:6px 0 2px;padding:7px 10px;border-radius:6px;border:1px solid var(--c);background:var(--field)}
+.sug b{font-size:16px}
 .swap{margin:10px 0;padding:12px;border-radius:8px;background:var(--field);border:1px solid var(--line)}
 .swap input{margin:8px 0}.swap .btn{background:var(--card)}.swap .btn.primary{background:var(--c);color:#fff}
 .save{width:100%;min-height:54px;border:0;border-radius:10px;background:var(--c,var(--ink));color:#fff;font:800 22px "Barlow Condensed",sans-serif;cursor:pointer}
@@ -191,7 +193,8 @@ const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
 const monday=()=>{const d=today();d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d)};
 const fmtD=s=>new Date(s+'T00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 const mmss=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
-const e1=(w,r)=>w*(1+r/30);
+const e1=(w,r,rpe)=>w*(1+(r+10-(rpe||10))/30);
+const estSet=x=>e1(+x.w||0,+x.r||0,+x.e||+x.t||10);
 
 let S={profile:null,sessions:{}};
 let mode='local',profRef=null,loaded=false,slow=false,booting=!!(window.claude&&window.claude.use),status='Saved on this device.';
@@ -251,7 +254,8 @@ function collect(){
   const P=curPlan(),ex={};
   for(const card of document.querySelectorAll('#main .card[data-card]')){
     const n=P[+card.dataset.card].n,sets=[];
-    for(const wi of card.querySelectorAll('input[data-f=w]')){const ri=card.querySelector(`input[data-f=r][data-k="${wi.dataset.k}"]`);const r=parseInt(ri.value,10),w=parseFloat(wi.value||wi.placeholder||'0')||0;if(r>0)sets.push({w,r})}
+    for(const wi of card.querySelectorAll('input[data-f=w]')){const ri=card.querySelector(`input[data-f=r][data-k="${wi.dataset.k}"]`);const ei=card.querySelector(`input[data-f=e][data-k="${wi.dataset.k}"]`);const r=parseInt(ri.value,10),w=parseFloat(wi.value||wi.placeholder||'0')||0,e=parseFloat(ei&&ei.value);
+      if(r>0){const o={w,r};if(e>=1&&e<=10)o.e=Math.round(e*2)/2;if(repsFor(P[+card.dataset.card],0))o.t=rpeFor(P[+card.dataset.card]);sets.push(o)}}
     if(sets.length)ex[n]=sets}
   return ex;
 }
@@ -272,6 +276,30 @@ function lastFor(name,exceptId,beforeDate){
   let best=null;
   for(const [id,d] of Object.entries(S.sessions)){if(id===exceptId||!d.ex||!d.ex[name]||!d.ex[name].length)continue;if(beforeDate&&d.date>beforeDate)continue;if(!best||d.date>best.date||(d.date===best.date&&(d.updated||0)>(best.updated||0)))best=d}
   return best?{date:best.date,sets:best.ex[name]}:null;
+}
+
+const defRpe=()=>(S.profile&&S.profile.rpeDef)||8;
+const rpeFor=x=>x.rpe||defRpe();
+const repsFor=(x,k)=>{const m=String(x.reps).match(/\d+/g);if(!m)return 0;return String(x.reps).includes(',')?+(m[k]!=null?m[k]:m[m.length-1]):+m[0]};
+const roundW=w=>{const inc=unit()==='kg'?2.5:5;return Math.max(0,Math.round(w/inc)*inc)};
+function bestEst(sets){let b=0;for(const x of sets||[]){if(+x.w>0&&+x.r>0)b=Math.max(b,estSet(x))}return b}
+function suggest(x,todaySets,last){
+  if(!repsFor(x,0))return null;let est=bestEst(todaySets),src='today';
+  if(!est&&last){est=bestEst(last.sets);src='last'}
+  if(!est)return null;
+  return {est,src,w:k=>{const r=repsFor(x,k);return r?roundW(est/(1+(r+10-rpeFor(x))/30)):''}};
+}
+function sugText(x,sg){const u=unit();
+  if(!sg)return repsFor(x,0)?'Log a set (add its RPE if you can) and the rest get weight suggestions.':'';
+  const multi=String(x.reps).includes(',');
+  return `Suggested: <b>${sg.w(0)} ${u}</b> × ${repsFor(x,0)}${multi?' (each set has its own target)':''} @ RPE ${rpeFor(x)} · est. 1RM ${Math.round(sg.est)} ${u} from ${sg.src==='today'?'today\'s sets':'your last workout'}`}
+function refreshSug(card){
+  const i=+card.dataset.card,x=curPlan()[i];if(!x)return;const rows=[];
+  for(const wi of card.querySelectorAll('input[data-f=w]')){const k=wi.dataset.k,ri=card.querySelector(`input[data-f=r][data-k="${k}"]`),ei=card.querySelector(`input[data-f=e][data-k="${k}"]`);
+    if(+ri.value>0&&wi.value!=='')rows.push({w:wi.value,r:ri.value,e:ei.value,t:rpeFor(x)})}
+  const sg=suggest(x,rows,lastFor(x.n,sidFor(view.date,view.k),view.date));
+  if(sg)card.querySelectorAll('input[data-f=w]').forEach(wi=>{wi.placeholder=sg.w(+wi.dataset.k)});
+  const el=card.querySelector('.sug');if(el)el.innerHTML=sugText(x,sg);
 }
 
 function renderHeader(){
@@ -303,7 +331,8 @@ function renderToday(){
   const day=p.days.find(d=>d.k===view.k),c=dayColor(view.k),dn=day?day.n:(saved&&saved.dn)||'Workout';
   let h=`<div class="chips">${p.days.map(d=>`<button class="chip${S.sessions[sidFor(view.date,d.k)]?' done':''}" style="--c:${d.c}" data-s="${esc(d.k)}" aria-pressed="${d.k===view.k}">${esc(d.n)}</button>`).join('')}</div>
   <div class="head"><div><h2>${esc(dn)}</h2><div class="meta">${p.periodize?`Week ${wk} · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}`:`Week ${W}`}${view.k===nextDay()&&!saved?' · up next':''}${saved&&saved.dur?` · ${saved.dur} min`:''}</div></div>
-  <input type="date" id="wdate" value="${view.date}" aria-label="Workout date"></div>`;
+  <input type="date" id="wdate" value="${view.date}" aria-label="Workout date"></div>
+  <p class="meta" style="margin:-4px 0 12px">RPE is how hard a set felt: 10 = no reps left, 9 = 1 left, 8 = 2 left. Leave weight blank to use the suggestion.</p>`;
   if(!P.length){$('#main').innerHTML=h+(p.periodize&&wk===15?`<div class="empty">Test week: no lifting on this day. Do light cardio or technique work.</div>`:`<div class="empty">No exercises on this day yet. Add some in the Program tab.</div>`);return}
   h+=P.map((x,i)=>{
     const sv=(saved&&saved.ex&&(saved.ex[x.n]||(x.orig&&saved.ex[x.orig])))||[],dr=(draft[id]||{})[x.n]||[];
@@ -314,17 +343,20 @@ function renderToday(){
       const hitTop=tr&&!x.test&&!x.note&&last.sets.length>=x.sets&&last.sets.every(s=>s.r>=tr);
       const inc=u==='kg'?(LOWER.test(x.n)?5:2.5):(LOWER.test(x.n)?10:5);
       hint=hitTop?`<div class="hint up">Last (${fmtD(last.date)}): ${esc(lw)}. You hit the top of the range: add ${inc} ${u}.</div>`:`<div class="hint">Last (${fmtD(last.date)}): ${esc(lw)}</div>`}
-    const pw=last&&last.sets[0]?last.sets[0].w:'',pr=String(x.reps).match(/\d+/);
-    let rows='';for(let k=0;k<n;k++){const w=dr[k]&&dr[k].w!=null?dr[k].w:(sv[k]?sv[k].w:''),r=dr[k]&&dr[k].r!=null?dr[k].r:(sv[k]?sv[k].r:'');
-      rows+=`<div class="n">${k+1}</div><input inputmode="decimal" aria-label="Set ${k+1} weight" data-i="${i}" data-k="${k}" data-f="w" value="${esc(w)}" placeholder="${esc(pw)}"><input inputmode="numeric" aria-label="Set ${k+1} reps" data-i="${i}" data-k="${k}" data-f="r" value="${esc(r)}" placeholder="${pr?pr[0]:''}">`}
+    const pw=last&&last.sets[0]?last.sets[0].w:'';
+    const val=(k,f)=>dr[k]&&dr[k][f]!=null?dr[k][f]:(sv[k]&&sv[k][f]!=null?sv[k][f]:'');
+    const todaySets=[];for(let k=0;k<n;k++){const w=val(k,'w'),r=val(k,'r');if(w!==''&&+r>0)todaySets.push({w,r,e:val(k,'e'),t:rpeFor(x)})}
+    const sg=suggest(x,todaySets,last);
+    let rows='';for(let k=0;k<n;k++){
+      rows+=`<div class="n">${k+1}</div><input inputmode="decimal" aria-label="Set ${k+1} weight" data-i="${i}" data-k="${k}" data-f="w" value="${esc(val(k,'w'))}" placeholder="${esc(sg?sg.w(k):pw)}"><input inputmode="numeric" aria-label="Set ${k+1} reps" data-i="${i}" data-k="${k}" data-f="r" value="${esc(val(k,'r'))}" placeholder="${repsFor(x,k)||''}"><input inputmode="decimal" aria-label="Set ${k+1} RPE" data-i="${i}" data-k="${k}" data-f="e" value="${esc(val(k,'e'))}" placeholder="${repsFor(x,0)?rpeFor(x):''}">`}
     const base=x.orig||x.n,opts=alts(base).filter(o=>o!==x.n);
     const panel=view.swap===i?`<div class="swap"><label for="swsel" style="margin-top:0">Replace ${esc(x.n)} with</label><select id="swsel">${opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>
       <input id="swcustom" maxlength="60" placeholder="Or type your own exercise" aria-label="Custom exercise name">
       <div class="row"><button class="btn primary" data-swapgo="${i}">Use it</button>${x.orig?`<button class="btn" data-swapreset="${i}">Back to ${esc(x.orig)}</button>`:''}<button class="btn" data-swapcancel="1">Cancel</button></div>
       <div class="meta" style="margin-top:8px">Changes this exercise in every ${esc(dn)} workout. Past logs stay as they are.</div></div>`:'';
-    const tgt=x.reps?`<span class="tgt">${x.sets} × ${esc(x.reps)}</span>${x.rpe?' @ RPE '+x.rpe:''}`:'<span class="tgt">Extra exercise</span>';
+    const tgt=x.reps?`<span class="tgt">${x.sets} × ${esc(x.reps)}</span> @ RPE ${rpeFor(x)}`:'<span class="tgt">Extra exercise</span>';
     return `<section class="card" data-card="${i}" style="--c:${c}"><div class="ch"><h3>${esc(x.n)}</h3>${x.extra?'':`<button class="pill" data-swap="${i}" aria-expanded="${view.swap===i}">Swap</button>`}</div><div class="meta">${tgt}${x.note?' · '+esc(x.note):''}${x.orig?' · swapped from '+esc(x.orig):''}</div>${panel}${hint}
-    <div class="sets"><span></span><span class="h">Weight (${u})</span><span class="h">Reps</span>${rows}</div><button class="small" data-add="${i}">+ Add set</button></section>`}).join('');
+    ${repsFor(x,0)?`<div class="sug">${sugText(x,sg)}</div>`:''}<div class="sets"><span></span><span class="h">Weight (${u})</span><span class="h">Reps</span><span class="h">RPE</span>${rows}</div><button class="small" data-add="${i}">+ Add set</button></section>`}).join('');
   h+=`<button class="save" id="save" style="--c:${c}">${saved?'Save':'Finish'} ${esc(dn)}</button><p class="note">${esc(flash||(autoAt?'Saves automatically as you type · last saved '+autoAt:'Saves automatically as you type'))}</p>`;
   $('#main').innerHTML=h;
 }
@@ -347,7 +379,7 @@ function editProg(fn){
 }
 
 function points(name){
-  return Object.values(S.sessions).filter(d=>d.ex&&d.ex[name]&&d.ex[name].length).map(d=>{let b=null;for(const x of d.ex[name]){const v=e1(+x.w||0,+x.r||0);if(!b||v>b.v)b={v,w:x.w,r:x.r}}return {date:d.date,...b}}).filter(p=>p.v>0).sort((a,b)=>a.date<b.date?-1:1);
+  return Object.values(S.sessions).filter(d=>d.ex&&d.ex[name]&&d.ex[name].length).map(d=>{let b=null;for(const x of d.ex[name]){const v=estSet(x);if(!b||v>b.v)b={v,w:x.w,r:x.r}}return {date:d.date,...b}}).filter(p=>p.v>0).sort((a,b)=>a.date<b.date?-1:1);
 }
 function renderProgress(){
   const names={};for(const d of Object.values(S.sessions))for(const n in (d.ex||{}))names[n]=(names[n]||0)+1;
@@ -399,6 +431,8 @@ function renderSettings(){
   <label class="check"><input type="checkbox" id="tsound"${t.sound?' checked':''}> Beep and vibrate when rest is over</label>
   <div class="row" style="gap:12px"><div style="flex:1"><label for="trest">Rest between sets (seconds)</label><input type="number" id="trest" min="15" max="600" value="${t.rest}"></div>
   <div style="flex:1"><label for="tmain">Rest after first lift of the day (seconds)</label><input type="number" id="tmain" min="15" max="900" value="${t.main}"></div></div></div>
+  <div class="sec"><h2>Effort (RPE)</h2><p class="meta">Weight suggestions use your estimated 1-rep max and each set's target RPE. Programs without RPE targets use this one.</p>
+  <label for="rpedef">Default target RPE</label><select id="rpedef">${[6,6.5,7,7.5,8,8.5,9,9.5,10].map(v=>`<option value="${v}"${v===defRpe()?' selected':''}>RPE ${v}${v===10?' (no reps left)':v===8?' (2 reps left)':''}</option>`).join('')}</select></div>
   <div class="sec"><h2>Program</h2><p class="meta">Current: ${esc(p.name)}</p>
   ${p.ppl?'':`<label class="check"><input type="checkbox" id="per"${p.periodize?' checked':''}> Use 15-week plateau-breaking blocks</label>`}
   <label for="start">Program start date (Week 1)</label><input type="date" id="start" value="${startISO()}">
@@ -461,6 +495,7 @@ $('#main').addEventListener('input',e=>{const t=e.target;
     clearTimeout(asTimer);asTimer=setTimeout(autosave,1200)}
 });
 $('#main').addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.f&&view.tab==='today'){const card=t.closest('.card[data-card]');if(card)refreshSug(card)}
   if(t.dataset.f==='r'&&+t.value>0&&tm().auto){startRest(+t.dataset.i===0?tm().main:tm().rest)}
   if(t.id==='wdate'&&t.value){flush();view.date=t.value;view.swap=null;render()}
   if(t.id==='lift'){view.lift=t.value;render()}
@@ -471,6 +506,7 @@ $('#main').addEventListener('change',e=>{const t=e.target;
   if(t.id==='per')editProg(p=>{p.periodize=t.checked});
   if(t.id==='start'&&t.value){putProfile({start:t.value})}
   if(t.id==='unit')putProfile({unit:t.value});
+  if(t.id==='rpedef')putProfile({rpeDef:+t.value});
   if(['tauto','tsound','trest','tmain'].includes(t.id)){const x=tm();x.auto=$('#tauto').checked;x.sound=$('#tsound').checked;x.rest=Math.min(600,Math.max(15,+$('#trest').value||90));x.main=Math.min(900,Math.max(15,+$('#tmain').value||180));putProfile({timer:x})}
 });
 $('#main').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;unfocus();
