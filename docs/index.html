@@ -139,6 +139,11 @@ label{display:block;font-weight:600;margin:14px 0 6px}
 @media(prefers-reduced-motion:no-preference){.chip{transition:background .15s}.tbar{transition:background .3s}}
 
 /* ---------- polish pass ---------- */
+.startbtn{width:100%;min-height:54px;margin:0 0 12px;border:0;border-radius:14px;background:var(--c);color:#fff;font:800 22px "Barlow Condensed",Barlow,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.stp.live{background:light-dark(#e3f5ec,#143323);color:light-dark(#135c38,#8fe0b6);border-color:transparent;display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.stp .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:none}
+@media(prefers-reduced-motion:no-preference){.stp .dot{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{opacity:.3}}}
+.livetag{color:var(--ok)}
 body{font-family:Barlow,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif}
 header{padding:14px max(4vw,14px) 12px}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -310,7 +315,7 @@ const estSet=x=>e1(+x.w||0,+x.r||0,+x.e||+x.t||10);
 
 let S={profile:null,sessions:{}};
 let mode='local',profRef=null,loaded=false,slow=false,booting=!!(window.claude&&window.claude.use),status='Saved on this device.';
-let view={tab:'today',date:null,k:null,swap:null},draft={},extra={},armed=null,pendingRender=false,flash='',wStart={};
+let view={tab:'today',date:null,k:null,swap:null},draft={},extra={},armed=null,pendingRender=false,flash='';
 const LK='liftlog.v1';
 try{const j=JSON.parse(localStorage.getItem(LK)||'null');if(j){S.profile=j.profile||null;S.sessions=j.sessions||{}}}catch(e){}
 const saveLocal=()=>{try{localStorage.setItem(LK,JSON.stringify(S))}catch(e){}};
@@ -405,10 +410,24 @@ function collect(){
 }
 function sessionDoc(ex){
   const id=sidFor(view.date,view.k),old=S.sessions[id],W=wOf(view.date),day=prog().days.find(d=>d.k===view.k);
-  const start=(old&&old.start)||wStart[id]||null,isToday=view.date===iso(today());
-  let dur=old&&old.dur;if(start&&isToday&&Date.now()-start<5*36e5)dur=Math.max(1,Math.round((Date.now()-start)/6e4));
   const doc={date:view.date,W,wk:wkOf(W),s:view.k,dn:day?day.n:(old&&old.dn)||view.k,ex,updated:Date.now()};
-  if(start)doc.start=start;if(dur)doc.dur=dur;const rt=readyToday();if(rt)doc.rd={sl:rt.sl,so:rt.so,en:rt.en};return [id,doc];
+  if(old){for(const f of ['start','end','dur','live'])if(old[f]!=null)doc[f]=old[f]}
+  doc.act=old&&JSON.stringify(old.ex||{})===JSON.stringify(ex)?(old.act||old.updated||Date.now()):Date.now();const rt=readyToday();if(rt)doc.rd={sl:rt.sl,so:rt.so,en:rt.en};return [id,doc];
+}
+const liveSess=()=>Object.entries(S.sessions).find(([k,d])=>d.live===true);
+async function startWorkout(){
+  flush();const now=Date.now(),id=sidFor(view.date,view.k),old=S.sessions[id],W=wOf(view.date),day=prog().days.find(d=>d.k===view.k);
+  const other=liveSess();if(other&&other[0]!==id)await endSession(other[0],other[1]);
+  const doc=Object.assign({date:view.date,W,wk:wkOf(W),s:view.k,dn:day?day.n:view.k,ex:{}},old||{},{start:now,live:true,updated:now});delete doc.end;delete doc.dur;
+  const rt=readyToday();if(rt)doc.rd={sl:rt.sl,so:rt.so,en:rt.en};
+  flash='';await putSession(id,doc);
+}
+async function endSession(id,d){
+  const now=Date.now(),hasSets=d.ex&&Object.keys(d.ex).length;
+  if(!hasSets){await delSession(id);return 0}
+  const last=d.act||d.updated||now,end=now-last>30*6e4?Math.min(now,last+5*6e4):now;
+  const doc=Object.assign({},d,{live:false,end,dur:Math.max(1,Math.round((end-d.start)/6e4))});
+  await putSession(id,doc);return doc.dur;
 }
 let asTimer=null;
 function autosave(){asTimer=null;if(view.tab!=='today'||!document.querySelector('#main .card[data-card]'))return;const ex=collect();if(!Object.keys(ex).length)return;const [id,doc]=sessionDoc(ex),old=S.sessions[id];
@@ -574,7 +593,10 @@ function renderToday(){
   {const td=today().getDay(),cw=wOf(iso(today())),rw=td===0?cw:cw-1;if((td===0||td===1)&&rw>=1&&isToday&&Object.values(S.sessions).some(d=>wOf(d.date)===rw))st.push(`<button class="stp good" data-report="${rw}">Week ${prog().periodize?wkOf(rw):rw} report ready →</button>`)}
   const act=Object.entries(pains()).filter(([k,v])=>v&&v.lvl>0).sort((a,b)=>b[1].lvl-a[1].lvl);
   if(act.length)st.push(`<button class="stp pain" data-gobody="1">${act.map(([k,v])=>esc(painLabel(k)[0].toUpperCase()+painLabel(k).slice(1))+' '+v.lvl+'/10').join(', ')} · adjusted →</button>`);
+  const live=saved&&saved.live===true;
+  if(live){const age=Date.now()-saved.start;st.unshift(`<button class="stp live" data-wend="1"><span class="dot"></span><span id="wlive">${age>4*36e5?`Started ${Math.floor(age/36e5)}h ago, still going?`:'In progress '+mmss(age/1000)}</span> · ${armed==='wend'?'tap again to end':'End'}</button>`)}
   if(st.length)h+=`<div class="status">${st.join('')}</div>`;
+  if(isToday&&!live&&!(saved&&saved.end)&&P.some(z=>!z.skip))h+=`<button class="startbtn" data-wstart="1" style="--c:${c}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>${saved?'Start timing this workout':'Start workout'}</button>`;
   if(!P.length){$('#main').innerHTML=h+(p.periodize&&wk===15?`<div class="empty">Test week: no lifting on this day. Do light cardio or technique work.</div>`:`<div class="empty">No exercises on this day yet. Add some in the Program tab.</div>`);return}
   if(isToday&&!rt&&!view.rdSkip){const r=view.rd||{};
     h+=`<section class="card ready" style="--c:${c}"><h3>How ready are you today?</h3><p class="meta" style="margin:2px 0 0">Your targets and suggested weights adjust to how you feel.</p>${[['sl','Sleep','bad','great'],['so','Soreness','very sore','fresh'],['en','Energy','drained','fired up']].map(([k,l,lo,hi])=>`<div class="rq"><b>${l}</b><div class="scale">${[1,2,3,4,5].map(v=>`<button data-rk="${k}" data-rv="${v}" aria-pressed="${r[k]===v}" aria-label="${l} ${v}">${v}</button>`).join('')}</div><span class="meta">1 = ${lo} · 5 = ${hi}</span></div>`).join('')}
@@ -613,7 +635,8 @@ function renderToday(){
     ${repsFor(x,0)?`<div class="sug">${sugText(x,sg)}${prLine(x,sg,i)}</div>`:''}${!dl&&!x.test&&!x.extra&&!todaySets.length?warmHTML(x,i,sg,pw,id,i===firstBar):''}<div class="sets"><span></span><span class="h">Weight (${u})</span><span class="h">Reps</span><span class="h">RPE</span>${rows}</div>${g?`<div class="glab">Ghost = ${esc(g.lab)}</div>`:''}<button class="small" data-add="${i}">+ Add set</button></section>`}).join('');
   h+=`<details class="tip"><summary>How RPE and suggestions work</summary><p>RPE is how hard a set felt: 10 = no reps left, 9 = 1 left, 8 = 2 left. Suggested weights come from your estimated max and each set's target RPE, and update as you log. Leave weight blank to use the suggestion.</p></details>`;
   if(gw+gl+gt)h+=`<p class="race">Ghost race: ${gw} won · ${gt} tied · ${gl} behind</p>`;
-  h+=`<button class="save" id="save" style="--c:${c}">${saved?'Save':'Finish'} ${esc(dn)}</button><p class="note">${esc(flash||(autoAt?'Saves automatically as you type · last saved '+autoAt:'Saves automatically as you type'))}</p>`;
+  h+=live?`<button class="save" data-wend="2" style="--c:${c}">End workout${armed==='wend2'?': tap again to confirm':''}</button>`:`<button class="save" id="save" style="--c:${c}">Save ${esc(dn)}</button>`;
+  h+=`<p class="note">${esc(flash||(autoAt?'Saves automatically as you type · last saved '+autoAt:'Saves automatically as you type'))}</p>`;
   $('#main').innerHTML=h;
 }
 
@@ -674,7 +697,7 @@ function renderProgress(){
   const pts=points(view.lift),u=unit();
   const top=list.filter(n=>points(n).length).slice(0,6);
   const prs=top.map(n=>{const p=points(n).reduce((a,b)=>b.v>a.v?b:a);return `<div class="pr"><span>${esc(n)}</span><b>${Math.round(p.v)} ${u}</b><span>est. 1RM · ${esc(p.w)}×${esc(p.r)}</span></div>`}).join('');
-  const sess=Object.values(S.sessions),wk7=sess.filter(d=>(today()-new Date(d.date+'T00:00'))/864e5<7).length,mins=sess.reduce((a,d)=>a+(d.dur||0),0);
+  const sess=Object.values(S.sessions).filter(d=>Object.keys(d.ex||{}).length),wk7=sess.filter(d=>(today()-new Date(d.date+'T00:00'))/864e5<7).length,mins=sess.reduce((a,d)=>a+(d.dur||0),0);
   if(!view.rw)view.rw=wOf(iso(today()));
   $('#main').innerHTML=reportHTML(view.rw)+`<h2 style="margin:22px 0 0">All time</h2><div class="prs"><div class="pr"><span>Workouts logged</span><b>${sess.length}</b><span>${wk7} in the last 7 days</span></div><div class="pr"><span>Time trained</span><b>${Math.floor(mins/60)}h ${mins%60}m</b><span>from the workout clock</span></div></div>
   ${prs?`<h2 style="margin:16px 0 0">Best estimated 1-rep maxes</h2><div class="prs">${prs}</div>`:''}
@@ -701,11 +724,11 @@ function mountChart(pts){
 }
 
 function renderHistory(){
-  const rows=Object.entries(S.sessions).sort((a,b)=>a[1].date<b[1].date?1:a[1].date>b[1].date?-1:(b[1].updated||0)-(a[1].updated||0));
+  const rows=Object.entries(S.sessions).filter(([k,d])=>d.live||Object.keys(d.ex||{}).length).sort((a,b)=>a[1].date<b[1].date?1:a[1].date>b[1].date?-1:(b[1].updated||0)-(a[1].updated||0));
   if(!rows.length){$('#main').innerHTML=`<div class="empty">No workouts logged yet.</div>`;return}
   $('#main').innerHTML=rows.map(([id,d])=>{const sets=Object.values(d.ex||{}).flat(),vol=sets.reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0);
     const nm=d.dn||(SESS[d.s]?SESS[d.s][0]:d.s);
-    return `<div class="hist" style="--c:${dayColor(d.s)}"><div><b>${esc(nm)}</b><div class="meta">${fmtD(d.date)} · ${sets.length} sets · ${Math.round(vol).toLocaleString()} ${unit()}${d.dur?' · '+d.dur+' min':''}</div></div>
+    return `<div class="hist" style="--c:${dayColor(d.s)}"><div><b>${esc(nm)}</b><div class="meta">${d.live?'<b class="livetag">In progress</b> · ':''}${fmtD(d.date)} · ${sets.length} set${sets.length===1?'':'s'} · ${Math.round(vol).toLocaleString()} ${unit()}${d.dur?' · '+d.dur+' min':''}</div></div>
     <button class="btn" data-open="${esc(id)}">Open</button><button class="btn danger" data-del="${esc(id)}">${armed===id?'Confirm':'Delete'}</button></div>`}).join('');
 }
 
@@ -765,7 +788,7 @@ function tick(){
   if(running){const left=(T.end-now)/1000;$('#tleft').textContent=mmss(Math.ceil(left));$('#twhy').textContent=T.why;$('#tfill').style.width=Math.max(0,Math.min(100,left/T.dur*100))+'%'}
   let clock='Rest timer';
   if(alarm)clock='Rest over. Next set!';
-  else if(view.tab==='today'&&view.date===iso(today())&&view.k){const id=sidFor(view.date,view.k),st=(S.sessions[id]&&S.sessions[id].start)||wStart[id];if(st&&now-st<5*36e5)clock='Workout '+mmss((now-st)/1000)}
+  else{const L=liveSess();if(L){const age=now-L[1].start;clock=age>4*36e5?'Workout running '+Math.floor(age/36e5)+'h+':'Workout '+mmss(age/1000);const wl=document.getElementById('wlive');if(wl&&age<=4*36e5)wl.textContent='In progress '+mmss(age/1000)}}
   const wc=$('#wclock');if(wc.textContent!==clock)wc.textContent=clock;
   bar.hidden=needsSetup()||(!running&&!alarm&&view.tab!=='today');
 }
@@ -787,7 +810,6 @@ document.querySelector('.gear').addEventListener('click',()=>{unfocus();flush();
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;window.scrollTo(0,0);unfocus();flush();view.swap=null;view.tab=b.dataset.tab;armed=null;flash='';render()});
 $('#main').addEventListener('input',e=>{const t=e.target;
   if(t.dataset.f&&view.tab==='today'){const P=curPlan(),id=sidFor(view.date,view.k),n=P[+t.dataset.i].n;const d=(draft[id]=draft[id]||{}),a=(d[n]=d[n]||[]);a[+t.dataset.k]=Object.assign({},a[+t.dataset.k],{[t.dataset.f]:t.value});
-    if(!wStart[id]&&!(S.sessions[id]&&S.sessions[id].start)&&view.date===iso(today()))wStart[id]=Date.now();
     clearTimeout(asTimer);asTimer=setTimeout(autosave,1200)}
 });
 $('#main').addEventListener('change',e=>{const t=e.target;
@@ -817,6 +839,12 @@ $('#main').addEventListener('click',async e=>{
   if(b.dataset.pdone){view.painSel=null;render();return}
   if(b.dataset.pedit){view.painSel=b.dataset.pedit;render();return}
   if(b.dataset.pclear){if(view.painSel===b.dataset.pclear)view.painSel=null;await setPain(b.dataset.pclear,0);return}
+  if(b.dataset.wstart){await startWorkout();return}
+  if(b.dataset.wend){const key=b.dataset.wend==='2'?'wend2':'wend';if(armed!==key){armed=key;render();return}
+    armed=null;clearTimeout(asTimer);asTimer=null;const id=sidFor(view.date,view.k),ex=collect();
+    if(Object.keys(ex).length){const [,doc]=sessionDoc(ex);S.sessions[id]=doc}
+    const d=S.sessions[id];delete draft[id];delete extra[id];T.end=0;
+    const dur=d?await endSession(id,d):0;flash=dur?`Workout saved · ${dur} min`:'Workout ended. No sets were logged, so nothing was saved.';render();window.scrollTo(0,0);return}
   if(b.dataset.wnav){flush();const d=new Date(view.date+'T00:00');d.setDate(d.getDate()+(+b.dataset.wnav));view.date=iso(d);view.swap=null;render();return}
   if(b.dataset.wtoday){flush();view.date=iso(today());view.k=null;view.swap=null;render();return}
   if(b.dataset.rw){view.rw=Math.max(1,+b.dataset.rw);render();return}
