@@ -10,8 +10,8 @@ android {
         applicationId = "com.nheil.liftlog"
         minSdk = 26
         targetSdk = 34
-        versionCode = 12
-        versionName = "3.2"
+        versionCode = 13
+        versionName = "3.3"
     }
 
     // One fixed key so every new build installs over the old one (keeps your data).

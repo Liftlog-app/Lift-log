@@ -24,3 +24,7 @@ iPhones can't install the APK. Use the web version instead:
 3. Open Lift Log from the new icon. It runs full screen and saves workouts on the phone.
 
 The web version lives in the `docs` folder (served by GitHub Pages from `main` / `docs`).
+
+## Credits
+
+Exercise photos come from [Free Exercise DB](https://github.com/yuhonas/free-exercise-db), released into the public domain (Unlicense).

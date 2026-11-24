@@ -131,6 +131,15 @@ label{display:block;font-weight:600;margin:14px 0 6px}
 @media(prefers-reduced-motion:no-preference){.chip{transition:background .15s}.tbar{transition:background .3s}}
 
 /* ---------- polish pass ---------- */
+.thumb{width:56px!important;height:56px!important;padding:0!important;overflow:hidden}
+.thumb .ph{display:block;width:100%;height:100%;object-fit:cover}
+.thumb .xfig{padding:3px}
+.cmp .big{aspect-ratio:4/3!important;max-width:170px!important;padding:0!important;overflow:hidden;position:relative}
+.cmp .big .xfig{padding:6px}
+.phanim{position:absolute;inset:0}
+.phanim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media(prefers-reduced-motion:no-preference){.phanim .f2{animation:frame 2.6s ease-in-out infinite}@keyframes frame{0%,40%{opacity:0}50%,90%{opacity:1}100%{opacity:0}}}
+@media(prefers-reduced-motion:reduce){.phanim .f2{display:none}}
 main{padding-bottom:110px!important}body.timing main{padding-bottom:190px!important}
 .tidle .wclock{font:800 22px "Barlow Condensed",Barlow,sans-serif;color:#fff}
 .xfig{display:block;width:100%;height:100%;color:var(--ink)}
@@ -594,6 +603,10 @@ function figSVG(n,cls){
     else if(f==='Q')out.push(`<rect x="${a[0]}" y="${a[1]}" width="${a[2]}" height="${a[3]}" rx="1.5" class="pl"/>`);}
   return `<svg viewBox="0 0 64 64" class="xfig${cls?' '+cls:''}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">${out.join('')}</g></svg>`;
 }
+const PHOTOS={"Bench press":"Barbell_Bench_Press_-_Medium_Grip","DB bench press":"Dumbbell_Bench_Press","Incline DB press":"Incline_Dumbbell_Press","Incline barbell press":"Barbell_Incline_Bench_Press_-_Medium_Grip","Close-grip bench":"Close-Grip_Barbell_Bench_Press","Floor press":"Floor_Press","Neutral-grip DB press":"Dumbbell_Bench_Press_with_Neutral_Grip","Machine chest press":"Leverage_Chest_Press","Push-up (weighted)":"Pushups","Diamond push-up":"Push-Ups_-_Close_Triceps_Position","Weighted dips":"Dips_-_Chest_Version","Cable fly":"Cable_Crossover","DB fly":"Dumbbell_Flyes","Pec deck":"Butterfly","Overhead press":"Standing_Military_Press","Seated DB shoulder press":"Dumbbell_Shoulder_Press","Arnold press":"Arnold_Dumbbell_Press","Machine shoulder press":"Leverage_Shoulder_Press","Landmine press":"Landmine_Linear_Jammer","DB lateral raise":"Side_Lateral_Raise","Cable lateral raise":"Cable_Seated_Lateral_Raise","Machine lateral raise":"Side_Lateral_Raise","Upright row (wide grip)":"Standing_Dumbbell_Upright_Row","Face pull":"Face_Pull","Reverse pec deck":"Reverse_Machine_Flyes","Rear-delt DB fly":"Reverse_Flyes","Band pull-apart":"Band_Pull_Apart","DB shrug":"Dumbbell_Shrug","Triceps pushdown":"Triceps_Pushdown","Rope pushdown":"Triceps_Pushdown_-_Rope_Attachment","Overhead triceps extension":"Cable_Rope_Overhead_Triceps_Extension","Skull crusher":"EZ-Bar_Skullcrusher","Barbell curl":"Barbell_Curl","EZ-bar curl":"EZ-Bar_Curl","Hammer curl":"Hammer_Curls","Incline DB curl":"Incline_Dumbbell_Curl","Cable curl":"Standing_Biceps_Cable_Curl","Preacher curl":"Preacher_Curl","Barbell row":"Bent_Over_Barbell_Row","Pendlay row":"Bent_Over_Barbell_Row","T-bar row":"T-Bar_Row_with_Handle","Seated cable row":"Seated_Cable_Rows","Chest-supported DB row":"Lying_T-Bar_Row","Single-arm DB row":"One-Arm_Dumbbell_Row","Machine row":"Leverage_Iso_Row","Pull-up (weighted)":"Weighted_Pull_Ups","Chin-up":"Chin-Up","Assisted pull-up":"Band_Assisted_Pull-Up","Lat pulldown":"Wide-Grip_Lat_Pulldown","Neutral-grip pulldown":"V-Bar_Pulldown","Back squat":"Barbell_Squat","Pause squat":"Barbell_Squat","Safety-bar squat":"Barbell_Squat","Front squat":"Front_Barbell_Squat","Goblet squat":"Goblet_Squat","Box squat (pain-free depth)":"Box_Squat","Hack squat":"Hack_Squat","Leg press":"Leg_Press","Bulgarian split squat (each leg)":"Split_Squat_with_Dumbbells","Walking lunge":"Barbell_Walking_Lunge","Sissy squat":"Weighted_Sissy_Squat","Spanish squat (isometric hold)":"Bodyweight_Squat","Spanish squat":"Bodyweight_Squat","Deadlift":"Barbell_Deadlift","Romanian deadlift":"Romanian_Deadlift","Trap-bar deadlift":"Trap_Bar_Deadlift","Rack pull":"Rack_Pulls","Good morning":"Good_Morning","Hip thrust":"Barbell_Hip_Thrust","Barbell glute bridge":"Barbell_Glute_Bridge","Leg curl":"Lying_Leg_Curls","Seated leg curl":"Seated_Leg_Curl","Nordic curl":"Natural_Glute_Ham_Raise","Stability-ball leg curl":"Ball_Leg_Curl","Leg extension":"Leg_Extensions","Standing calf raise":"Standing_Calf_Raises","Seated calf raise":"Seated_Calf_Raise","Leg-press calf raise":"Calf_Press_On_The_Leg_Press_Machine","Single-leg calf raise":"Standing_Dumbbell_Calf_Raise","Hanging leg raise":"Hanging_Leg_Raise","Cable crunch":"Cable_Crunch","Decline crunch":"Decline_Crunch","Ab wheel rollout":"Ab_Roller","Plank":"Plank"};
+function exPic(n,big){const id=PHOTOS[n];if(!id)return figSVG(n);const f=`img/ex/${id}-0.jpg`;
+  return big?`<div class="phanim" data-fb="${esc(n)}"><img src="${f}" alt="${esc(n)}, start position" loading="lazy"><img class="f2" src="img/ex/${id}-1.jpg" alt="${esc(n)}, end position" loading="lazy"></div>`:`<img class="ph" src="${f}" alt="" loading="lazy" data-fb="${esc(n)}">`}
+document.addEventListener('error',e=>{const t=e.target;if(!t||t.tagName!=='IMG')return;const box=t.closest('.phanim')||t;const n=box.dataset.fb;if(n&&box.isConnected){const d=document.createElement('div');d.innerHTML=figSVG(n);box.replaceWith(d.firstChild)}},true);
 function equipOf(n){if(/\bDB\b|dumbbell/i.test(n))return 'Dumbbells';if(/landmine|t-bar/i.test(n))return 'Landmine';if(/trap-bar/i.test(n))return 'Trap bar';if(/band/i.test(n))return 'Band';if(/cable|rope|pushdown|face pull|pulldown|crunch/i.test(n))return 'Cable';if(/machine|pec deck|leg press|leg curl|leg extension|hack|seated calf|leg-press/i.test(n))return 'Machine';if(/pull-up|chin|dips|push-up|hanging|nordic|plank|ab wheel|sissy|spanish/i.test(n))return 'Bodyweight';if(isBarbell(n))return 'Barbell';return ''}
 function refreshCard(card){
   const i=+card.dataset.card,x0=curPlan()[i];if(!x0)return;const id=sidFor(view.date,view.k),key=id+'|'+x0.n;
@@ -680,8 +693,8 @@ function renderToday(){
     const base=x.orig||x.n,opts=alts(base).filter(o=>o!==x.n);
     let panel='';
     if(view.swap===i){const pick=view.swapPick&&opts.includes(view.swapPick)?view.swapPick:opts[0],open=!!view.ddOpen;
-      const row=(o,tag)=>`<span class="thumb">${figSVG(o)}</span><span class="ddtext"><b>${esc(o)}</b><span class="meta">${esc(equipOf(o)||'Exercise')}</span></span>${tag||''}`;
-      panel=`<div class="swap"><div class="cmp"><figure><div class="big">${figSVG(x.n)}</div><figcaption>Now: ${esc(x.n)}</figcaption></figure><span class="arrow" aria-hidden="true">→</span><figure><div class="big">${figSVG(pick)}</div><figcaption>New: ${esc(pick)}</figcaption></figure></div>
+      const row=(o,tag)=>`<span class="thumb">${exPic(o)}</span><span class="ddtext"><b>${esc(o)}</b><span class="meta">${esc(equipOf(o)||'Exercise')}</span></span>${tag||''}`;
+      panel=`<div class="swap"><div class="cmp"><figure><div class="big">${exPic(x.n,1)}</div><figcaption>Now: ${esc(x.n)}</figcaption></figure><span class="arrow" aria-hidden="true">→</span><figure><div class="big">${exPic(pick,1)}</div><figcaption>New: ${esc(pick)}</figcaption></figure></div>
       <div class="ddwrap"><button class="dd" data-ddtoggle="1" aria-expanded="${open}" aria-haspopup="listbox" aria-label="Replacement exercise: ${esc(pick)}">${row(pick,'<svg class="chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')}</button>
       ${open?`<div class="ddlist" role="listbox" aria-label="Replacement exercises">${opts.map(o=>`<button role="option" aria-selected="${o===pick}" data-ddpick="${esc(o)}">${row(o,o===pick?'<span class="tick" aria-hidden="true">✓</span>':'')}</button>`).join('')}</div>`:''}</div>
       <input id="swcustom" maxlength="60" placeholder="Or type your own exercise" aria-label="Custom exercise name">
@@ -812,7 +825,8 @@ function renderSettings(){
   <div class="sec"><h2>Backup</h2><p class="meta">Copy your data and keep it somewhere safe, or paste a backup to restore it.</p>
   <button class="btn" id="copy">Copy all data</button><textarea id="io" aria-label="Backup data" placeholder="Paste a backup here to restore it"></textarea>
   <button class="btn" id="imp" style="margin-top:8px">${armed==='imp'?'Confirm restore':'Restore from pasted backup'}</button></div>
-  <p class="meta" style="margin-top:18px">${esc(slow?'Your saved data can\'t be reached yet; showing what is on this device.':status)}${flash?' · '+esc(flash):''}</p>`;
+  <p class="meta" style="margin-top:18px">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db">Free Exercise DB</a> (public domain).</p>
+  <p class="meta" style="margin-top:6px">${esc(slow?'Your saved data can\'t be reached yet; showing what is on this device.':status)}${flash?' · '+esc(flash):''}</p>`;
 }
 
 function render(){
