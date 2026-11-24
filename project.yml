@@ -16,8 +16,8 @@ targets:
       path: ios/LiftLog/Info.plist
       properties:
         CFBundleDisplayName: Lift Log
-        CFBundleShortVersionString: "2.4"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: "2.5"
+        CFBundleVersion: "2"
         UILaunchScreen:
           UIColorName: ""
         UIStatusBarStyle: UIStatusBarStyleLightContent

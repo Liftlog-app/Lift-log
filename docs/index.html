@@ -88,6 +88,16 @@ textarea{min-height:110px;padding:10px;font:13px/1.4 ui-monospace,monospace}
 .pscale button{min-height:44px;border-radius:8px;border:2px solid var(--pc);background:var(--field);color:var(--ink);font:700 17px Barlow,sans-serif;cursor:pointer}
 .pscale button[aria-pressed=true]{background:var(--pc);color:#fff}
 @media(max-width:600px){.bodywrap{grid-template-columns:minmax(0,1fr)}.bodymap{max-width:300px;margin:0 auto;width:100%}}
+.wu{margin:8px 0 4px;border:1px solid var(--line);border-radius:8px;background:var(--field)}
+.wu summary{cursor:pointer;padding:10px 12px;font-weight:700;min-height:44px;display:flex;align-items:center}
+.wurow{display:flex;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);margin:0;font-weight:400;cursor:pointer}
+.wurow input{width:22px;min-height:22px;flex:none}
+.wurow input:checked+span{opacity:.5;text-decoration:line-through}
+.report{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.rhead{display:flex;align-items:center;gap:10px}.rhead>div{flex:1;text-align:center}.rhead h2{margin:0;font-size:26px}.rhead .btn{width:48px;padding:0;font-size:22px}
+.report .pr{background:var(--field)}
+.focus{margin:0;padding-left:20px}.focus li{margin:4px 0}
+td.up{color:var(--ok);font-weight:700}td.down{color:var(--push);font-weight:700}
 .swap{margin:10px 0;padding:12px;border-radius:8px;background:var(--field);border:1px solid var(--line)}
 .swap input{margin:8px 0}.swap .btn{background:var(--card)}.swap .btn.primary{background:var(--c);color:#fff}
 .save{width:100%;min-height:54px;border:0;border-radius:10px;background:var(--c,var(--ink));color:#fff;font:800 22px "Barlow Condensed",sans-serif;cursor:pointer}
@@ -387,7 +397,61 @@ function suggest(x,todaySets,last){
 function sugText(x,sg){const u=unit();
   if(!sg)return repsFor(x,0)?'Log a set (add its RPE if you can) and the rest get weight suggestions.':'';
   const multi=String(x.reps).includes(',');
-  return `Suggested: <b>${sg.w(0)} ${u}</b> × ${repsFor(x,0)}${multi?' (each set has its own target)':''} @ RPE ${rpeFor(x)} · est. 1RM ${Math.round(sg.est)} ${u} from ${sg.src==='today'?'today\'s sets':'your last workout'}`}
+  const pl=isBarbell(x.n)?`<br><span class="meta">Load: ${plateText(sg.w(0))}</span>`:'';
+  return `Suggested: <b>${sg.w(0)} ${u}</b> × ${repsFor(x,0)}${multi?' (each set has its own target)':''} @ RPE ${rpeFor(x)} · est. 1RM ${Math.round(sg.est)} ${u} from ${sg.src==='today'?'today\'s sets':'your last workout'}${pl}`}
+const isBarbell=n=>/bench press|squat|deadlift|overhead press|barbell|pendlay|rack pull|close-grip bench|good morning|floor press|hip thrust/i.test(n)&&!/\bDB\b|dumbbell|goblet|bulgarian|split|hack|sissy|spanish|machine|smith|landmine|trap-bar|leg press/i.test(n);
+const GEAR={lb:{bar:45,plates:[45,35,25,10,5,2.5]},kg:{bar:20,plates:[25,20,15,10,5,2.5,1.25]}};
+const gear=()=>Object.assign({},GEAR[unit()],((S.profile&&S.profile.gear)||{})[unit()]||{});
+function plateText(W){
+  const g=gear();W=+W;if(!(W>0))return '';
+  if(W<g.bar)return `Lighter than the ${g.bar} ${unit()} bar`;
+  let per=(W-g.bar)/2;if(per<1e-9)return 'Just the bar';
+  const out=[];for(const p of [...g.plates].sort((a,b)=>b-a)){while(per>=p-1e-9){out.push(p);per-=p}}
+  return `${out.length?out.join(' + '):'Nothing'} per side${per>0.01?` (${+(per*2).toFixed(2)} ${unit()} short: closest you can load)`:''}`;
+}
+function warmups(x,work){
+  const g=gear();work=+work;if(!isBarbell(x.n)||!(work>g.bar*1.2))return [];
+  const out=[[g.bar,10]];
+  for(const [f,r] of [[.4,5],[.6,3],[.8,2]]){const w=roundW(work*f);if(w>out[out.length-1][0]&&w<work)out.push([w,r])}
+  return out;
+}
+function warmHTML(x,i,sg,pw,id,open){
+  const work=sg?sg.w(0):pw,ws=warmups(x,work);if(!ws.length)return '';
+  return `<details class="wu"${open?' open':''}><summary>Warm-up: ${ws.length} sets up to ${work} ${unit()}</summary>${ws.map(([w,r],j)=>{const k=id+'|'+x.n+'|'+j;return `<label class="wurow"><input type="checkbox" data-wu="${esc(k)}"${view.wu&&view.wu[k]?' checked':''}><span><b>${w===gear().bar?'Bar':w+' '+unit()} × ${r}</b><span class="meta"> · ${plateText(w)}</span></span></label>`}).join('')}</details>`;
+}
+const weekStartISO=W=>{const d=new Date(startISO()+'T00:00');d.setDate(d.getDate()+(W-1)*7);return iso(d)};
+function weekReport(RW){
+  const all=Object.values(S.sessions).filter(d=>d.ex&&Object.keys(d.ex).length);
+  const inW=all.filter(d=>wOf(d.date)===RW),prev=all.filter(d=>wOf(d.date)===RW-1);
+  const ws=weekStartISO(RW),we=weekStartISO(RW+1);
+  const vol=a=>a.reduce((t,d)=>t+Object.values(d.ex).flat().reduce((x,q)=>x+(+q.w||0)*(+q.r||0),0),0);
+  const nsets=a=>a.reduce((t,d)=>t+Object.values(d.ex).flat().length,0);
+  const lifts=[...new Set(inW.flatMap(d=>Object.keys(d.ex)))].map(n=>{
+    const bt=Math.max(0,...inW.filter(d=>d.ex[n]).map(d=>bestEst(d.ex[n]))),bb=Math.max(0,...all.filter(d=>d.date<ws&&d.ex[n]).map(d=>bestEst(d.ex[n])));
+    return {n,bt,bb,pct:bb?(bt/bb-1)*100:null,stall:plateau(n,we)}}).filter(l=>l.bt>0);
+  const prs=lifts.filter(l=>l.bb&&l.bt>l.bb*1.005).sort((a,b)=>b.pct-a.pct);
+  const stalls=lifts.filter(l=>l.stall>=2).sort((a,b)=>b.stall-a.stall);
+  const rds=inW.filter(d=>d.rd).map(d=>(d.rd.sl+d.rd.so+d.rd.en)/3),rAvg=rds.length?rds.reduce((a,b)=>a+b,0)/rds.length:null;
+  const planned=prog().days.length,done=inW.length,v=vol(inW),pv=vol(prev),mins=inW.reduce((a,d)=>a+(d.dur||0),0);
+  const focus=[];
+  if(stalls.length){const l=stalls[0];focus.push(`${l.n} has stalled for ${l.stall} workouts. ${l.stall>=5?'Take the deload on it':l.stall===4?'Swap to a variation for a few weeks':l.stall===3?'Add a back-off set':'Use smaller jumps (2.5 lb / 1 kg)'}.`)}
+  if(rAvg!=null&&rAvg<3)focus.push(`Readiness averaged ${rAvg.toFixed(1)}/5. Sleep and food come first; if it stays low, deload early.`);
+  if(planned&&done<Math.min(planned,3))focus.push(`You logged ${done} of ${planned} workouts. Pick fixed days and aim for ${Math.min(planned,done+1)} next week.`);
+  const act=Object.entries(pains()).filter(([k,q])=>q&&q.lvl>=4);if(act.length)focus.push(`Your ${act.map(([k])=>painLabel(k)).join(' and ')} still hurt${act.length>1?'':'s'} (4+/10). Keep the swaps and update the Body tab as it improves.`);
+  if(prog().periodize){const nw=wkOf(RW+1);const msg={5:'Next week is a deload: half the sets, lighter weight. Let your body catch up.',6:'Next week the Strength block starts: heavier weight and 5×5 on main lifts.',10:'Next week is a deload before the Peak block.',11:'Next week the Peak block starts: low reps, heavy, fewer sets.',15:'Next week is test week: go for new 3-rep maxes.',1:'Next week a new cycle starts: back to Hypertrophy, using your new maxes.'}[nw];if(msg)focus.push(msg)}
+  if(prs.length&&!stalls.length)focus.push(`Momentum is good: ${prs.length} lift${prs.length>1?'s':''} hit a new best. Keep the same plan.`);
+  if(!focus.length)focus.push(done?'Steady week. Keep logging RPE so your suggestions stay accurate.':'No workouts logged this week yet.');
+  return {RW,ws,inW,done,planned,v,pv,sets:nsets(inW),mins,lifts,prs,stalls,rAvg,focus};
+}
+function reportHTML(RW){
+  const r=weekReport(RW),u=unit(),cur=wOf(iso(today()));
+  const vch=r.pv?Math.round((r.v/r.pv-1)*100):null;
+  const rows=r.lifts.sort((a,b)=>(b.pct??-999)-(a.pct??-999)).slice(0,6).map(l=>`<tr><td>${esc(l.n)}</td><td class="num">${Math.round(l.bt)} ${u}</td><td class="num ${l.pct==null?'':l.pct>0.5?'up':l.pct<-0.5?'down':''}">${l.pct==null?'first time':(l.pct>0?'+':'')+l.pct.toFixed(1)+'%'}</td></tr>`).join('');
+  return `<section class="report"><div class="rhead"><button class="btn" data-rw="${RW-1}" aria-label="Previous week"${RW<=1?' disabled':''}>‹</button><div><h2>Week ${prog().periodize?wkOf(RW):RW} report</h2><div class="meta">${fmtD(r.ws)} – ${fmtD(weekStartISO(RW+1)>iso(today())&&RW===cur?iso(today()):(()=>{const d=new Date(weekStartISO(RW+1)+'T00:00');d.setDate(d.getDate()-1);return iso(d)})())}${RW===cur?' · so far':''}</div></div><button class="btn" data-rw="${RW+1}" aria-label="Next week"${RW>=cur?' disabled':''}>›</button></div>
+  <div class="prs"><div class="pr"><span>Workouts</span><b>${r.done}${r.planned?'/'+r.planned:''}</b><span>${r.sets} sets${r.mins?' · '+r.mins+' min':''}</span></div><div class="pr"><span>Volume</span><b>${Math.round(r.v).toLocaleString()}</b><span>${u}${vch==null?'':` · ${vch>0?'+':''}${vch}% vs last week`}</span></div><div class="pr"><span>New bests</span><b>${r.prs.length}</b><span>${r.prs[0]?esc(r.prs[0].n)+' +'+r.prs[0].pct.toFixed(1)+'%':'est. 1RM records'}</span></div><div class="pr"><span>Readiness</span><b>${r.rAvg==null?'–':r.rAvg.toFixed(1)}</b><span>average out of 5</span></div></div>
+  <h3 style="margin:12px 0 6px;font-size:20px">Focus for next week</h3><ul class="focus">${r.focus.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>
+  ${rows?`<table style="margin-top:10px"><thead><tr><th>Lift</th><th class="num">Best est. 1RM</th><th class="num">vs before</th></tr></thead><tbody>${rows}</tbody></table>`:''}</section>`;
+}
 function refreshCard(card){
   const i=+card.dataset.card,x0=curPlan()[i];if(!x0)return;const id=sidFor(view.date,view.k),key=id+'|'+x0.n;
   const x=deloadNow[key]?Object.assign({},x0,{sets:Math.ceil(x0.sets/2)}):x0;
@@ -440,9 +504,10 @@ function renderToday(){
     <div class="row" style="margin-top:12px"><button class="btn primary" data-rsave="1"${r.sl&&r.so&&r.en?'':' disabled'}>Set my targets</button><button class="btn" data-rskip="1">Skip</button></div></section>`;
   }else if(rt&&isToday){const v=readyScore(rt),adj=readyAdj();
     h+=`<div class="hint${v>=4.5?' up':''}" style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:12px"><span>Readiness ${v.toFixed(1)}/5 · ${adj<0?`targets lowered by ${-adj} RPE`:v>=4.5?'great day: PR chance on your first lift':'normal targets'}</span><button class="small" data-rchange="1">Change</button></div>`}
+  {const td=today().getDay(),cw=wOf(iso(today())),rw=td===0?cw:cw-1;if((td===0||td===1)&&rw>=1&&isToday&&Object.values(S.sessions).some(d=>wOf(d.date)===rw))h+=`<div class="hint up" style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:12px"><span>Your Week ${prog().periodize?wkOf(rw):rw} coach report is ready.</span><button class="small" data-report="${rw}">Open</button></div>`}
   const act=Object.entries(pains()).filter(([k,v])=>v&&v.lvl>0).sort((a,b)=>b[1].lvl-a[1].lvl);
   if(act.length)h+=`<div class="hint pain" style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:12px"><span>Pain: ${act.map(([k,v])=>esc(painLabel(k))+' '+v.lvl+'/10').join(', ')} · exercises adjusted below</span><button class="small" data-gobody="1">Update</button></div>`;
-  let gw=0,gl=0,gt=0;
+  let gw=0,gl=0,gt=0;const firstBar=P.findIndex(z=>!z.skip&&isBarbell(z.n));
   h+=P.map((x0,i)=>{
     const pk=id+'|'+(x0.porig||x0.n);
     if(x0.skip)return `<section class="card skipped" data-card="${i}" style="--c:${c}"><h3>${esc(x0.n)}</h3><div class="hint pain">${esc(x0.pain)}</div><button class="pill" data-pover="${esc(pk)}">Do it anyway</button></section>`;
@@ -473,7 +538,7 @@ function renderToday(){
       <div class="meta" style="margin-top:8px">Changes this exercise in every ${esc(dn)} workout. Past logs stay as they are.</div></div>`:'';
     const tgt=x.reps?`<span class="tgt">${x.sets} × ${esc(x.reps)}</span> @ RPE ${rpeFor(x)}`:'<span class="tgt">Extra exercise</span>';
     return `<section class="card" data-card="${i}" style="--c:${c}"><div class="ch"><h3>${esc(x.n)}</h3>${x.extra||x.porig?'':`<button class="pill" data-swap="${i}" aria-expanded="${view.swap===i}">Swap</button>`}</div><div class="meta">${tgt}${x.note?' · '+esc(x.note):''}${x.orig?' · swapped from '+esc(x.orig):''}</div>${pnote}${panel}${hint}
-    ${repsFor(x,0)?`<div class="sug">${sugText(x,sg)}${prLine(x,sg,i)}</div>`:''}<div class="sets"><span></span><span class="h">Weight (${u})</span><span class="h">Reps</span><span class="h">RPE</span>${rows}</div><button class="small" data-add="${i}">+ Add set</button></section>`}).join('');
+    ${repsFor(x,0)?`<div class="sug">${sugText(x,sg)}${prLine(x,sg,i)}</div>`:''}${!dl&&!x.test&&!x.extra&&!todaySets.length?warmHTML(x,i,sg,pw,id,i===firstBar):''}<div class="sets"><span></span><span class="h">Weight (${u})</span><span class="h">Reps</span><span class="h">RPE</span>${rows}</div><button class="small" data-add="${i}">+ Add set</button></section>`}).join('');
   if(gw+gl+gt)h+=`<p class="race">Ghost race: ${gw} won · ${gt} tied · ${gl} behind</p>`;
   h+=`<button class="save" id="save" style="--c:${c}">${saved?'Save':'Finish'} ${esc(dn)}</button><p class="note">${esc(flash||(autoAt?'Saves automatically as you type · last saved '+autoAt:'Saves automatically as you type'))}</p>`;
   $('#main').innerHTML=h;
@@ -537,7 +602,8 @@ function renderProgress(){
   const top=list.filter(n=>points(n).length).slice(0,6);
   const prs=top.map(n=>{const p=points(n).reduce((a,b)=>b.v>a.v?b:a);return `<div class="pr"><span>${esc(n)}</span><b>${Math.round(p.v)} ${u}</b><span>est. 1RM · ${esc(p.w)}×${esc(p.r)}</span></div>`}).join('');
   const sess=Object.values(S.sessions),wk7=sess.filter(d=>(today()-new Date(d.date+'T00:00'))/864e5<7).length,mins=sess.reduce((a,d)=>a+(d.dur||0),0);
-  $('#main').innerHTML=`<div class="prs"><div class="pr"><span>Workouts logged</span><b>${sess.length}</b><span>${wk7} in the last 7 days</span></div><div class="pr"><span>Time trained</span><b>${Math.floor(mins/60)}h ${mins%60}m</b><span>from the workout clock</span></div></div>
+  if(!view.rw)view.rw=wOf(iso(today()));
+  $('#main').innerHTML=reportHTML(view.rw)+`<h2 style="margin:22px 0 0">All time</h2><div class="prs"><div class="pr"><span>Workouts logged</span><b>${sess.length}</b><span>${wk7} in the last 7 days</span></div><div class="pr"><span>Time trained</span><b>${Math.floor(mins/60)}h ${mins%60}m</b><span>from the workout clock</span></div></div>
   ${prs?`<h2 style="margin:16px 0 0">Best estimated 1-rep maxes</h2><div class="prs">${prs}</div>`:''}
   <label for="lift">Lift</label><select id="lift">${list.map(n=>`<option${n===view.lift?' selected':''}>${esc(n)}</option>`).join('')}</select>
   <div class="fig"><svg id="chart" role="img" aria-label="Estimated 1RM over time for ${esc(view.lift)}"></svg></div>
@@ -586,6 +652,9 @@ function renderSettings(){
   <label for="start">Program start date (Week 1)</label><input type="date" id="start" value="${startISO()}">
   <label for="newp">Switch to a different program</label><div class="row" style="flex-wrap:nowrap"><select id="newp">${Object.entries(PRESETS).map(([id,x])=>`<option value="${id}">${esc(x.name)}</option>`).join('')}</select><button class="btn" id="swp">${armed==='swp'?'Confirm':'Switch'}</button></div>
   <p class="meta">Switching replaces your days and exercises. Your logged workouts stay.</p></div>
+  <div class="sec"><h2>Bar and plates</h2><p class="meta">Used for warm-ups and "Load:" plate math.</p>
+  <div class="row" style="gap:12px;align-items:flex-end"><div style="flex:1"><label for="gbar">Bar weight (${unit()})</label><input type="number" id="gbar" inputmode="decimal" value="${gear().bar}"></div>
+  <div style="flex:2"><label for="gpl">Plates you have (${unit()}, comma-separated)</label><input id="gpl" value="${gear().plates.join(', ')}"></div></div></div>
   <div class="sec"><h2>Units</h2><select id="unit" aria-label="Units"><option value="lb"${unit()==='lb'?' selected':''}>Pounds (lb)</option><option value="kg"${unit()==='kg'?' selected':''}>Kilograms (kg)</option></select></div>
   <div class="sec"><h2>Backup</h2><p class="meta">Copy your data and keep it somewhere safe, or paste a backup to restore it.</p>
   <button class="btn" id="copy">Copy all data</button><textarea id="io" aria-label="Backup data" placeholder="Paste a backup here to restore it"></textarea>
@@ -595,7 +664,7 @@ function renderSettings(){
 
 function render(){
   const a=document.activeElement;
-  if(a&&a.matches&&a.matches('#main input,#main textarea')&&(view.tab==='today'||view.tab==='program'||view.tab==='settings')){pendingRender=true;return}
+  if(a&&a.matches&&a.matches('#main input:not([type=checkbox]),#main textarea')&&(view.tab==='today'||view.tab==='program'||view.tab==='settings')){pendingRender=true;return}
   pendingRender=false;
   renderHeader();
   for(const b of document.querySelectorAll('#tabs button'))b.setAttribute('aria-current',b.dataset.tab===view.tab);
@@ -661,6 +730,8 @@ $('#main').addEventListener('change',e=>{const t=e.target;
   if(t.id==='per')editProg(p=>{p.periodize=t.checked});
   if(t.id==='start'&&t.value){putProfile({start:t.value})}
   if(t.id==='unit')putProfile({unit:t.value});
+  if(t.id==='gbar'||t.id==='gpl'){const b=parseFloat($('#gbar').value),pl=$('#gpl').value.split(/[,\s]+/).map(Number).filter(v=>v>0&&v<=100);const G=Object.assign({},(S.profile&&S.profile.gear)||{});G[unit()]={bar:b>0&&b<=60?b:GEAR[unit()].bar,plates:pl.length?[...new Set(pl)].sort((a,c)=>c-a):GEAR[unit()].plates};putProfile({gear:G})}
+  if(t.dataset.wu){view.wu=Object.assign({},view.wu,{[t.dataset.wu]:t.checked})}
   if(t.id==='rpedef')putProfile({rpeDef:+t.value});
   if(['tauto','tsound','tadapt','trest','tmain'].includes(t.id)){const x=tm();x.auto=$('#tauto').checked;x.sound=$('#tsound').checked;x.adapt=$('#tadapt').checked;x.rest=Math.min(600,Math.max(15,+$('#trest').value||90));x.main=Math.min(900,Math.max(15,+$('#tmain').value||180));putProfile({timer:x})}
 });
@@ -673,6 +744,8 @@ $('#main').addEventListener('click',async e=>{
   if(b.dataset.pclear){if(view.painSel===b.dataset.pclear)view.painSel=null;await setPain(b.dataset.pclear,0);return}
   if(b.dataset.wnav){flush();const d=new Date(view.date+'T00:00');d.setDate(d.getDate()+(+b.dataset.wnav));view.date=iso(d);view.swap=null;render();return}
   if(b.dataset.wtoday){flush();view.date=iso(today());view.k=null;view.swap=null;render();return}
+  if(b.dataset.rw){view.rw=Math.max(1,+b.dataset.rw);render();return}
+  if(b.dataset.report){flush();view.rw=+b.dataset.report;view.tab='progress';render();return}
   if(b.dataset.gobody){flush();view.tab='body';render();return}
   if(b.dataset.pover){flush();painOver[b.dataset.pover]=true;render();return}
   if(b.dataset.pick){view.pick=b.dataset.pick;view.per=null;render();return}
