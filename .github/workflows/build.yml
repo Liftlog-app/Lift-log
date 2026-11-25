@@ -3,7 +3,7 @@ name: Build APK
 on:
   push:
     branches: [main]
-    paths-ignore: ["ops/**", ".claude/**", "tests/**", "CLAUDE.md", "README.md", "package.json", ".github/workflows/test.yml"]
+    paths-ignore: ["ops/**", ".claude/**", "docs/agents.html", "tests/**", "CLAUDE.md", "README.md", "package.json", ".github/workflows/test.yml"]
   workflow_dispatch:
 
 permissions:

@@ -3,7 +3,7 @@ name: Build iOS app
 on:
   push:
     branches: [main]
-    paths: ["docs/**", "ios/**", "project.yml", ".github/workflows/ios.yml"]
+    paths: ["docs/**", "!docs/agents.html", "ios/**", "project.yml", ".github/workflows/ios.yml"]
   workflow_dispatch:
 
 permissions:
