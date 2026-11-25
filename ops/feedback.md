@@ -4,6 +4,7 @@ Nheil and testers: add a line here any time (newest at the top), or tell Claude 
 
 Format: `- YYYY-MM-DD · who · what happened or what you want · (status)`
 
+- 2026-11-24 · Nheil · Hold off on the Marketer in every run until he says so · (active: Marketer paused)
 - 2026-11-24 · Nheil · Wants the team to turn Lift Log into the best app in the App Store and Google Play · (goal; drives the roadmap, read by Product Lead 2026-11-24)
 - 2026-11-24 · Nheil · Drawn exercise pictures looked bad; real photos are much better · (done, build 16)
 - 2026-11-24 · Nheil · The rest-timer bar was always showing on the Workout tab; it should only appear after logging a set · (done, build 15)

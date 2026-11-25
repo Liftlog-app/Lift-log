@@ -31,14 +31,16 @@ Run the `qa-tester` agent on that PR. If it finds blockers, run the `coder` agen
 
 Run the `designer` agent on the PR. Small polish goes on the branch; bigger ideas go to `ops/ideas.md`.
 
-## 6. Marketer
+## 6. Marketer (PAUSED)
 
-Run the `marketer` agent. Output: this week's content calendar in `ops/marketing/posts/`, "what's new" posts for features merged since last cycle, store listing updates, one growth experiment.
+**Paused by Nheil on 2026-11-24. Skip this step every run until Nheil says to resume it** (he will say so in chat or in `ops/feedback.md`). Don't run the Marketer, don't write marketing files, and leave the video idea out of the report.
+
+When resumed: run the `marketer` agent. Output: this week's content calendar in `ops/marketing/posts/`, "what's new" posts for features merged since last cycle, store listing updates, one growth experiment.
 
 ## 7. Report and notify
 
 1. Write `ops/weekly/<yyyy>-W<ww>.md`:
-   - **For Nheil (top, 5 lines max):** the PR link to review, what it does, anything he must do (merge, test on phone, create an account), and the best video idea of the week.
+   - **For Nheil (top, 5 lines max):** the PR link to review, what it does, and anything he must do (merge, test on phone, create an account). Add the best video idea only while the Marketer is active.
    - What each agent did, with links to files and the PR.
    - What failed or couldn't be verified.
 2. Commit everything in `ops/` (and only `ops/`) straight to `main` with a message like `ops: weekly cycle <yyyy>-W<ww>` and push. These notes don't trigger app builds.

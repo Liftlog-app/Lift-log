@@ -207,7 +207,7 @@ async function load(){
 
   /* running-now animation: light agents in sequence */
   if(runningNow()){const step=Math.floor((Date.now()-nextRun())/(2.5*36e5)*6);AGENTS.forEach((a,i)=>{if(i<step)st[a.id]=Object.assign({},st[a.id],{state:'done'});else if(i===step)st[a.id]={state:'active',text:'working now'}})}
-  for(const a of AGENTS)if(!st[a.id])st[a.id]={state:'',text:a.id==='researcher'?'next: Saturday':a.id==='marketer'?'next: Saturday':'waiting'};
+  for(const a of AGENTS)if(!st[a.id])st[a.id]={state:'',text:a.id==='researcher'?'next: Saturday':a.id==='marketer'?'paused':'waiting'};
   drawNodes(st);
 
   const live=runningNow();$('#state').classList.toggle('live',live||!failed);
