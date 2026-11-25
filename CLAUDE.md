@@ -22,6 +22,18 @@ npm test               # runs tests/*.test.cjs against src/index.html
 
 Each test file loads the app in jsdom with a fixed date and fake data, clicks through a feature and prints results. A test fails if it crashes or the page logs errors. When you add a feature, add `tests/<feature>.test.cjs` that exercises it and checks the important outcome (throw an Error if it is wrong).
 
+## GitHub from Claude sessions
+
+`gh pr …` and other GraphQL-based commands are blocked here. Use the REST API through `gh api`:
+
+```bash
+gh api "repos/nheilmangoba1/Lift-log/pulls?state=all&per_page=10" --jq '.[]|"#\(.number) \(.state) merged=\(.merged_at!=null) \(.head.ref) \(.title)"'
+gh api repos/nheilmangoba1/Lift-log/pulls -f title='...' -f head='agent/<slug>' -f base=main -f body="$(cat /tmp/pr.md)"
+gh api repos/nheilmangoba1/Lift-log/pulls/<n>                 # one PR
+gh api repos/nheilmangoba1/Lift-log/issues/<n>/comments -f body="$(cat /tmp/comment.md)"   # comment on a PR
+gh api "repos/nheilmangoba1/Lift-log/actions/runs?branch=agent/<slug>&per_page=3"           # CI status
+```
+
 ## Rules for every agent
 
 1. **App code changes go through pull requests.** Work on a branch named `agent/<short-feature-name>`, open a PR, and stop. Never push app code to `main`, never merge a PR. Nheil reviews and merges.
