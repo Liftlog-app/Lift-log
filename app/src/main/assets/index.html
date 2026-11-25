@@ -270,7 +270,7 @@ body.setup .tbar{bottom:0}
 .bwin label{margin:12px 0 6px;font-size:15px}
 .bwbtn{width:100%;margin-top:12px;--c:var(--pull)}.bwbtns{margin-top:10px}.bwbtns .btn{width:100%}
 .bwbox .prs{grid-template-columns:repeat(2,minmax(0,1fr))}
-.bwbox .pr{background:var(--field)}.bwbox .pr b{font-size:26px;margin:2px 0}
+.bwbox .pr{background:var(--field)}.bwbox .pr b{font-size:clamp(22px,6.8vw,28px);margin:2px 0;white-space:nowrap;font-variant-numeric:tabular-nums}
 .bwbox .pr.good{background:light-dark(#e3f5ec,#143323);border-color:transparent}.bwbox .pr.good,.bwbox .pr.good span{color:light-dark(#135c38,#8fe0b6)}
 .bwbox .pr.warn{background:light-dark(#fff1dc,#3a2a12);border-color:transparent}.bwbox .pr.warn,.bwbox .pr.warn span{color:light-dark(#7a4300,#ffcf8a)}
 .bwbox .pr.pain{background:light-dark(#fde8e6,#3a1714);border-color:transparent}.bwbox .pr.pain,.bwbox .pr.pain span{color:light-dark(#8a1c14,#ffb3ab)}
@@ -282,7 +282,14 @@ body.setup .tbar{bottom:0}
 .bwrow span{flex:1;color:var(--mute);font-size:15px}.bwrow b{font-variant-numeric:tabular-nums}.bwrow .btn{padding:0 12px;font-size:15px}
 .bwgoal{margin:4px 0 6px;font-weight:600}
 .bwnote{margin:14px 0 0;font-size:13px}
-.bwhome .btn{width:100%}.bwhl{font:700 18px Barlow,sans-serif;font-variant-numeric:tabular-nums}
+.bwhome .btn{width:100%}.bwhl{font:600 16px Barlow,sans-serif;color:var(--mute);font-variant-numeric:tabular-nums}
+.bwhl b{font:800 34px/1 "Barlow Condensed",Barlow,sans-serif;color:var(--ink);margin-right:2px}
+.bwhr{margin-top:4px}.bwhr.good{color:light-dark(#157a47,#6fd39e)}.bwhr.warn{color:light-dark(#8a4d00,#ffcf8a)}.bwhr.pain{color:light-dark(#b0241c,#ff9d93)}
+.bwfig{margin-top:12px}.bwfig.bwempty{height:72px}
+.bwbox .prs{margin:12px 0 4px}
+.bwrow b{font:700 21px "Barlow Condensed",Barlow,sans-serif}
+.bwrow .btn.danger{border-color:transparent;background:none;min-width:84px}
+.bwrow .btn.danger:focus-visible,.bwrow .btn.danger.bwarm{border-color:currentColor}
 </style>
 </head>
 <body>
@@ -912,15 +919,16 @@ function bwHTML(){
   const tiles=`<div class="prs"><div class="pr"><span>Trend</span><b>${st.trend==null?'–':bwF(st.trend)+' '+u}</b><span>${st.L.length?'smoothed over your weigh-ins':'log a weigh-in to start'}</span></div>
   <div class="pr bwrate${r&&r.cls?' '+r.cls:''}" id="bwrate"><span>Rate (last 14 days)</span>${r?`<b>${esc(r.txt)}</b><span>${esc(r.ptxt)} · ${esc(r.lab)}</span>`:`<span class="bwnone">Log 4 weigh-ins over a week to see your rate.</span>`}</div></div>`;
   const recent=st.L.slice(-7).reverse();
-  const list=recent.length?`<h3 class="bwh">Recent</h3>${recent.map(e=>`<div class="bwrow"><span>${esc(fmtD(e.d))}</span><b>${bwF(e.w)} ${u}</b><button class="btn danger" data-bwdel="${esc(e.d)}" aria-label="Remove weigh-in for ${esc(fmtD(e.d))}">${armed==='bw'+e.d?'Confirm':'Remove'}</button></div>`).join('')}`:'';
+  const list=recent.length?`<h3 class="bwh">Recent</h3>${recent.map(e=>`<div class="bwrow"><span>${esc(fmtD(e.d))}</span><b>${bwF(e.w)} ${u}</b><button class="btn danger${armed==='bw'+e.d?' bwarm':''}" data-bwdel="${esc(e.d)}" aria-label="Remove weigh-in for ${esc(fmtD(e.d))}">${armed==='bw'+e.d?'Confirm':'Remove'}</button></div>`).join('')}`:'';
   const gv=c?+bwConv(c.goal,bwU(c)).toFixed(1):'';
   return `<section class="hcard bwbox" id="bwsec"><h2>Bodyweight</h2>
+  ${st.L.length?tiles:''}
   <div class="bwin"><div><label for="bww">Morning weight (${u})</label><input id="bww" type="number" inputmode="decimal" step="0.1" min="${lo}" max="${hi}" placeholder="${st.L.length?bwF(st.L[st.L.length-1].w):''}"></div>
   <div><label for="bwd">Date</label><input id="bwd" type="date" value="${td}" max="${td}"></div></div>
   <button class="btn primary bwbtn" id="bwlog">Log weight</button>
   ${flash&&view.bwFlash?`<p class="meta" role="status" id="bwmsg">${esc(flash)}</p>`:''}
-  ${tiles}
-  <div class="bwfig"><svg id="bwchart" role="img" aria-label="Bodyweight over the last 8 weeks: dots are weigh-ins, the line is your trend"></svg></div>
+  ${st.L.length?'':tiles}
+  <div class="bwfig${st.L.length?'':' bwempty'}"><svg id="bwchart" role="img" aria-label="Bodyweight over the last 8 weeks: dots are weigh-ins, the line is your trend"></svg></div>
   ${list}
   <h3 class="bwh">Goal</h3>${bwGoalHTML(st)}
   <div class="bwin"><div><label for="bwgoal">Goal weight (${u})</label><input id="bwgoal" type="number" inputmode="decimal" step="0.1" value="${gv}"></div>
@@ -948,7 +956,7 @@ function mountBw(){
 }
 function bwHomeHTML(){
   const st=bwStats(),u=unit(),r=st.rate;
-  if(st.todayE)return `<section class="hcard bwhome"><div class="hct"><b>Bodyweight</b><button class="small" data-gotab="progress">Details →</button></div><div class="bwhl">${bwF(st.todayE.w)} ${u} today · trend ${bwF(st.trend)} ${u}</div>${r?`<div class="meta">${esc(r.txt)} · ${esc(r.ptxt)} · ${esc(r.lab)}</div>`:''}</section>`;
+  if(st.todayE)return `<section class="hcard bwhome"><div class="hct"><b>Bodyweight</b><button class="small" data-gotab="progress">Details →</button></div><div class="bwhl"><b>${bwF(st.todayE.w)} ${u}</b> today · trend ${bwF(st.trend)} ${u}</div>${r?`<div class="meta bwhr${r.cls?' '+r.cls:''}">${esc(r.txt)} · ${esc(r.ptxt)} · ${esc(r.lab)}</div>`:''}</section>`;
   return `<section class="hcard bwhome"><div class="hct"><b>Bodyweight</b>${st.trend!=null?`<span class="meta">trend ${bwF(st.trend)} ${u}</span>`:''}</div><button class="btn" data-gotab="progress" data-bwfocus="1">Log today's weight</button></section>`;
 }
 async function bwLog(){
