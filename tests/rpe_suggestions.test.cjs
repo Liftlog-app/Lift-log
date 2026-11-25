@@ -16,6 +16,6 @@ const w=dom.window,d=w.document,ev=(el,t)=>el.dispatchEvent(new w.Event(t,{bubbl
  console.log('placeholders now:',[...card.querySelectorAll('input[data-f=w]')].map(i=>i.placeholder).join(','));
  const c2=d.querySelector('.card[data-card="1"]');console.log('no-history card sug:',c2.querySelector('.sug').textContent);
  await sleep(1400);const st=JSON.parse(w.localStorage.getItem('liftlog.v1'));console.log('saved:',JSON.stringify(Object.values(st.sessions).find(x=>x.date==='2026-11-23').ex));
- d.querySelector('[data-tab=progress]').click();console.log('progress first pr:',d.querySelector('.prs .pr:nth-child(1)').textContent, '|', [...d.querySelectorAll('.pr')].map(x=>x.textContent).slice(2).join(' / '));
+ d.querySelector('[data-tab=progress]').click();console.log('progress first pr:',d.querySelector('.prs:not(.bwbox .prs) .pr:nth-child(1)').textContent, '|', [...d.querySelectorAll('.pr:not(.bwbox .pr)')].map(x=>x.textContent).slice(2).join(' / '));
  d.querySelector('[data-tab=settings]').click();console.log('rpe setting:',!!d.querySelector('#rpedef'));
  console.log('errors',w.__e);process.exit(0)})();

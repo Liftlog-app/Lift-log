@@ -25,7 +25,7 @@ const ev=(w,el,t)=>el.dispatchEvent(new w.Event(t,{bubbles:true}));
  d.querySelector('[data-tab=today]').click();await sleep(20);
  d.querySelector('[data-swap="1"]').click();await sleep(10);d.querySelector('[data-ddtoggle]').click();await sleep(10);d.querySelectorAll('[data-ddpick]')[1].click();await sleep(10);console.log('picked shows:',d.querySelector('.cmp figcaption:last-child')?.textContent||[...d.querySelectorAll('.cmp figcaption')].pop().textContent);d.querySelector('[data-swapgo="1"]').click();await sleep(20);
  console.log('after swap card2:',d.querySelectorAll('.card h3')[1].textContent);
- d.querySelector('[data-tab=progress]').click();console.log('progress prs:',d.querySelectorAll('.pr').length);
+ d.querySelector('[data-tab=progress]').click();console.log('progress prs:',d.querySelectorAll('.pr:not(.bwbox .pr)').length);
  d.querySelector('[data-tab=history]').click();console.log('history:',d.querySelector('.hist').textContent.replace(/\s+/g,' '));
  d.querySelector('[data-tab=settings]').click();console.log('settings ok:',!!d.querySelector('#trest'));
  console.log('errors1',w.__errs);
