@@ -93,9 +93,9 @@ const base=()=>({profile:{start:'2026-11-16',unit:'lb'},sessions:{'2026-11-23_pu
   // goal date already passed (old data)
   const s2=base();s2.profile.bw=[{d:'2026-11-24',w:180,u:'lb'}];s2.profile.cut={goal:165,u:'lb',by:'2026-11-01'};const B=boot(s2);await sleep(150);await B.tab('progress');
   ok(/passed/.test(B.$('.bwgoal').textContent)&&!/needs/.test(B.$('.bwgoal').textContent),'passed goal: '+B.$('.bwgoal').textContent);
-  // trend already at/below goal
-  const s3=base();s3.profile.bw=[{d:'2026-11-24',w:164,u:'lb'}];s3.profile.cut={goal:165,u:'lb',by:'2027-06-01'};const C=boot(s3);await sleep(150);await C.tab('progress');
-  ok(/already at or below/.test(C.$('.bwgoal').textContent)&&!C.$('#bwsec .hint.plat'),'reached goal: '+C.$('.bwgoal').textContent);
+  // trend within 0.2 of the goal (Product Lead decision on QA item 1: "You're at your goal.")
+  const s3=base();s3.profile.bw=[{d:'2026-11-24',w:165.1,u:'lb'}];s3.profile.cut={goal:165,u:'lb',by:'2027-06-01'};const C=boot(s3);await sleep(150);await C.tab('progress');
+  ok(/You're at your goal\./.test(C.$('.bwgoal').textContent)&&!C.$('#bwsec .hint.plat'),'reached goal: '+C.$('.bwgoal').textContent);
   // no weigh-ins yet but a goal
   const s4=base();s4.profile.cut={goal:165,u:'lb',by:'2027-06-01'};const D=boot(s4);await sleep(150);await D.tab('progress');D.noNaN('goal no weigh-ins');
   ok(/log a weigh-in/.test(D.$('.bwgoal').textContent),'goal without weigh-ins: '+D.$('.bwgoal').textContent);

@@ -555,7 +555,9 @@ function ghostCell(g,k,w,r){
   return {cls:st,txt:`${st==='win'?'▲ Beat':st==='lose'?'▼ Behind':st==='tie'?'= Tied with':'Ghost:'} ${gs.w} × ${gs.r}`};
 }
 function phWeights(x,sg,n,key,pw){const out=[];for(let k=0;k<n;k++){let v=sg?sg.w(k):pw;if(sg&&deloadNow[key])v=roundW(sg.w(k)*0.6,x.n);if(sg&&backoff[key]&&k===n-1)v=roundW(sg.w(0)*0.82,x.n);out.push(v)}return out}
-function prLine(x,sg,i){if(i!==0||!sg||x.test)return '';const v=readyScore(readyToday());if(v==null||v<4.5)return '';return `<br><b>PR chance:</b> after your work sets, try one top set of ${roundW(sg.est/(1+(repsFor(x,0)+0.5)/30),x.n)} ${unit()} × ${repsFor(x,0)} at RPE 9.5.`}
+function prLine(x,sg,i){if(i!==0||!sg||x.test)return '';const v=readyScore(readyToday());if(v==null||v<4.5)return '';
+  const work=+sg.w(0)||0;let top=roundW(sg.est/(1+(repsFor(x,0)+0.5)/30),x.n);if(top<=work)top=isBarbell(x.n)?+(work+barStep()).toFixed(2):work+(unit()==='kg'?2.5:5);
+  return `<br><b>PR chance:</b> after your work sets, try one top set of ${top} ${unit()} × ${repsFor(x,0)} at RPE 9.5.`}
 const repsFor=(x,k)=>{const m=String(x.reps).match(/\d+/g);if(!m)return 0;return String(x.reps).includes(',')?+(m[k]!=null?m[k]:m[m.length-1]):+m[0]};
 // Barbell lifts round to what you can load: bar + k x (2 x smallest plate). Everything else keeps 5 lb / 2.5 kg.
 const barStep=()=>{const pl=(gear().plates||[]).map(Number).filter(v=>v>0);return pl.length?2*Math.min(...pl):(unit()==='kg'?2.5:5)};
@@ -574,12 +576,14 @@ function sugText(x,sg){const u=unit();
   return `Suggested: <b>${sg.w(0)} ${u}</b> × ${repsFor(x,0)}${multi?' (each set has its own target)':''} @ RPE ${rpeFor(x)} · est. 1RM ${Math.round(sg.est)} ${u} from ${sg.src==='today'?'today\'s sets':'your last workout'}${pl}`}
 const isBarbell=n=>/bench press|squat|deadlift|overhead press|barbell|pendlay|rack pull|close-grip bench|good morning|floor press|hip thrust/i.test(n)&&!/\bDB\b|dumbbell|goblet|bulgarian|split|hack|sissy|spanish|machine|smith|landmine|trap-bar|leg press/i.test(n);
 const GEAR={lb:{bar:45,plates:[45,35,25,10,5,2.5]},kg:{bar:20,plates:[25,20,15,10,5,2.5,1.25]}};
-const gear=()=>Object.assign({},GEAR[unit()],((S.profile&&S.profile.gear)||{})[unit()]||{});
+const gear=()=>{const d=GEAR[unit()],c=((S.profile&&S.profile.gear)||{})[unit()]||{},b=+c.bar;
+  const pl=Array.isArray(c.plates)?c.plates.map(Number).filter(v=>Number.isFinite(v)&&v>0):[];
+  return {bar:Number.isFinite(b)&&b>0?b:d.bar,plates:pl.length?pl:d.plates.slice()}};
 function plateText(W){
   const g=gear();W=+W;if(!(W>0))return '';
   if(W<g.bar)return `Lighter than the ${g.bar} ${unit()} bar`;
   let per=(W-g.bar)/2;if(per<1e-9)return 'Just the bar';
-  const out=[];for(const p of [...g.plates].sort((a,b)=>b-a)){while(per>=p-1e-9){out.push(p);per-=p}}
+  const out=[];for(const p of [...g.plates].sort((a,b)=>b-a)){if(!(p>0))continue;while(per>=p-1e-9&&out.length<200){out.push(p);per-=p}}
   return `${out.length?out.join(' + '):'Nothing'} per side${per>0.01?` (${+(per*2).toFixed(2)} ${unit()} short: closest you can load)`:''}`;
 }
 function warmups(x,work){
@@ -883,7 +887,7 @@ const bwF=v=>(Math.round(v*10)/10).toFixed(1);
 const bwShort=s=>new Date(s+'T00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'});
 const bwRange=()=>unit()==='kg'?[14,318]:[30,700];
 function bwStats(){
-  const L=bwList().map(e=>({d:e.d,w:bwConv(e.w,bwU(e))}));
+  const td0=iso(today()),L=bwList().filter(e=>e.d<=td0).map(e=>({d:e.d,w:bwConv(e.w,bwU(e))}));// weigh-ins dated after today (other clock, restored backup) stay stored but are ignored
   let t=null;for(const e of L){t=t==null?e.w:t+0.1*(e.w-t);e.t=t}
   const td=iso(today()),n0=dayN(td),win=L.filter(e=>{const k=n0-dayN(e.d);return k>=0&&k<=13});
   let rate=null;
@@ -893,7 +897,8 @@ function bwStats(){
     const wk=7*sxy/sxx,pct=wk/my*100,loss=-pct;
     const cls=loss>1?'pain':loss>0.75?'warn':loss>=0.25?'good':'';
     const lab=cls==='pain'?'Very fast: strength may drop':cls==='warn'?'Fast: watch your main lifts':cls==='good'?'Steady, strength-friendly loss':pct>=0.25?'Gaining':'About steady';
-    rate={wk,pct,cls,lab,txt:`${wk<0&&Math.abs(wk)>=0.05?'−':wk>=0.05?'+':''}${Math.abs(wk).toFixed(1)} ${unit()}/wk`,ptxt:`${Math.abs(pct).toFixed(2)}%/wk`}}
+    const sg=wk<0&&Math.abs(wk)>=0.05?'−':wk>=0.05?'+':'';
+    rate={wk,pct,cls,lab,txt:`${sg}${Math.abs(wk).toFixed(1)} ${unit()}/wk`,ptxt:`${sg==='+'?'+':''}${Math.abs(pct).toFixed(2)}%/wk`}}
   return {L,trend:t,rate,todayE:L.find(e=>e.d===td)};
 }
 function bwGoalHTML(st){
@@ -901,7 +906,9 @@ function bwGoalHTML(st){
   const days=dayN(c.by)-dayN(iso(today()));
   if(st.trend==null)return `<p class="bwgoal">${esc(lab)} · log a weigh-in to see the pace it needs.</p>`;
   if(days<=0)return `<p class="bwgoal">${esc(lab)} · that date has passed. Set a new date when you're ready.</p>`;
-  if(st.trend<=g)return `<p class="bwgoal">${esc(lab)} · your trend is already at or below it.</p>`;
+  if(Math.abs(st.trend-g)<=0.2)return `<p class="bwgoal">${esc(lab)} · You're at your goal.</p>`;
+  if(g>st.trend){const gain=(g-st.trend)/(days/7),gp=gain/st.trend*100;
+    return `<p class="bwgoal">${esc(lab)} · Your goal is above your current trend: you'd need to gain about ${gain.toFixed(2)} ${u}/wk (${gp.toFixed(2)}%/wk).</p>${gp>0.5?`<div class="hint plat">That's faster than lean gaining usually goes (about 0.25–0.5% a week).</div>`:''}`}
   const need=(st.trend-g)/(days/7),pct=need/st.trend*100;
   return `<p class="bwgoal">${esc(lab)} · needs ${need.toFixed(2)} ${u}/wk (${pct.toFixed(2)}%/wk)</p>${pct>1?`<div class="hint plat">That's faster than 1% a week. A later date or a smaller target keeps more strength.</div>`:''}`;
 }
@@ -1083,7 +1090,7 @@ $('#tbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
 $('#stripbox').addEventListener('click',e=>{const b=e.target.closest('[data-jw]');if(!b)return;unfocus();flush();
   const target=+b.dataset.jw,cur=wOf(view.date||iso(today())),d=new Date((view.date||iso(today()))+'T00:00');d.setDate(d.getDate()+(target-cur)*7);
   if(target===wOf(iso(today())))view.date=iso(today());else view.date=iso(d);view.tab='today';view.swap=null;render()});
-$('#main').addEventListener('keydown',e=>{const sp=e.target.closest&&e.target.closest('[data-pk]');if(sp&&(e.key==='Enter'||e.key===' ')){e.preventDefault();view.painSel=sp.dataset.pk;render()}});
+$('#main').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&/^(bww|bwd|bwgoal|bwby)$/.test(e.target.id)){e.preventDefault();const id=e.target.id;unfocus();(id==='bww'||id==='bwd'?bwLog:bwGoal)();return}const sp=e.target.closest&&e.target.closest('[data-pk]');if(sp&&(e.key==='Enter'||e.key===' ')){e.preventDefault();view.painSel=sp.dataset.pk;render()}});
 const unfocus=()=>{const a=document.activeElement;if(a&&a.blur&&a.matches&&a.matches('#main input,#main textarea'))a.blur()};
 document.addEventListener('focusout',()=>setTimeout(()=>{if(pendingRender)render()},0));
 document.querySelector('.gear').addEventListener('click',()=>{unfocus();flush();view.swap=null;view.tab='settings';armed=null;flash='';render();window.scrollTo(0,0)});
