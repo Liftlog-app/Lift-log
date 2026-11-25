@@ -1,0 +1,14 @@
+const {JSDOM}=require('jsdom');
+const html=require('fs').readFileSync(require('path').join(__dirname,'..','src','index.html'),'utf8');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const seed={profile:{start:'2026-11-16',unit:'lb',ready:{date:'2026-11-23',sl:3,so:3,en:3}},sessions:{'2026-11-23_pushA':{date:'2026-11-23',W:2,wk:2,s:'pushA',ex:{'Bench press':[{w:135,r:8}]},updated:5}}};
+const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){const RD=w.Date;class FD extends RD{constructor(...a){if(a.length)super(...a);else super(FD.now())}static now(){return w.__now||new RD('2026-11-23T12:00:00').getTime()}};w.Date=FD;w.ResizeObserver=class{observe(){}disconnect(){}};w.localStorage.setItem('liftlog.v1',JSON.stringify(seed));w.__e=[];w.addEventListener('error',e=>w.__e.push(e.message))}});
+const w=dom.window,d=w.document;(async()=>{await sleep(100);/*GOTODAY*/d.querySelector('[data-tab=today]').click();await sleep(10);
+ const show=l=>console.log(l,'|',d.querySelector('.head .meta').textContent,'|',d.querySelector('#wdate').value,'| card0:',d.querySelector('.card[data-card] h3').textContent,d.querySelector('.card[data-card] .meta').textContent.slice(0,40),'| strip now/sel:',[...d.querySelectorAll('.strip .now,.strip .sel')].map(b=>b.className+':'+b.textContent).join(','));
+ show('start');
+ d.querySelector('[data-wnav="7"]').click();await sleep(20);show('next week');console.log('  ahead pill:',[...d.querySelectorAll('.stp')].map(h=>h.textContent).find(t=>t.includes('looking ahead')));
+ d.querySelector('[data-jw="7"]').click();await sleep(20);d.querySelector('[data-s=pushA]').click();await sleep(20);show('strip wk7 pushA');
+ d.querySelector('[data-jw="12"]').click();await sleep(20);show('strip wk12');
+ d.querySelector('[data-tab=history]').click();d.querySelector('[data-jw="10"]').click();await sleep(20);console.log('from history tab ->',d.querySelector('[aria-current=true]').textContent);show('wk10');
+ d.querySelector('[data-wtoday]').click();await sleep(20);show('today');
+ d.querySelector('[data-wnav="-7"]').click();await sleep(20);show('prev week');
+ console.log('errors',w.__e);process.exit(0)})();

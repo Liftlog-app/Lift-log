@@ -1,0 +1,10 @@
+const {JSDOM}=require('jsdom');
+const html=require('fs').readFileSync(require('path').join(__dirname,'..','src','index.html'),'utf8');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const seed={profile:{start:'2026-11-16',unit:'lb',ready:{date:'2026-11-23',sl:3,so:3,en:3}},sessions:{'2026-11-23_pushA':{date:'2026-11-23',W:2,wk:2,s:'pushA',ex:{'Bench press':[{w:135,r:8}]},updated:5},'w1-pullA':{date:'2026-11-20',W:1,wk:1,s:'pullA',ex:{'Barbell row':[{w:135,r:8}]},updated:1}}};
+const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){const RD=w.Date;class FD extends RD{constructor(...a){if(a.length)super(...a);else super(FD.now())}static now(){return w.__now||new RD('2026-11-23T12:00:00').getTime()}};w.Date=FD;w.ResizeObserver=class{observe(){}disconnect(){}};w.localStorage.setItem('liftlog.v1',JSON.stringify(seed));w.__e=[];w.addEventListener('error',e=>w.__e.push(e.message))}});
+const w=dom.window,d=w.document;(async()=>{await sleep(100);/*GOTODAY*/d.querySelector('[data-tab=today]').click();await sleep(10);
+ const show=l=>console.log(l,[...d.querySelectorAll('.chip')].map(c=>c.textContent+(c.classList.contains('done')?'✓':'')).join(' '),'|',d.querySelector('.head .meta').textContent);
+ show('today:');
+ const dt=d.querySelector('#wdate');dt.value='2026-11-25';dt.dispatchEvent(new w.Event('change',{bubbles:true}));await sleep(20);d.querySelector('[data-s=pushA]').click();await sleep(20);show('viewing Wed, Push A:');
+ dt.value='2026-11-30';d.querySelector('#wdate').value='2026-11-30';d.querySelector('#wdate').dispatchEvent(new w.Event('change',{bubbles:true}));await sleep(20);show('next week:');
+ console.log('errors',w.__e);process.exit(0)})();

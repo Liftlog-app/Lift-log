@@ -1,0 +1,12 @@
+{
+  "name": "lift-log",
+  "private": true,
+  "description": "Lift Log workout tracker. Source lives in src/index.html.",
+  "scripts": {
+    "test": "node tests/run.cjs",
+    "sync": "python3 scripts/sync.py"
+  },
+  "devDependencies": {
+    "jsdom": "24.1.3"
+  }
+}

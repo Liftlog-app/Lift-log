@@ -1,0 +1,32 @@
+const {JSDOM}=require('jsdom');
+const html=require('fs').readFileSync(require('path').join(__dirname,'..','src','index.html'),'utf8');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const T0=new Date('2026-11-23T17:00:00').getTime();
+const seed={profile:{start:'2026-11-16',unit:'lb',ready:{date:'2026-11-23',sl:4,so:4,en:4}},sessions:{'2026-11-23_pushA':{date:'2026-11-23',W:2,wk:2,s:'pushA',ex:{'Bench press':[{w:190,r:8}]},updated:T0-3600e3,start:T0-5*3600e3}}};
+const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){const RD=w.Date;class FD extends RD{constructor(...a){if(a.length)super(...a);else super(FD.now())}static now(){return w.__now||new RD('2026-11-23T12:00:00').getTime()}};w.Date=FD;w.ResizeObserver=class{observe(){}disconnect(){}};w.scrollTo=()=>{};w.localStorage.setItem('liftlog.v1',JSON.stringify(seed));w.__now=T0;w.__e=[];w.addEventListener('error',e=>w.__e.push(e.message))}});
+const w=dom.window,d=w.document,ev=(el,t)=>el.dispatchEvent(new w.Event(t,{bubbles:true}));
+const clock=()=>d.querySelector('#wclock').textContent;
+(async()=>{await sleep(400);/*GOTODAY*/d.querySelector('[data-tab=today]').click();await sleep(10);
+ console.log('legacy session (old glitch): clock =',clock(),'| start btn:',d.querySelector('[data-wstart]')&&d.querySelector('[data-wstart]').textContent);
+ d.querySelector('[data-s=pullA]').click();await sleep(20);
+ console.log('Pull A start btn:',d.querySelector('[data-wstart]').textContent,'| save btn:',!!d.querySelector('#save'));
+ d.querySelector('[data-wstart]').click();await sleep(50);
+ w.__now=T0+125e3;await sleep(300);
+ console.log('after start +2:05 → clock:',clock(),'| pill:',d.querySelector('.stp.live').textContent,'| start btn gone:',!d.querySelector('[data-wstart]'),'| bottom:',d.querySelector('[data-wend="2"]').textContent);
+ const wi=d.querySelector('.card[data-card="0"] input[data-f=w][data-k="0"]'),ri=d.querySelector('.card[data-card="0"] input[data-f=r][data-k="0"]');
+ wi.value='155';ev(wi,'input');ri.value='10';ev(ri,'input');ev(ri,'change');await sleep(1400);
+ w.__now=T0+52*60e3;await sleep(300);console.log('at 52 min clock:',clock());
+ d.querySelector('[data-wend="2"]').click();await sleep(20);console.log('first tap:',d.querySelector('[data-wend="2"]').textContent);
+ d.querySelector('[data-wend="2"]').click();await sleep(50);
+ console.log('after end → note:',d.querySelector('.note').textContent,'| clock:',clock(),'| start btn:',!!d.querySelector('[data-wstart]'));
+ const st=JSON.parse(w.localStorage.getItem('liftlog.v1'));const s2=st.sessions['2026-11-23_pullA'];console.log('saved:',JSON.stringify({live:s2.live,dur:s2.dur,ex:s2.ex}));
+ // forgot to end: start Legs A, log a set, come back 3h later
+ d.querySelector('[data-s=legsA]').click();await sleep(20);d.querySelector('[data-wstart]').click();await sleep(30);
+ const w2=d.querySelector('.card[data-card="0"] input[data-f=w][data-k="0"]'),r2=d.querySelector('.card[data-card="0"] input[data-f=r][data-k="0"]');
+ w.__now+=40*60e3;w2.value='225';ev(w2,'input');r2.value='8';ev(r2,'input');ev(r2,'change');await sleep(1400);
+ w.__now+=3*3600e3;await sleep(300);d.querySelector('[data-wend="1"]').click();await sleep(20);d.querySelector('[data-wend="1"]').click();await sleep(50);
+ console.log('forgot-to-end saved as:',d.querySelector('.note').textContent);
+ // start then end with no sets
+ d.querySelector('[data-s=pushB]').click();await sleep(20);d.querySelector('[data-wstart]').click();await sleep(30);d.querySelector('[data-wend="2"]').click();d.querySelector('[data-wend="2"]').click();await sleep(50);
+ console.log('empty end:',d.querySelector('.note').textContent,'| pushB in storage:',!!JSON.parse(w.localStorage.getItem('liftlog.v1')).sessions['2026-11-23_pushB']);
+ d.querySelector('[data-tab=history]').click();console.log('history:',[...d.querySelectorAll('.hist .meta')].map(m=>m.textContent).join(' / '));
+ console.log('errors',w.__e);process.exit(0)})();

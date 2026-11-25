@@ -28,3 +28,16 @@ The web version lives in the `docs` folder (served by GitHub Pages from `main` /
 ## Credits
 
 Exercise photos come from [Free Exercise DB](https://github.com/yuhonas/free-exercise-db), released into the public domain (Unlicense).
+
+## Development
+
+The whole app is `src/index.html`. After editing it:
+
+```bash
+python3 scripts/sync.py   # copies it into the Android, iPhone and web versions
+npm install && npm test   # runs the tests in tests/
+```
+
+## Agent team
+
+A team of AI agents (Researcher, Product Lead, Coder, QA, Designer, Marketer) improves the app every week. App changes arrive as pull requests for review; notes live in `ops/`. See `ops/README.md` and `CLAUDE.md`.

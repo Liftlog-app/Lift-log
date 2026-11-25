@@ -8,3 +8,4 @@ LiftLog.xcodeproj/
 build/
 Payload/
 *.ipa
+node_modules/

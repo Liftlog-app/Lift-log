@@ -1,0 +1,23 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths: ["src/**", "tests/**", "package.json", ".github/workflows/test.yml"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install --no-audit --no-fund
+      - name: Check generated copies are in sync with src/index.html
+        run: |
+          python3 scripts/sync.py
+          git diff --exit-code -- app/src/main/assets/index.html docs/index.html || (echo "::error::Run 'python3 scripts/sync.py' and commit the result" && exit 1)
+      - run: npm test
