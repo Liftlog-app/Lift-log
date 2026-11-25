@@ -556,7 +556,9 @@ function ghostCell(g,k,w,r){
 }
 function phWeights(x,sg,n,key,pw){const out=[];for(let k=0;k<n;k++){let v=sg?sg.w(k):pw;if(sg&&deloadNow[key])v=roundW(sg.w(k)*0.6,x.n);if(sg&&backoff[key]&&k===n-1)v=roundW(sg.w(0)*0.82,x.n);out.push(v)}return out}
 function prLine(x,sg,i){if(i!==0||!sg||x.test)return '';const v=readyScore(readyToday());if(v==null||v<4.5)return '';
-  const work=+sg.w(0)||0;let top=roundW(sg.est/(1+(repsFor(x,0)+0.5)/30),x.n);if(top<=work)top=isBarbell(x.n)?+(work+barStep()).toFixed(2):work+(unit()==='kg'?2.5:5);
+  const work=+sg.w(0)||0,raw=sg.est/(1+(repsFor(x,0)+0.5)/30);let top=roundW(raw,x.n);if(top<=work)top=isBarbell(x.n)?+(work+barStep()).toFixed(2):work+(unit()==='kg'?2.5:5);
+  // coarse plates can force a big jump: hide PR chance when rounding puts it more than 5% above the work weight (or the unrounded target, whichever is higher)
+  if(top>Math.max(work,raw)*1.05)return '';
   return `<br><b>PR chance:</b> after your work sets, try one top set of ${top} ${unit()} × ${repsFor(x,0)} at RPE 9.5.`}
 const repsFor=(x,k)=>{const m=String(x.reps).match(/\d+/g);if(!m)return 0;return String(x.reps).includes(',')?+(m[k]!=null?m[k]:m[m.length-1]):+m[0]};
 // Barbell lifts round to what you can load: bar + k x (2 x smallest plate). Everything else keeps 5 lb / 2.5 kg.

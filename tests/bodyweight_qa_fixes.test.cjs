@@ -40,7 +40,9 @@ const goalView=async(w,goal,by)=>{const s=base();s.profile.bw=[{d:'2026-11-24',w
  const legs=()=>({'2026-11-17_legsA':{date:'2026-11-17',W:0,wk:0,s:'legsA',ex:{'Back squat':[{w:247,r:6,e:8}],'Romanian deadlift':[{w:203,r:9}]},updated:1,dur:50}});
  for(const plates of [[45],[45,35,25,10,5,2.5],[45,25,10,5]]){
   const A=boot({profile:{start:'2026-11-02',unit:'lb',ready:{date:'2026-11-24',sl:5,so:5,en:5},gear:{lb:{bar:45,plates}}},sessions:legs()});await sleep(120);await A.tab('today');A.$('[data-s=legsA]').click();await sleep(20);
-  const sug=A.$('.card[data-card="0"] .sug').textContent,work=parseFloat(sug.match(/Suggested: ([\d.]+)/)[1]),m=sug.match(/top set of ([\d.]+)/);ok(m,'no PR chance line');const top=+m[1],step=2*Math.min(...plates);
+  const sug=A.$('.card[data-card="0"] .sug').textContent,work=parseFloat(sug.match(/Suggested: ([\d.]+)/)[1]),m=sug.match(/top set of ([\d.]+)/);
+  if(plates.length===1){console.log(`plates 45 only: work ${work}, PR chance hidden: ${!m}`);ok(!m,'PR chance shown with only 45s (jump > 5%)');continue}
+  ok(m,'no PR chance line');if(plates.length===6)ok(work===240&&+m[1]===245,'default gear PR chance differs from main (240 work → 245 on main)');ok(+m[1]<=work*1.05+1e-9,`PR chance ${m[1]} more than 5% above ${work}`);const top=+m[1],step=2*Math.min(...plates);
   console.log(`plates ${plates.join('/')}: work ${work}, PR chance ${top}`);ok(top>work&&(top-45)%step===0,`PR chance ${top} not above work ${work} on a ${step} step`)}
  // 6. bad plates in a restored backup: ignored, no hang
  for(const [plates,exp] of [[[0,-5,'x',null],'45, 35, 25, 10, 5, 2.5'],[[0,45],'45']]){
