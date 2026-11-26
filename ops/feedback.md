@@ -10,3 +10,7 @@ Format: `- YYYY-MM-DD · who · what happened or what you want · (status)`
 - 2026-11-24 · Nheil · The rest-timer bar was always showing on the Workout tab; it should only appear after logging a set · (done, build 15)
 - 2026-11-23 · Nheil · Workout clock kept counting after the workout; wants clear Start and End buttons · (done, build 14)
 - 2026-11-23 · Nheil · Couldn't look at future weeks; Push A wasn't checked off when done earlier in the week · (done)
+
+## 2026-11-26 (Nheil, via chat)
+- Bug: on Home, the "Week 1 of 15" bar shows the 5 Peak weeks as huge yellow columns (Android screenshot). Queued; cause found (`.b3` class clash with the 3D body viewer).
+- Wants the Program tab more interactive and better looking. Queued.

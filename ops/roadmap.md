@@ -75,6 +75,27 @@ Fix 1:
 - **Set cap on a grinder**: after an RPE 10 set or missed target reps, offer to drop the remaining sets or cut their load.
 - **PR share cards**: one tap turns a new personal record into a branded image to post. Growth loop for Nheil's gym content. Needs a native share/save bridge in the Android and iPhone wrappers.
 
+## Queued by Nheil (2026-11-26), do these first
+
+1. **Bug: Home "Week X of 15" bar, Peak weeks are giant yellow columns** (screenshot from Nheil's Android, 2026-11-26).
+   - **Cause:** CSS class clash. The 3D body viewer (PR #5) styles `.b3` (height `min(560px,70vh)`, `min-height:420px`, border, background). The plan bar marks Peak-block weeks with `<i class="b3">`, so they inherit that height.
+   - **Fix:** rename the viewer's classes (e.g. `.b3` → `.body3d`, along with every `.b3*` selector and the JS that sets `className='b3'`), or scope the bar rules (`.bar15 i.b3`). The renaming option is safer.
+   - **Acceptance:** on Home, all 15 week squares are 10 px tall with Peak weeks in yellow, in dark and light mode at 390 px. The Body tab 3D viewer looks unchanged. Add a test that checks `.bar15 i` heights are equal.
+2. **Program tab: more interactive and better looking** (Nheil, 2026-11-26). Designer + Coder. The current tab is mostly a static editor and list.
+   - **Ideas to choose from:**
+     - a visual 15-week timeline (Hypertrophy → Strength → Peak) you can tap to preview any week's sets, reps and RPE
+     - day cards in plate colours (Push red, Pull blue, Legs yellow) with exercise photos
+     - drag to reorder exercises
+     - tap an exercise to swap it using the photo dropdown
+     - a progress ring for how far through the block you are
+     - "this week vs next week" changes highlighted
+     - smooth transitions between views
+   - **Must keep:** the program editor features, presets, swaps, periodization and saved data (`profile.program`, `swaps`) working.
+   - **Acceptance:**
+     - Designer screenshots at 390 px, dark and light, before and after.
+     - Tap targets at least 44 px.
+     - A test that opens the tab, previews a future week and edits an exercise.
+
 ## Pro features (queued by Nheil, 2026-11-26)
 
 Nheil picked these as the premium features to build toward the Pro tier. Build them in this order. They can ship free at first and be put behind Pro later, once accounts and store billing exist (see Blocked). Idea #3 ("Gym's packed" mode) was left out on purpose.
