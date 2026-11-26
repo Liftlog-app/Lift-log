@@ -8,7 +8,7 @@ const allErrors=[];
 function boot(seed){
   const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){const RD=w.Date;class FD extends RD{constructor(...a){if(a.length)super(...a);else super(FD.now())}static now(){return w.__now||NOW}};w.Date=FD;w.ResizeObserver=class{observe(){}disconnect(){}};w.scrollTo=()=>{};w.localStorage.setItem('liftlog.v1',JSON.stringify(seed));w.__now=NOW;w.__e=[];w.addEventListener('error',e=>w.__e.push(e.message))}});
   const w=dom.window,d=w.document,$=s=>d.querySelector(s);allErrors.push(w.__e);
-  return {w,d,$,tab:async t=>{$(`[data-tab=${t}]`).click();await sleep(15)},store:()=>JSON.parse(w.localStorage.getItem('liftlog.v1'))};
+  return {w,d,$,tab:async t=>{$(`[data-tab=${t}]`).click();await sleep(15);if(t==='progress'){const b=$('[data-pseg=body]');if(b){b.click();await sleep(15)}}},store:()=>JSON.parse(w.localStorage.getItem('liftlog.v1'))};
 }
 const base=()=>({profile:{start:'2026-11-16',unit:'lb'},sessions:{'2026-11-23_pushA':{date:'2026-11-23',W:2,wk:2,s:'pushA',ex:{'Bench press':[{w:185,r:8}]},updated:1,dur:50}}});
 const goalView=async(w,goal,by)=>{const s=base();s.profile.bw=[{d:'2026-11-24',w,u:'lb'}];s.profile.cut={goal,u:'lb',by};const A=boot(s);await sleep(120);await A.tab('progress');return {g:A.$('.bwgoal').textContent,warn:(A.$('#bwsec .hint.plat')||{}).textContent||''}};
@@ -47,7 +47,7 @@ const goalView=async(w,goal,by)=>{const s=base();s.profile.bw=[{d:'2026-11-24',w
  // 6. bad plates in a restored backup: ignored, no hang
  for(const [plates,exp] of [[[0,-5,'x',null],'45, 35, 25, 10, 5, 2.5'],[[0,45],'45']]){
   const A=boot({profile:{start:'2026-11-02',unit:'lb',gear:{lb:{bar:45,plates}}},sessions:legs()});await sleep(120);await A.tab('today');A.$('[data-s=legsA]').click();await sleep(20);
-  const load=(A.$('.card[data-card="0"] .sug .meta')||{}).textContent||'';console.log(`plates ${JSON.stringify(plates)} → ${load}`);ok(/^Load: /.test(load)&&!/NaN|undefined/.test(load),'bad plates load line');
+  const load=(A.$('.card[data-card="0"] .sug .sugpl')||{}).textContent||'';console.log(`plates ${JSON.stringify(plates)} → ${load}`);ok(/per side|bar/.test(load)&&!/NaN|undefined/.test(load),'bad plates load line');
   A.$('.gear').click();await sleep(10);ok(A.$('#gpl').value===exp,'settings shows bad plates: '+A.$('#gpl').value);console.log('  settings plates:',A.$('#gpl').value)}
  const errs=allErrors.flat();console.log('errors',errs);if(errs.length)fail('page errors: '+errs.join('; '));
  console.log('ALL QA FIX CHECKS PASSED');process.exit(0)})().catch(e=>{console.log(e.message);process.exit(1)});
