@@ -2,99 +2,159 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lift Log Agent Team</title>
-<meta name="theme-color" content="#0d1015">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lift Log Agent HQ</title>
+<meta name="theme-color" content="#04060d">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Barlow:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" id="tabler" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" onerror="document.documentElement.classList.add('noicons')">
 <style>
-/* VOICE: a gym's control room for the team that builds Lift Log - energetic, legible at a glance
-   IDEA: the six agents orbit the app like plates on a bar; a pulse travels the loop in weekly order
-   PICTURE: the orbit itself, full width at the top, nodes lit by live GitHub status
-   COLOUR and TYPE: night charcoal, plate colours (red/blue/yellow), green for done; Barlow Condensed + Barlow
-   LAYOUT: title, orbit, then live status cards in one column on phones, two columns wider */
-:root{color-scheme:dark;--bg:#0d1015;--card:#161b23;--line:#262d38;--ink:#eef1f5;--mute:#9aa3b1;--red:#d8342c;--blue:#2a63d4;--yel:#e0a800;--ok:#22b268;--warn:#e0a800;--bad:#e5484d}
+/* VOICE: mission control for the AI crew that builds Lift Log
+   IDEA: an orbital space-station office: six robot agents in glass pods around the glowing Lift Log core
+   PICTURE: the station, lit by live GitHub status; a data packet travels pod to pod in weekly order
+   COLOUR and TYPE: deep space navy, cyan HUD lines, agent colours as visor glows; Orbitron for display, Barlow for text, JetBrains Mono for readouts
+   LAYOUT: HUD header, station, then glass HUD panels (1 column on phones, 2 wider) */
+:root{color-scheme:dark;--bg:#04060d;--ink:#eaf2ff;--mute:#93a3bd;--hud:#5fe1ff;--hud2:#8a7dff;--line:rgba(95,225,255,.18);--glass:rgba(14,22,40,.58);--ok:#3ee08f;--warn:#ffcf4a;--bad:#ff6b6b}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,-apple-system,system-ui,sans-serif;overflow-x:clip}
-a{color:#8fb4ff}
-.wrap{max-width:980px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(4vw,16px) 48px}
+html{background:var(--bg)}
+body{margin:0;color:var(--ink);font:16px/1.5 Barlow,-apple-system,system-ui,sans-serif;overflow-x:clip;background:
+ radial-gradient(60% 40% at 15% 10%,rgba(138,125,255,.20),transparent 70%),
+ radial-gradient(50% 35% at 90% 25%,rgba(95,225,255,.13),transparent 70%),
+ radial-gradient(70% 45% at 60% 100%,rgba(216,52,44,.13),transparent 70%),var(--bg);min-height:100vh}
+#space{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+a{color:var(--hud)}
+.wrap{max-width:1000px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(4vw,16px) 48px;position:relative}
 header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
-h1{font:800 clamp(32px,7vw,48px)/1.02 "Barlow Condensed",Barlow,sans-serif;margin:0;text-wrap:balance}
-.sub{color:var(--mute);margin:4px 0 0}
-.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:15px;white-space:nowrap}
-.pill .dot{width:9px;height:9px;border-radius:50%;background:var(--mute)}
-.pill.live .dot{background:var(--ok)}
-.stage{position:relative;margin:14px auto 6px;max-width:560px;aspect-ratio:1/1.02}
+.kicker{font:500 12px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.22em;color:var(--hud);text-transform:uppercase;opacity:.85}
+h1{font:800 clamp(26px,6.4vw,44px)/1.05 Orbitron,Barlow,sans-serif;margin:4px 0 0;letter-spacing:.02em;text-wrap:balance;
+ background:linear-gradient(90deg,#fff 0%,#bfefff 45%,#a99dff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(95,225,255,.25))}
+.sub{color:var(--mute);margin:6px 0 0}
+.pill{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:999px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font:600 14px "JetBrains Mono",monospace;letter-spacing:.04em;white-space:nowrap;box-shadow:0 0 24px rgba(95,225,255,.08) inset}
+.pill .dot{width:9px;height:9px;border-radius:50%;background:var(--mute);box-shadow:0 0 10px currentColor}
+.pill.live .dot{background:var(--ok);color:var(--ok)}
+/* station */
+.stage{position:relative;margin:10px auto 4px;max-width:600px;aspect-ratio:440/455}
 .stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.ring{fill:none;stroke:#2a3240;stroke-width:2;stroke-dasharray:3 7}
-.spoke{stroke:#222a35;stroke-width:1.5}
-.hubc{fill:#131820;stroke:#2f3846;stroke-width:1.5}
-.node circle.bg{fill:#151b24;stroke-width:3}
-.node .halo{fill:none;stroke-width:2;opacity:0}
-.node.done .halo{opacity:.9;stroke:var(--ok)}
-.node.active .halo{opacity:1}
-.nlabel{font:800 17px "Barlow Condensed",Barlow,sans-serif;fill:var(--ink);text-anchor:middle}
-.nstat{font:600 12.5px Barlow,sans-serif;fill:var(--mute);text-anchor:middle}
-.ninit{display:none;font:800 22px "Barlow Condensed",Barlow,sans-serif;fill:#fff;text-anchor:middle}
-.noicons .ninit{display:block}.noicons #icons{display:none}
-.ico{position:absolute;transform:translate(-50%,-50%);font-size:clamp(20px,5.4vw,30px);pointer-events:none;color:#fff}
-.hubtxt{position:absolute;left:50%;top:50.5%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
-.hubtxt b{display:block;font:800 clamp(20px,5vw,28px)/1 "Barlow Condensed",Barlow,sans-serif}
-.hubtxt span{font-size:clamp(11px,2.6vw,13px);color:var(--mute)}
-.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;color:var(--mute);font-size:13px;margin-bottom:18px}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.card h2{font:800 20px "Barlow Condensed",Barlow,sans-serif;margin:0 0 6px;display:flex;align-items:center;gap:8px}
-.card h2 i{font-size:20px;color:var(--mute)}
-.big{font:800 34px/1.05 "Barlow Condensed",Barlow,sans-serif;font-variant-numeric:tabular-nums}
+.orbit{fill:none;stroke:rgba(95,225,255,.22);stroke-width:1.2}
+.orbit2{fill:none;stroke:rgba(138,125,255,.25);stroke-width:1;stroke-dasharray:2 9}
+.route{fill:none;stroke:rgba(95,225,255,.35);stroke-width:1.6;stroke-dasharray:6 8}
+.spoke{stroke:rgba(95,225,255,.14);stroke-width:1.4}
+.spoke.on{stroke:var(--hud);stroke-width:2;stroke-dasharray:5 6}
+.ticks{fill:none;stroke:rgba(95,225,255,.35);stroke-width:5;stroke-dasharray:1 7.5}
+.corebg{fill:url(#coreGrad);stroke:rgba(95,225,255,.55);stroke-width:1.5}
+.coretxt{font:800 15px Orbitron,sans-serif;fill:#fff;text-anchor:middle;letter-spacing:.08em}
+.coresub{font:500 9.5px "JetBrains Mono",monospace;fill:var(--hud);text-anchor:middle;letter-spacing:.06em}
+.pod .glass{fill:rgba(18,30,56,.62);stroke:var(--c);stroke-opacity:.75;stroke-width:1.6}
+.pod .dome{fill:url(#domeGrad);opacity:.55}
+.pod .floor{fill:var(--c);opacity:.22}
+.pod .body{fill:#d9e3f2}.pod .shade{fill:#a9b6c9}
+.pod .visor{fill:var(--c);filter:url(#glow)}
+.pod .bulb{fill:var(--c);filter:url(#glow)}
+.pod .holo{fill:var(--c);opacity:.16;stroke:var(--c);stroke-opacity:.8;stroke-width:.8}
+.pod .hl{stroke:var(--c);stroke-width:1.4;stroke-linecap:round;opacity:.9}
+.pod .desk{fill:#24324d;stroke:rgba(255,255,255,.18);stroke-width:.6}
+.pod .badge{opacity:0}
+.pod.done .badge{opacity:1}
+.pod.paused{opacity:.55}
+.pod .zz{opacity:0;font:800 10px Orbitron,sans-serif;fill:var(--hud2)}
+.pod.paused .zz{opacity:1}
+.pod.paused .visor{opacity:.25}
+.nlabel{font:800 12px Orbitron,sans-serif;fill:var(--ink);text-anchor:middle;letter-spacing:.06em;text-transform:uppercase}
+.nstat{font:500 10.5px "JetBrains Mono",monospace;fill:var(--mute);text-anchor:middle}
+.pod.active .nstat{fill:#fff}.pod.done .nstat{fill:var(--ok)}
+.ninit{display:none}
+.ico{position:absolute;transform:translate(-50%,-50%);font-size:clamp(11px,2.6vw,15px);pointer-events:none;color:#fff;text-shadow:0 0 8px currentColor}
+.noicons #icons{display:none}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;color:var(--mute);font:500 12px "JetBrains Mono",monospace;margin-bottom:18px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:0;box-shadow:0 0 8px currentColor}
+/* HUD panels */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:16px 18px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 10px 40px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.02) inset;overflow:hidden}
+.card::before,.card::after{content:"";position:absolute;width:16px;height:16px;border:2px solid var(--hud);opacity:.7}
+.card::before{top:8px;left:8px;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+.card::after{bottom:8px;right:8px;border-left:0;border-top:0;border-radius:0 0 6px 0}
+.card h2{font:600 11.5px "JetBrains Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--hud);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.card h2 i{font-size:16px}
+.big{font:800 clamp(28px,7vw,36px)/1.05 Orbitron,sans-serif;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 22px rgba(95,225,255,.45)}
 .muted{color:var(--mute);font-size:14px}
-.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:700;background:#222a35;color:var(--mute)}
-.tag.ok{background:#123522;color:#7fe0aa}.tag.warn{background:#3a2e0c;color:#ffd666}.tag.bad{background:#3d1517;color:#ffaaa6}.tag.open{background:#13264a;color:#9cc0ff}
-.lines{margin:6px 0 0;padding-left:18px}.lines li{margin:2px 0}
-.feed{list-style:none;margin:0;padding:0}.feed li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.feed li:first-child{border-top:0}
-.feed time{color:var(--mute);font-size:13px;white-space:nowrap;min-width:4.6em}
+.tag{display:inline-block;padding:2px 10px;border-radius:999px;font:600 12px "JetBrains Mono",monospace;background:rgba(255,255,255,.07);color:var(--mute);border:1px solid rgba(255,255,255,.08)}
+.tag.ok{background:rgba(62,224,143,.12);color:#8af5bf;border-color:rgba(62,224,143,.3)}.tag.warn{background:rgba(255,207,74,.12);color:#ffe08a;border-color:rgba(255,207,74,.3)}.tag.bad{background:rgba(255,107,107,.12);color:#ffb0b0;border-color:rgba(255,107,107,.3)}.tag.open{background:rgba(95,225,255,.12);color:#a9f0ff;border-color:rgba(95,225,255,.35)}
+.lines{margin:6px 0 0;padding-left:18px}.lines li{margin:3px 0}.lines li::marker{color:var(--hud)}
+.feed{list-style:none;margin:0;padding:0;font-size:15px}.feed li{display:flex;gap:12px;padding:8px 0;border-top:1px dashed rgba(95,225,255,.14)}.feed li:first-child{border-top:0}
+.feed time{color:var(--hud);font:500 12px "JetBrains Mono",monospace;white-space:nowrap;min-width:5.2em;padding-top:2px;opacity:.85}
 .wide{grid-column:1/-1}
-.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;background:#222a35;border:1px solid #2f3846;color:var(--ink);text-decoration:none;font-weight:700}
-.note{color:var(--mute);font-size:13px;margin-top:18px;text-align:center}
-@media(max-width:640px){.grid{grid-template-columns:minmax(0,1fr)}.nstat{font-size:14px}.nlabel{font-size:19px}}
-@media(prefers-reduced-motion:no-preference){.pulse{animation:pulse 1.8s ease-in-out infinite}.node.active .halo{animation:pulse 1.2s ease-in-out infinite}@keyframes pulse{50%{opacity:.25}}}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 16px;border-radius:12px;background:linear-gradient(180deg,rgba(95,225,255,.16),rgba(95,225,255,.06));border:1px solid rgba(95,225,255,.4);color:#e8fbff;text-decoration:none;font-weight:700;box-shadow:0 0 18px rgba(95,225,255,.12);transition:transform .2s,box-shadow .2s}
+.btn:hover{box-shadow:0 0 26px rgba(95,225,255,.3)}.btn:active{transform:scale(.96)}
+.note{color:var(--mute);font:500 12px "JetBrains Mono",monospace;margin-top:20px;text-align:center;opacity:.8}
+@media(max-width:640px){.grid{grid-template-columns:minmax(0,1fr)}.nlabel{font-size:15.5px}.nstat{font-size:13.5px}.stage{margin-left:-8px;margin-right:-8px}}
+@media(prefers-reduced-motion:no-preference){
+ .spin{animation:spin 60s linear infinite;transform-origin:220px 222px}.spin.rev{animation-duration:90s;animation-direction:reverse}
+ @keyframes spin{to{transform:rotate(360deg)}}
+ .route{animation:flow 2.4s linear infinite}.spoke.on{animation:flow 1s linear infinite}@keyframes flow{to{stroke-dashoffset:-28}}
+ .core-pulse{animation:cpulse 3.2s ease-in-out infinite;transform-origin:220px 222px}@keyframes cpulse{50%{transform:scale(1.06);opacity:.55}}
+ .pod .bot{animation:bob 3.4s ease-in-out infinite;animation-delay:var(--d)}@keyframes bob{50%{transform:translateY(-2.2px)}}
+ .pod .bulb{animation:blink 2.6s ease-in-out infinite;animation-delay:var(--d)}@keyframes blink{50%{opacity:.3}}
+ .pod.active .visor{animation:scan .7s ease-in-out infinite alternate}@keyframes scan{to{opacity:.45}}
+ .pod.active .hl{animation:type 1.1s steps(4) infinite}.pod.active .hl:nth-child(2){animation-delay:.3s}.pod.active .hl:nth-child(3){animation-delay:.6s}
+ @keyframes type{0%{stroke-dasharray:0 30}100%{stroke-dasharray:30 0}}
+ .pod.active .glass{animation:podglow 1.4s ease-in-out infinite}@keyframes podglow{50%{stroke-opacity:1;stroke-width:2.6}}
+ .pod.paused .zz{animation:zz 2.6s ease-in-out infinite}@keyframes zz{0%{transform:translate(0,0);opacity:0}30%{opacity:1}100%{transform:translate(6px,-10px);opacity:0}}
+ .pulse{animation:dot 1.8s ease-in-out infinite}@keyframes dot{50%{opacity:.35}}
+ .card{animation:rise .6s cubic-bezier(.2,.8,.3,1) both}.card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.12s}.card:nth-child(4){animation-delay:.18s}.card:nth-child(5){animation-delay:.24s}.card:nth-child(6){animation-delay:.3s}
+ @keyframes rise{from{opacity:0;transform:translateY(14px)}}
+}
 </style>
 </head>
 <body>
+<canvas id="space" aria-hidden="true"></canvas>
 <div class="wrap">
   <header>
-    <div><h1>Lift Log agent team</h1><p class="sub">Six AI agents improving the app every week. Live from GitHub.</p></div>
+    <div><div class="kicker">Orbital station · Lift Log</div><h1>Agent HQ</h1><p class="sub">Six AI agents working in orbit to make Lift Log better every week. Live from GitHub.</p></div>
     <span class="pill" id="state"><span class="dot pulse"></span><span id="stateText">Checking…</span></span>
   </header>
 
   <div class="stage" id="stage">
-    <svg viewBox="0 0 420 430" role="img" aria-labelledby="orbitTitle orbitDesc">
-      <title id="orbitTitle">Agent team orbit</title>
-      <desc id="orbitDesc">Researcher, Product Lead, Coder, QA, Designer and Marketer arranged in a loop around the Lift Log app, in the order they work each week.</desc>
+    <svg viewBox="0 0 440 455" role="img" aria-labelledby="orbitTitle orbitDesc">
+      <title id="orbitTitle">Agent space station</title>
+      <desc id="orbitDesc">Researcher, Product Lead, Coder, QA, Designer and Marketer work in glass pods orbiting the Lift Log core, in the order they work each week.</desc>
+      <defs>
+        <radialGradient id="coreGrad" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#1b3a63"/><stop offset=".7" stop-color="#0b1426"/><stop offset="1" stop-color="#070c18"/></radialGradient>
+        <radialGradient id="coreGlow"><stop offset="0" stop-color="#5fe1ff" stop-opacity=".45"/><stop offset="1" stop-color="#5fe1ff" stop-opacity="0"/></radialGradient>
+        <linearGradient id="domeGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <g class="spin"><circle class="ticks" cx="220" cy="222" r="200"/></g>
+      <g class="spin rev"><circle class="orbit2" cx="220" cy="222" r="184"/></g>
+      <circle class="orbit" cx="220" cy="222" r="158"/>
       <g id="spokes"></g>
-      <circle class="ring" cx="210" cy="210" r="150" id="ringPath"/>
-      <circle class="hubc" cx="210" cy="210" r="62"/>
-      <g id="hubPlates"></g>
-      <circle r="6" fill="#fff" id="spark" opacity=".9"><animateMotion dur="9s" repeatCount="indefinite" rotate="auto" path="M210,60 a150,150 0 1,1 -0.01,0"/></circle>
+      <path class="route" id="route" d=""/>
+      <circle r="4.5" fill="#fff" filter="url(#glow)" id="packet"><animateMotion id="pm" dur="10s" repeatCount="indefinite" rotate="auto" path=""/></circle>
+      <circle class="core-pulse" cx="220" cy="222" r="92" fill="url(#coreGlow)"/>
+      <circle class="corebg" cx="220" cy="222" r="64"/>
+      <g class="spin"><circle cx="220" cy="222" r="74" fill="none" stroke="rgba(95,225,255,.45)" stroke-width="1.2" stroke-dasharray="40 14 4 14"/></g>
+      <g transform="translate(220 205) scale(.058) translate(-512 -512)">
+        <polyline points="250,560 430,740 790,330" fill="none" stroke="#fff" stroke-width="92" stroke-linecap="round" stroke-linejoin="round"/>
+        <g transform="translate(790,330) rotate(-48.7)"><rect x="-34" y="-150" width="68" height="300" rx="22" fill="#d8342c"/><rect x="-86" y="-105" width="46" height="210" rx="16" fill="#2a63d4"/></g>
+        <g transform="translate(250,560) rotate(45)"><rect x="-30" y="-110" width="60" height="220" rx="20" fill="#e0a800"/></g>
+      </g>
+      <text class="coretxt" x="220" y="250">LIFT LOG</text>
+      <text class="coresub" x="220" y="264" id="hubSub">the app</text>
       <g id="nodes"></g>
     </svg>
-    <div class="hubtxt"><b>Lift Log</b><span id="hubSub">the app</span></div>
     <div id="icons"></div>
   </div>
-  <div class="legend"><span><i style="background:var(--ok)"></i>Done this week</span><span><i style="background:#fff"></i>Working now</span><span><i style="background:#3a4250"></i>Waiting</span></div>
+  <div class="legend"><span><i style="background:var(--ok);color:var(--ok)"></i>Done this week</span><span><i style="background:#fff;color:#fff"></i>Working now</span><span><i style="background:#4a5872;color:#4a5872"></i>Standing by</span><span><i style="background:var(--hud2);color:var(--hud2)"></i>Paused</span></div>
 
   <div class="grid">
-    <section class="card"><h2><i class="ti ti-clock-play" aria-hidden="true"></i>Next team run</h2><div class="big" id="cd">–</div><div class="muted" id="cdWhen">Every Saturday, 1:32 PM Eastern</div></section>
-    <section class="card"><h2><i class="ti ti-git-pull-request" aria-hidden="true"></i>Agent pull request</h2><div id="pr" class="muted">Loading…</div></section>
-    <section class="card wide"><h2><i class="ti ti-target-arrow" aria-hidden="true"></i>This week's build</h2><div id="week" class="muted">Loading…</div></section>
+    <section class="card"><h2><i class="ti ti-rocket" aria-hidden="true"></i>T-minus next team run</h2><div class="big" id="cd">–</div><div class="muted" id="cdWhen">Every Saturday, 3:32 AM Eastern</div></section>
+    <section class="card"><h2><i class="ti ti-git-pull-request" aria-hidden="true"></i>Incoming pull request</h2><div id="pr" class="muted">Loading…</div></section>
+    <section class="card wide"><h2><i class="ti ti-target-arrow" aria-hidden="true"></i>Current mission</h2><div id="week" class="muted">Loading…</div></section>
     <section class="card"><h2><i class="ti ti-download" aria-hidden="true"></i>Latest app builds</h2><div id="builds" class="muted">Loading…</div></section>
-    <section class="card"><h2><i class="ti ti-report-analytics" aria-hidden="true"></i>Latest weekly report</h2><div id="report" class="muted">Loading…</div></section>
-    <section class="card wide"><h2><i class="ti ti-activity" aria-hidden="true"></i>Recent team activity</h2><ul class="feed" id="feed"><li class="muted">Loading…</li></ul></section>
+    <section class="card"><h2><i class="ti ti-report-analytics" aria-hidden="true"></i>Weekly mission report</h2><div id="report" class="muted">Loading…</div></section>
+    <section class="card wide"><h2><i class="ti ti-antenna-bars-5" aria-hidden="true"></i>Comms log</h2><ul class="feed" id="feed"><li class="muted">Loading…</li></ul></section>
   </div>
   <p class="note" id="note">Data from the public GitHub repo nheilmangoba1/Lift-log. Refreshes every 5 minutes.</p>
 </div>
@@ -103,28 +163,58 @@ h1{font:800 clamp(32px,7vw,48px)/1.02 "Barlow Condensed",Barlow,sans-serif;margi
 {
 const REPO='nheilmangoba1/Lift-log',API='https://api.github.com/repos/'+REPO,RAW='https://raw.githubusercontent.com/'+REPO+'/main/';
 const AGENTS=[
-  {id:'researcher',name:'Researcher',icon:'ti-telescope',c:'#8a5cf6',path:'ops/research'},
-  {id:'lead',name:'Product Lead',icon:'ti-target-arrow',c:'#d8342c',path:'ops/roadmap.md'},
-  {id:'coder',name:'Coder',icon:'ti-code',c:'#2a63d4',path:null},
-  {id:'qa',name:'QA',icon:'ti-shield-check',c:'#22b268',path:null},
-  {id:'designer',name:'Designer',icon:'ti-palette',c:'#e06a1a',path:null},
-  {id:'marketer',name:'Marketer',icon:'ti-speakerphone',c:'#e0a800',path:'ops/marketing'}];
+  {id:'researcher',name:'Researcher',icon:'ti-telescope',c:'#a78bfa',path:'ops/research'},
+  {id:'lead',name:'Product Lead',icon:'ti-target-arrow',c:'#ff5a4f',path:'ops/roadmap.md'},
+  {id:'coder',name:'Coder',icon:'ti-code',c:'#5b8cff',path:null},
+  {id:'qa',name:'QA',icon:'ti-shield-check',c:'#3ee08f',path:null},
+  {id:'designer',name:'Designer',icon:'ti-palette',c:'#ff9a3c',path:null},
+  {id:'marketer',name:'Marketer',icon:'ti-speakerphone',c:'#ffcf4a',path:'ops/marketing'}];
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=d=>new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric'});
 const ago=d=>{const m=(Date.now()-new Date(d))/6e4;return m<60?Math.round(m)+'m ago':m<1440?Math.round(m/60)+'h ago':Math.round(m/1440)+'d ago'};
+const RED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- orbit ---------- */
-const CX=210,CY=210,R=150,NR=34;
+/* ---------- starfield ---------- */
+(()=>{const cv=$('#space'),cx=cv.getContext('2d');let W,H,stars=[],shoot=null,last=0;
+ const make=()=>{const dpr=Math.min(devicePixelRatio||1,2);W=cv.width=innerWidth*dpr;H=cv.height=innerHeight*dpr;
+  stars=Array.from({length:Math.round(innerWidth*innerHeight/2600)},()=>({x:Math.random()*W,y:Math.random()*H,z:Math.random(),t:Math.random()*6.3,s:(.4+Math.random()*1.3)*dpr}))};
+ make();addEventListener('resize',make);
+ const frame=now=>{const dt=Math.min(50,now-last)||16;last=now;cx.clearRect(0,0,W,H);
+  for(const s of stars){if(!RED){s.y+=s.z*.05*dt*.06;if(s.y>H)s.y=0;s.t+=.0016*dt}
+   const a=.35+.65*Math.abs(Math.sin(s.t))*(.4+s.z*.6);cx.globalAlpha=a;cx.fillStyle=s.z>.85?'#bfe9ff':s.z<.1?'#c9b8ff':'#fff';cx.beginPath();cx.arc(s.x,s.y,s.s*(.5+s.z*.7),0,6.3);cx.fill()}
+  if(!RED){if(!shoot&&Math.random()<.004)shoot={x:Math.random()*W*.7,y:Math.random()*H*.4,l:0};
+   if(shoot){shoot.l+=dt*.9;const k=shoot.l,x=shoot.x+k,y=shoot.y+k*.45,g=cx.createLinearGradient(x,y,x-120,y-54);g.addColorStop(0,'rgba(191,239,255,.9)');g.addColorStop(1,'rgba(191,239,255,0)');
+    cx.globalAlpha=1;cx.strokeStyle=g;cx.lineWidth=2;cx.beginPath();cx.moveTo(x,y);cx.lineTo(x-120,y-54);cx.stroke();if(k>W*.5)shoot=null}}
+  cx.globalAlpha=1;if(!RED)requestAnimationFrame(frame)};
+ requestAnimationFrame(frame);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!RED){last=performance.now();requestAnimationFrame(frame)}})})();
+
+/* ---------- station ---------- */
+const CX=220,CY=222,R=158;
 const pos=AGENTS.map((a,i)=>{const t=(-90+i*60)*Math.PI/180;return {x:CX+R*Math.cos(t),y:CY+R*Math.sin(t)}});
-$('#spokes').innerHTML=pos.map(p=>`<line class="spoke" x1="${CX}" y1="${CY}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}"/>`).join('');
-$('#hubPlates').innerHTML=[[-44,'#d8342c',26],[-30,'#2a63d4',18],[30,'#2a63d4',18],[44,'#d8342c',26]].map(([dx,c,h])=>`<rect x="${CX+dx-4}" y="${CY-30-h/2}" width="8" height="${h}" rx="2" fill="${c}"/>`).join('')+`<rect x="${CX-52}" y="${CY-32}" width="104" height="4" rx="2" fill="#cfd5de"/>`;
+$('#spokes').innerHTML=pos.map((p,i)=>`<line class="spoke" id="sp${i}" x1="${CX}" y1="${CY}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}"/>`).join('');
+const routeD='M'+pos.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' L')+' Z';
+$('#route').setAttribute('d',routeD);$('#pm').setAttribute('path',routeD);if(RED)$('#packet').remove();
+function pod(a,i,s){const p=pos[i],below=p.y>CY+10,ly=below?p.y+52:p.y-(window.innerWidth<640?66:60),st=s.state||'';
+ return `<g class="pod ${st}" style="--c:${a.c};--d:${(i*.45).toFixed(2)}s"><g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})">
+  <ellipse class="floor" cx="0" cy="27" rx="38" ry="7"/>
+  <rect class="glass" x="-42" y="-36" width="84" height="66" rx="22"/><rect class="dome" x="-40" y="-34" width="80" height="62" rx="20"/>
+  <rect class="desk" x="-30" y="15" width="60" height="7" rx="3"/>
+  <rect class="holo" x="10" y="-15" width="24" height="18" rx="3"/>
+  <g><line class="hl" x1="14" y1="-10" x2="30" y2="-10"/><line class="hl" x1="14" y1="-5" x2="26" y2="-5"/><line class="hl" x1="14" y1="0" x2="29" y2="0"/></g>
+  <g class="bot"><line x1="-14" y1="-31" x2="-14" y2="-24" stroke="#c4d0e2" stroke-width="1.6"/><circle class="bulb" cx="-14" cy="-32" r="2.6"/>
+   <rect class="body" x="-25" y="-4" width="22" height="19" rx="8"/><rect class="shade" x="-25" y="8" width="22" height="7" rx="3.5"/>
+   <rect class="body" x="-28" y="-25" width="28" height="22" rx="10"/><rect x="-25" y="-19" width="22" height="9" rx="4.5" fill="#0b1222"/><rect class="visor" x="-23" y="-17" width="18" height="5" rx="2.5"/>
+   <rect class="shade" x="-4" y="2" width="12" height="4.5" rx="2.2" transform="rotate(-14 -4 4)"/></g>
+  <g class="badge"><circle cx="34" cy="-30" r="9" fill="#0b1a14" stroke="#3ee08f" stroke-width="1.6"/><path d="M29.5 -30 l3 3 l6 -6" fill="none" stroke="#3ee08f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <text class="zz" x="2" y="-30">z z</text></g>
+  <text class="nlabel" x="${p.x.toFixed(1)}" y="${ly.toFixed(1)}">${esc(a.name)}</text><text class="nstat" x="${p.x.toFixed(1)}" y="${(ly+(window.innerWidth<640?17:14)).toFixed(1)}">${esc(s.text||'standing by')}</text></g>`}
 function drawNodes(status){
-  $('#nodes').innerHTML=AGENTS.map((a,i)=>{const p=pos[i],s=status[a.id]||{},below=p.y>CY+10,ly=below?p.y+NR+20:p.y-NR-26;
-    return `<g class="node ${s.state||''}" data-id="${a.id}"><circle class="halo" cx="${p.x}" cy="${p.y}" r="${NR+7}" stroke="${s.state==='active'?'#fff':'var(--ok)'}"/><circle class="bg" cx="${p.x}" cy="${p.y}" r="${NR}" stroke="${a.c}" fill="${a.c}22"/><text class="ninit" x="${p.x}" y="${p.y+7}">${/^[A-Z]+$/.test(a.name)?a.name:a.name.split(' ').map(w=>w[0]).join('')}</text>
-    <text class="nlabel" x="${p.x}" y="${ly}">${esc(a.name)}</text><text class="nstat" x="${p.x}" y="${ly+16}">${esc(s.text||'waiting')}</text></g>`}).join('');
-  $('#icons').innerHTML=AGENTS.map((a,i)=>`<i class="ti ${a.icon} ico" aria-hidden="true" style="left:${pos[i].x/420*100}%;top:${pos[i].y/430*100}%"></i>`).join('');
+  $('#nodes').innerHTML=AGENTS.map((a,i)=>pod(a,i,Object.assign({},status[a.id]||{},a.id==='marketer'&&!(status[a.id]||{}).state?{state:'paused'}:{}))).join('');
+  AGENTS.forEach((a,i)=>{const sp=document.getElementById('sp'+i);if(sp)sp.classList.toggle('on',(status[a.id]||{}).state==='active')});
+  $('#icons').innerHTML=AGENTS.map((a,i)=>`<i class="ti ${a.icon} ico" aria-hidden="true" style="left:${(pos[i].x+22)/440*100}%;top:${(pos[i].y-6)/455*100}%;color:${a.c}"></i>`).join('');
 }
+let lastSt={};const _dn=drawNodes;drawNodes=st=>{lastSt=st;_dn(st)};addEventListener('resize',()=>drawNodes(lastSt));
 drawNodes({});
 setTimeout(()=>{const l=document.getElementById('tabler');if(!l||!l.sheet)document.documentElement.classList.add('noicons')},3000);
 
@@ -132,7 +222,7 @@ setTimeout(()=>{const l=document.getElementById('tabler');if(!l||!l.sheet)docume
 function nyParts(d){const o={};for(const p of new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',hour12:false}).formatToParts(d))o[p.type]=p.value;return o}
 function nextRun(now=new Date()){
   for(let i=0;i<8;i++){const d=new Date(now.getTime()+i*864e5),p=nyParts(d);if(p.weekday!=='Sat')continue;
-    let t=Date.UTC(+p.year,+p.month-1,+p.day,18,32);const h=+nyParts(new Date(t)).hour%24;t+=(13-h)*36e5;
+    let t=Date.UTC(+p.year,+p.month-1,+p.day,8,32);const h=+nyParts(new Date(t)).hour%24;t+=(3-h)*36e5;
     if(t>now.getTime()-2.5*36e5)return t}
   return null}
 function runningNow(){const t=nextRun();return t&&Date.now()>=t&&Date.now()<t+2.5*36e5}
@@ -202,12 +292,12 @@ async function load(){
     const who=c=>{const m=c.commit.message;return /ops\/research|research/i.test(m)?'researcher':/marketing|posts/i.test(m)?'marketer':/^ops:/i.test(m)?'lead':/agent\//.test(m)?'coder':null};
     $('#feed').innerHTML=commits.slice(0,7).map(c=>`<li><time>${ago(c.commit.author.date)}</time><span>${esc(c.commit.message.split('\n')[0])}</span></li>`).join('');
     const opsRun=commits.find(c=>/^ops: weekly cycle/i.test(c.commit.message));
-    if(opsRun&&recent(opsRun.commit.author.date)){st.researcher=st.researcher||{state:'done',text:'ideas added'};st.marketer=st.marketer||{state:'done',text:'posts drafted'};st.lead=Object.assign({state:'done'},st.lead)}
+    if(opsRun&&recent(opsRun.commit.author.date)){st.researcher=st.researcher||{state:'done',text:'ideas added'};st.lead=Object.assign({state:'done'},st.lead)}
   }else $('#feed').innerHTML='<li class="muted">Couldn\'t load activity</li>';
 
   /* running-now animation: light agents in sequence */
-  if(runningNow()){const step=Math.floor((Date.now()-nextRun())/(2.5*36e5)*6);AGENTS.forEach((a,i)=>{if(i<step)st[a.id]=Object.assign({},st[a.id],{state:'done'});else if(i===step)st[a.id]={state:'active',text:'working now'}})}
-  for(const a of AGENTS)if(!st[a.id])st[a.id]={state:'',text:a.id==='researcher'?'next: Saturday':a.id==='marketer'?'paused':'waiting'};
+  if(runningNow()){const step=Math.floor((Date.now()-nextRun())/(2.5*36e5)*5);AGENTS.filter(a=>a.id!=='marketer').forEach((a,i)=>{if(i<step)st[a.id]=Object.assign({},st[a.id],{state:'done'});else if(i===step)st[a.id]={state:'active',text:'working now'}})}
+  for(const a of AGENTS)if(!st[a.id])st[a.id]={state:'',text:a.id==='researcher'?'next: Saturday':a.id==='marketer'?'paused':'standing by'};
   drawNodes(st);
 
   const live=runningNow();$('#state').classList.toggle('live',live||!failed);
