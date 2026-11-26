@@ -77,7 +77,7 @@ Fix 1:
 
 ## Queued by Nheil (2026-11-26), do these first
 
-1. **Bug: Home "Week X of 15" bar, Peak weeks are giant yellow columns** (screenshot from Nheil's Android, 2026-11-26).
+1. **Bug: Home "Week X of 15" bar, Peak weeks are giant yellow columns** (screenshot from Nheil's Android, 2026-11-26). **Fix in PR: https://github.com/nheilmangoba1/Lift-log/pull/6** (awaiting Nheil's merge).
    - **Cause:** CSS class clash. The 3D body viewer (PR #5) styles `.b3` (height `min(560px,70vh)`, `min-height:420px`, border, background). The plan bar marks Peak-block weeks with `<i class="b3">`, so they inherit that height.
    - **Fix:** rename the viewer's classes (e.g. `.b3` → `.body3d`, along with every `.b3*` selector and the JS that sets `className='b3'`), or scope the bar rules (`.bar15 i.b3`). The renaming option is safer.
    - **Acceptance:** on Home, all 15 week squares are 10 px tall with Peak weeks in yellow, in dark and light mode at 390 px. The Body tab 3D viewer looks unchanged. Add a test that checks `.bar15 i` heights are equal.
