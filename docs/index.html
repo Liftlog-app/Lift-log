@@ -474,10 +474,10 @@ button:disabled{cursor:default}
 /* ---------- 3D body ---------- */
 .bodywrap.b3on{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
 @media(max-width:600px){.bodywrap.b3on{grid-template-columns:minmax(0,1fr)}}
-.b3{--b3acc:light-dark(#2a63d4,#5aa2ff);position:relative;height:min(560px,70vh);min-height:420px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+.body3d{--b3acc:light-dark(#2a63d4,#5aa2ff);position:relative;height:min(560px,70vh);min-height:420px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
  background:radial-gradient(120% 70% at 50% 38%,light-dark(#ffffff,#1d2532) 0,light-dark(#e9edf3,#0e1218) 70%);isolation:isolate}
-.b3 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:pan-y;cursor:grab;display:block}
-.b3 canvas:active{cursor:grabbing}
+.body3d canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:pan-y;cursor:grab;display:block}
+.body3d canvas:active{cursor:grabbing}
 .b3top{position:absolute;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
 .b3lab small{display:block;font:600 12px Barlow,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
 .b3lab b{display:block;font:800 28px/1.05 "Barlow Condensed",Barlow,sans-serif;color:var(--ink)}
@@ -485,7 +485,7 @@ button:disabled{cursor:default}
 .b3ctl button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 82%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--ink);display:grid;place-items:center;cursor:pointer}
 .b3ctl svg{width:20px;height:20px}
 .b3hint{position:absolute;left:0;right:0;bottom:78px;text-align:center;font:600 13px Barlow,sans-serif;color:var(--mute);pointer-events:none;transition:opacity .4s}
-.b3.touched .b3hint{opacity:0}
+.body3d.touched .b3hint{opacity:0}
 .b3toast{position:absolute;left:50%;top:84px;transform:translate(-50%,-8px);padding:8px 14px;border-radius:999px;background:var(--b3acc);color:#fff;font:700 14px Barlow,sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
 .b3toast.on{opacity:1;transform:translate(-50%,0)}
 .b3pins{position:absolute;inset:0;pointer-events:none}
@@ -1120,7 +1120,7 @@ setTimeout(()=>{const go=()=>{try{if(!B3.mesh&&b3Ok())b3Mesh()}catch(e){}};(wind
 function b3Ok(){if(B3.on!==null)return B3.on;try{const c=document.createElement('canvas'),g=c.getContext&&(c.getContext('webgl',{antialias:true})||c.getContext('experimental-webgl'));B3.on=!!g}catch(e){B3.on=false}return B3.on}
 const b3Ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function b3Build(){
- const st=document.createElement('div');st.className='b3';st.id='b3stage';
+ const st=document.createElement('div');st.className='body3d';st.id='b3stage';
  st.innerHTML=`<canvas role="img" aria-label="3D body. Drag to turn, pinch to zoom, tap where it hurts. Or search below."></canvas><div class="b3pins" aria-hidden="true"></div>
   <div class="b3top"><div class="b3lab" aria-live="polite"><small>Tap where it hurts</small><b>Your body</b></div>
    <div class="b3ctl"><button type="button" data-b3="turn" aria-label="Turn around"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg></button>
