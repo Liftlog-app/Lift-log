@@ -49,7 +49,8 @@ const ema=a=>{let t=null;for(const e of a)t=t==null?e.w:t+0.1*(e.w-t);return t};
   // disclaimer and wording
   const txt=A.$('#main').textContent;
   ok(/Rate colours follow research guidelines for keeping strength while cutting \(about 0\.5–1% of bodyweight a week\)\. This is training guidance, not medical or diet advice\./.test(txt),'disclaimer missing');
-  ok(!/calori|macro/i.test(A.d.body.textContent)&&!/diet(?! advice)/i.test(A.d.body.textContent),'calorie/macro/diet wording found');
+  const vis=(()=>{const c=A.d.body.cloneNode(true);c.querySelectorAll('script,style').forEach(e=>e.remove());return c.textContent})(); // visible text only (scripts hold encoded data)
+  ok(!/calori|macro/i.test(vis)&&!/diet(?! advice)/i.test(vis),'calorie/macro/diet wording found');
   // chart
   const ch=A.$('#bwchart');ok(ch.getAttribute('role')==='img'&&ch.getAttribute('aria-label'),'chart a11y');
   ok(ch.querySelectorAll('.bwdot').length===2&&ch.querySelector('.bwtrend'),'chart dots/trend');
