@@ -463,6 +463,50 @@ button:disabled{cursor:default}
 @keyframes iZoom{to{transform:scale(1.25)}}
 @keyframes iOut{to{opacity:0;visibility:hidden}}
 @media(prefers-reduced-motion:reduce){#intro,#intro *{animation-duration:.01s!important;animation-delay:0s!important}#intro{animation:iOut .3s ease .5s both!important}}
+/* ---------- 3D body ---------- */
+.bodywrap.b3on{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+@media(max-width:600px){.bodywrap.b3on{grid-template-columns:minmax(0,1fr)}}
+.b3{--b3acc:light-dark(#2a63d4,#5aa2ff);position:relative;height:min(560px,70vh);min-height:420px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+ background:radial-gradient(120% 70% at 50% 38%,light-dark(#ffffff,#1d2532) 0,light-dark(#e9edf3,#0e1218) 70%);isolation:isolate}
+.b3 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:pan-y;cursor:grab;display:block}
+.b3 canvas:active{cursor:grabbing}
+.b3top{position:absolute;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+.b3lab small{display:block;font:600 12px Barlow,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.b3lab b{display:block;font:800 28px/1.05 "Barlow Condensed",Barlow,sans-serif;color:var(--ink)}
+.b3ctl{display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+.b3ctl button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 82%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.b3ctl svg{width:20px;height:20px}
+.b3hint{position:absolute;left:0;right:0;bottom:78px;text-align:center;font:600 13px Barlow,sans-serif;color:var(--mute);pointer-events:none;transition:opacity .4s}
+.b3.touched .b3hint{opacity:0}
+.b3toast{position:absolute;left:50%;top:84px;transform:translate(-50%,-8px);padding:8px 14px;border-radius:999px;background:var(--b3acc);color:#fff;font:700 14px Barlow,sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
+.b3toast.on{opacity:1;transform:translate(-50%,0)}
+.b3pins{position:absolute;inset:0;pointer-events:none}
+.b3pin{position:absolute;width:0;height:0}
+.b3pin b{position:absolute;left:-11px;top:-11px;width:22px;height:22px;border-radius:50%;background:var(--pc);border:2px solid #fff;display:grid;place-items:center;color:#fff;font:800 12px Barlow,sans-serif;font-style:normal;box-shadow:0 2px 10px rgb(0 0 0/.35);transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s}
+.b3pin::before,.b3pin::after{content:"";position:absolute;left:-11px;top:-11px;width:22px;height:22px;border-radius:50%;border:2px solid var(--pc);opacity:0}
+.b3pin.on b{transform:scale(1.25)}
+.b3pin.hid b{opacity:.18;transform:scale(.7)}.b3pin.hid::before,.b3pin.hid::after{display:none}
+.b3search{position:absolute;left:12px;right:12px;bottom:12px}
+.b3q{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 14px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 24px rgb(0 0 0/.18);color:var(--mute)}
+.b3q:focus-within{border-color:var(--b3acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--b3acc) 30%,transparent),0 8px 24px rgb(0 0 0/.18)}
+.b3q svg{width:20px;height:20px;flex:none}
+.b3q input{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:600 16px Barlow,sans-serif;outline:0;min-height:44px;padding:0}
+.b3sug{display:none;flex-direction:column;gap:2px;margin-bottom:8px;padding:6px;border-radius:14px;background:var(--card);border:1px solid var(--line);box-shadow:0 14px 34px rgb(0 0 0/.28);max-height:260px;overflow:auto}
+.b3sug.on{display:flex}
+.b3sug button{display:flex;align-items:center;justify-content:space-between;min-height:46px;padding:0 12px;border:0;border-radius:10px;background:none;color:var(--ink);font:600 16px Barlow,sans-serif;text-align:left;cursor:pointer}
+.b3sug button:hover,.b3sug button:focus-visible{background:color-mix(in srgb,var(--b3acc) 14%,transparent);outline:0}
+.b3sug svg{width:18px;height:18px;color:var(--b3acc)}
+.b3none{margin:0;padding:10px 12px;color:var(--mute);font:600 14px Barlow,sans-serif}
+@media(prefers-reduced-motion:no-preference){
+.b3pin::before{animation:b3ring 1.8s ease-out infinite}.b3pin::after{animation:b3ring 1.8s ease-out .9s infinite}
+.b3pin b{animation:b3drop .45s cubic-bezier(.34,1.56,.64,1) both}
+.b3sug.on button{animation:cmItem .26s ease-out both;animation-delay:calc(var(--i,0)*30ms)}
+.b3sug.on{animation:cmIn .22s cubic-bezier(.2,.9,.3,1.2) both;transform-origin:bottom center}
+.b3lab b{animation:b3lab .35s ease-out both}
+@keyframes b3ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.8);opacity:0}}
+@keyframes b3drop{from{transform:translateY(-14px) scale(.4);opacity:0}}
+@keyframes b3lab{from{opacity:0;transform:translateY(4px)}}
+}
 </style>
 </head>
 <body>
@@ -610,6 +654,16 @@ const AREAS={
  lowback:{l:'lower back',pair:false,re:/deadlift|back squat|front squat|pause squat|safety-bar squat|hack squat|good morning|rack pull|barbell row|pendlay|t-bar|^overhead press|romanian/i,sw:{'Deadlift':'Hip thrust','Trap-bar deadlift':'Hip thrust','Romanian deadlift':'Leg curl','Good morning':'Hip thrust','Rack pull':'Hip thrust','Barbell row':'Chest-supported DB row','Pendlay row':'Chest-supported DB row','T-bar row':'Chest-supported DB row','Single-arm DB row':'Chest-supported DB row','Back squat':'Leg press','Front squat':'Leg press','Pause squat':'Leg press','Hack squat':'Leg press','Safety-bar squat':'Leg press','Overhead press':'Seated DB shoulder press'}},
  hip:{l:'hip',pair:true,re:/squat|deadlift|lunge|hip thrust|glute|leg press|romanian|good morning/i,sw:{'Back squat':'Leg extension','Front squat':'Leg extension','Pause squat':'Leg extension','Goblet squat':'Leg extension','Safety-bar squat':'Leg extension','Bulgarian split squat (each leg)':'Leg extension','Walking lunge':'Leg extension','Deadlift':'Rack pull','Romanian deadlift':'Leg curl','Leg press':'Leg extension','Hack squat':'Leg extension','Good morning':'Leg curl','Hip thrust':'Leg curl','Barbell glute bridge':'Leg curl'}},
  knee:{l:'knee',pair:true,re:/squat|lunge|leg press|leg extension|hack|step-up/i,sw:{'Back squat':'Box squat (pain-free depth)','Front squat':'Box squat (pain-free depth)','Pause squat':'Box squat (pain-free depth)','Goblet squat':'Box squat (pain-free depth)','Safety-bar squat':'Box squat (pain-free depth)','Hack squat':'Romanian deadlift','Leg press':'Romanian deadlift','Bulgarian split squat (each leg)':'Hip thrust','Walking lunge':'Hip thrust','Leg extension':'Spanish squat (isometric hold)','Sissy squat':'Spanish squat (isometric hold)'}},
+ head:{l:'head',pair:false,re:/(?!)/,sw:{}},
+ chest:{l:'chest',pair:false,re:/bench|fly|dips|push-up|chest press|pec deck|floor press/i,sw:{'Dips':'Machine chest press','Bench press':'Floor press'}},
+ abs:{l:'abs / core',pair:false,re:/crunch|plank|leg raise|ab wheel|rollout|sit-up|russian twist/i,sw:{}},
+ upperarm:{l:'upper arm',pair:true,re:/^(?!.*leg).*curl|skull|triceps|pushdown|close-grip|dips|chin/i,sw:{'Skull crusher':'Rope pushdown','Overhead triceps extension':'Rope pushdown'}},
+ forearm:{l:'forearm',pair:true,re:/^(?!.*leg).*curl|deadlift|row|pull-up|chin|shrug|farmer/i,sw:{'Barbell curl':'Hammer curl','EZ-bar curl':'Hammer curl'}},
+ hand:{l:'hand',pair:true,re:/deadlift|row|^(?!.*leg).*curl|pull-up|chin|shrug|farmer|bench|^(?!.*leg).*press|push-up/i,sw:{}},
+ quad:{l:'quad',pair:true,re:/squat|lunge|leg press|leg extension|step-up|hack/i,sw:{}},
+ hamstring:{l:'hamstring',pair:true,re:/deadlift|romanian|good morning|leg curl|lunge|split squat/i,sw:{'Romanian deadlift':'Hip thrust','Good morning':'Hip thrust'}},
+ calf:{l:'calf / shin',pair:true,re:/calf|lunge|split|step-up|jump/i,sw:{'Standing calf raise':'Seated calf raise'}},
+ foot:{l:'foot',pair:true,re:/calf|lunge|split|squat|deadlift|step-up/i,sw:{}},
  ankle:{l:'ankle',pair:true,re:/calf|squat|lunge|split/i,sw:{'Standing calf raise':'Seated calf raise','Single-leg calf raise':'Seated calf raise','Leg-press calf raise':'Seated calf raise','Walking lunge':'Leg extension','Bulgarian split squat (each leg)':'Leg extension','Back squat':'Leg press','Front squat':'Leg press','Goblet squat':'Leg press'}}};
 const SPOTS=[['neck',110,64],['shoulder-R',70,80],['shoulder-L',150,80],['back',110,104],['elbow-R',61,134],['elbow-L',159,134],['lowback',110,160],['wrist-R',61,184],['wrist-L',159,184],['hip-R',93,192],['hip-L',127,192],['knee-R',93,262],['knee-L',127,262],['ankle-R',93,334],['ankle-L',127,334]];
 const pains=()=>(S.profile&&S.profile.pain)||{};
@@ -954,6 +1008,258 @@ function renderToday(){
   $('#main').innerHTML=h;
 }
 
+/* ================= 3D body for the pain map (hand-written WebGL, no library) ================= */
+// Body space: metres, feet at y=0, facing +z. The person's RIGHT side is at x<0 (as seen from the front).
+// Region index -> pain key (AREAS key + side).
+const B3REG=['head','neck','chest','back','abs','lowback',
+ 'shoulder-R','shoulder-L','upperarm-R','upperarm-L','elbow-R','elbow-L','forearm-R','forearm-L','wrist-R','wrist-L','hand-R','hand-L',
+ 'hip-R','hip-L','quad-R','quad-L','hamstring-R','hamstring-L','knee-R','knee-L','calf-R','calf-L','ankle-R','ankle-L','foot-R','foot-L'];
+// Part kinds: 0 head 1 neck 2 upper torso 3 lower torso 4 pelvis 5 shoulder 6 upper arm 7 elbow 8 forearm 9 wrist 10 hand 11 thigh 12 knee 13 shin 14 ankle 15 foot
+function b3Region(k,p){const L=p[0]>0?1:0,F=p[2]>=0;
+ if(k===0)return 0;if(k===1)return 1;if(k===2)return F?2:3;if(k===3)return F?4:5;if(k===4)return 18+L;
+ if(k<=10)return 6+2*(k-5)+L;if(k===11)return (F?20:22)+L;return 24+2*(k-12)+L}
+const B3PRIMS=(()=>{const P=[],E=(c,r,k)=>P.push({t:'e',c,r,k}),C=(a,b,ra,rb,k)=>P.push({t:'c',a,b,ra,rb,k});
+ E([0,1.645,.01],[.086,.108,.098],0);E([0,1.585,.035],[.066,.058,.066],0);
+ C([0,1.44,-.008],[0,1.55,0],.05,.046,1);
+ E([0,1.30,0],[.176,.17,.106],2);E([0,1.31,.03],[.156,.11,.088],2);
+ E([0,1.12,.004],[.138,.15,.092],3);
+ E([0,.98,0],[.158,.115,.106],4);
+ for(const s of [-1,1]){
+  E([.075*s,.95,-.058],[.085,.092,.074],4);
+  E([.208*s,1.39,-.005],[.072,.07,.07],5);
+  C([.218*s,1.37,-.005],[.262*s,1.135,-.012],.058,.046,6);
+  E([.266*s,1.11,-.022],[.05,.05,.05],7);
+  C([.268*s,1.09,-.004],[.292*s,.88,.02],.044,.031,8);
+  E([.294*s,.862,.022],[.03,.03,.03],9);
+  E([.3*s,.79,.026],[.024,.062,.042],10);
+  C([.09*s,.93,0],[.096*s,.555,.006],.088,.056,11);
+  E([.096*s,.522,.012],[.053,.053,.053],12);
+  C([.096*s,.49,.002],[.091*s,.11,-.01],.05,.031,13);
+  E([.096*s,.385,-.028],[.05,.092,.05],13);
+  E([.09*s,.085,-.01],[.034,.034,.034],14);
+  E([.094*s,.034,.052],[.042,.03,.102],15)}
+ return P})();
+const v3={sub:(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],add:(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],mul:(a,s)=>[a[0]*s,a[1]*s,a[2]*s],dot:(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],
+ cross:(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],len:a=>Math.hypot(a[0],a[1],a[2]),norm:a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l]}};
+// Signed distance to one part (ellipsoid or rounded cone), allocation-free for speed.
+for(const p of B3PRIMS){if(p.t==='c'){p.ba=v3.sub(p.b,p.a);p.l2=v3.dot(p.ba,p.ba);p.rr=p.ra-p.rb;p.a2=p.l2-p.rr*p.rr;p.il2=1/p.l2}else{p.i1=p.r.map(v=>1/v);p.i2=p.r.map(v=>1/(v*v))}}
+function b3Sdf(x,y,z,p){
+ if(p.t==='e'){const dx=x-p.c[0],dy=y-p.c[1],dz=z-p.c[2],a=p.i1,b=p.i2,k0=Math.sqrt(dx*dx*a[0]*a[0]+dy*dy*a[1]*a[1]+dz*dz*a[2]*a[2]),k1=Math.sqrt(dx*dx*b[0]*b[0]+dy*dy*b[1]*b[1]+dz*dz*b[2]*b[2]);return k1?k0*(k0-1)/k1:-.01}
+ const ba=p.ba,px=x-p.a[0],py=y-p.a[1],pz=z-p.a[2],l2=p.l2,yy=px*ba[0]+py*ba[1]+pz*ba[2],zz=yy-l2,cx=px*l2-ba[0]*yy,cy=py*l2-ba[1]*yy,cz=pz*l2-ba[2]*yy,
+  x2=cx*cx+cy*cy+cz*cz,y2=yy*yy*l2,z2=zz*zz*l2,rr=p.rr,a2=p.a2,il2=p.il2,k=Math.sign(rr)*rr*rr*x2;
+ if(Math.sign(zz)*a2*z2>k)return Math.sqrt(x2+z2)*il2-p.rb;
+ if(Math.sign(yy)*a2*y2<k)return Math.sqrt(x2+y2)*il2-p.ra;
+ return (Math.sqrt(x2*a2*il2)+yy*rr)*il2-p.ra}
+const b3Sd=(q,pr)=>b3Sdf(q[0],q[1],q[2],pr);
+function b3Map(q){let d=1e9,k=-1;for(const pr of B3PRIMS){const s=b3Sd(q,pr);if(s<d){d=s;k=pr.k}}return [b3Uni(q,B3PRIMS),k]}
+// Cast a ray in body space; returns {p,k,r,key,t} for the first part it hits, or null.
+function b3Ray(o,dir){dir=v3.norm(dir);let t=0;for(let i=0;i<160&&t<12;i++){const q=v3.add(o,v3.mul(dir,t)),[d,k]=b3Map(q);if(d<.0008){const r=b3Region(k,q);return {p:q.map(v=>Math.round(v*1000)/1000),k,r,key:B3REG[r],t}}t+=Math.max(d*.9,.0005)}return null}
+// Where the camera should go for a region: anchor point on the surface, yaw to face it, zoom distance.
+function b3Anchor(r){const key=B3REG[r],[a,sd]=key.split('-'),s=sd==='L'?1:sd==='R'?-1:0;
+ const kinds={head:0,neck:1,chest:2,back:2,abs:3,lowback:3,hip:4,shoulder:5,upperarm:6,elbow:7,forearm:8,wrist:9,hand:10,quad:11,hamstring:11,knee:12,calf:13,ankle:14,foot:15}[a];
+ const ps=B3PRIMS.filter(p=>p.k===kinds&&(s===0||Math.sign((p.c||p.a)[0]+(p.b?p.b[0]:0))===s));
+ let c=[0,0,0],n=0;for(const p of ps){const m=p.c||v3.mul(v3.add(p.a,p.b),.5);c=v3.add(c,m);n++}c=v3.mul(c,1/(n||1));
+ const back=/^(back|lowback|hamstring|calf)$/.test(a),dz=back?-1:1;
+ let yaw=back?Math.PI:/^(elbow|forearm|wrist|hand)$/.test(a)?-1.05*s:/^(shoulder|upperarm)$/.test(a)?-.6*s:0,h=null;
+ // look from the planned side first, then other sides, until the ray lands on this region
+ for(const y of [yaw,yaw+Math.PI/2*(s||1),Math.PI,yaw-Math.PI/2*(s||1)]){const dv=[Math.sin(-y),0,Math.cos(-y)],o=v3.add(c,v3.mul(dv,2)),t=b3Ray(o,v3.mul(dv,-1));if(t&&t.r===r){h=t;yaw=y;break}}
+ const big=/^(chest|back|abs|lowback|quad|hamstring|hip)$/.test(a);
+ return {p:h?h.p:c,yaw,dist:big?1.45:a==='head'?1.05:1.15}}
+const B3ALIAS={head:'head skull jaw temple forehead face headache',neck:'neck cervical trap traps trapezius',chest:'chest pec pecs pectoral sternum ribs rib',
+ back:'upper back lats lat shoulder blade scapula rhomboid rhomboids mid back thoracic',abs:'abs core stomach belly oblique obliques abdominal side',
+ lowback:'lower back low back lumbar spine sciatica si joint tailbone',shoulder:'shoulder rotator cuff delt delts deltoid ac joint labrum',
+ upperarm:'upper arm biceps bicep triceps tricep arm',elbow:'elbow tennis elbow golfers elbow',forearm:'forearm forearms grip',wrist:'wrist carpal tunnel',
+ hand:'hand finger fingers thumb palm knuckle',hip:'hip hips glute glutes butt groin hip flexor piriformis',quad:'quad quads thigh front thigh quadriceps',
+ hamstring:'hamstring hamstrings back of thigh back thigh',knee:'knee kneecap patella acl mcl meniscus patellar',calf:'calf calves shin shins shin splints lower leg',
+ ankle:'ankle ankles achilles sprain',foot:'foot feet heel toe toes arch plantar'};
+const b3Lab=k=>{const s=painLabel(k);return s[0].toUpperCase()+s.slice(1)};
+function b3Search(q){q=(' '+q.toLowerCase().replace(/[^a-z' ]/g,' ').replace(/'/g,'')+' ').replace(/\s+/g,' ');
+ const side=/ (left|lft|l) /.test(q)?'L':/ (right|rt|r) /.test(q)?'R':'';q=q.replace(/ (left|lft|right|rt|my|the|l|r|pain|hurts|sore) /g,' ').replace(/ (left|lft|right|rt|my|the|l|r|pain|hurts|sore) /g,' ').trim();
+ if(!q)return [];const out=[];
+ for(const [a,al] of Object.entries(B3ALIAS)){const words=al.split(' '),phr=[a,...al.split(/ (?=[a-z]+$)/)];let sc=0;
+  for(const w of [al,...words])if(w.startsWith(q))sc=Math.max(sc,w===al?2:3);
+  if(!sc&&(' '+al+' ').includes(' '+q))sc=2;if(!sc&&al.includes(q)&&q.length>=3)sc=1;
+  if(!sc)continue;for(let r=0;r<B3REG.length;r++){const [ka,ks]=B3REG[r].split('-');if(ka===a&&(!side||!ks||ks===side))out.push({r,sc})}}
+ return out.sort((x,y)=>y.sc-x.sc||x.r-y.r).slice(0,6).map(o=>o.r)}
+// --- tiny matrix helpers (column-major) ---
+const M4={mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+r]*b[c*4+k];o[c*4+r]=s}return o},
+ persp(f,asp,n,fa){const t=1/Math.tan(f/2),o=new Float32Array(16);o[0]=t/asp;o[5]=t;o[10]=(fa+n)/(n-fa);o[11]=-1;o[14]=2*fa*n/(n-fa);return o},
+ look(e,c,u){const z=v3.norm(v3.sub(e,c)),x=v3.norm(v3.cross(u,z)),y=v3.cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-v3.dot(x,e),-v3.dot(y,e),-v3.dot(z,e),1])},
+ rotY(a){const c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1])},
+ inv(m){const a=m,o=new Float32Array(16),b00=a[0]*a[5]-a[1]*a[4],b01=a[0]*a[6]-a[2]*a[4],b02=a[0]*a[7]-a[3]*a[4],b03=a[1]*a[6]-a[2]*a[5],b04=a[1]*a[7]-a[3]*a[5],b05=a[2]*a[7]-a[3]*a[6],b06=a[8]*a[13]-a[9]*a[12],b07=a[8]*a[14]-a[10]*a[12],b08=a[8]*a[15]-a[11]*a[12],b09=a[9]*a[14]-a[10]*a[13],b10=a[9]*a[15]-a[11]*a[13],b11=a[10]*a[15]-a[11]*a[14];
+  let det=b00*b11-b01*b10+b02*b09+b03*b08-b04*b07+b05*b06;if(!det)return o;det=1/det;
+  o[0]=(a[5]*b11-a[6]*b10+a[7]*b09)*det;o[1]=(a[2]*b10-a[1]*b11-a[3]*b09)*det;o[2]=(a[13]*b05-a[14]*b04+a[15]*b03)*det;o[3]=(a[10]*b04-a[9]*b05-a[11]*b03)*det;
+  o[4]=(a[6]*b08-a[4]*b11-a[7]*b07)*det;o[5]=(a[0]*b11-a[2]*b08+a[3]*b07)*det;o[6]=(a[14]*b02-a[12]*b05-a[15]*b01)*det;o[7]=(a[8]*b05-a[10]*b02+a[11]*b01)*det;
+  o[8]=(a[4]*b10-a[5]*b08+a[7]*b06)*det;o[9]=(a[1]*b08-a[0]*b10-a[3]*b06)*det;o[10]=(a[12]*b04-a[13]*b02+a[15]*b00)*det;o[11]=(a[9]*b02-a[8]*b04-a[11]*b00)*det;
+  o[12]=(a[5]*b07-a[4]*b09-a[6]*b06)*det;o[13]=(a[0]*b09-a[1]*b07+a[2]*b06)*det;o[14]=(a[13]*b01-a[12]*b03-a[14]*b00)*det;o[15]=(a[8]*b03-a[9]*b01+a[10]*b00)*det;return o},
+ xf(m,p){const x=p[0],y=p[1],z=p[2],w=m[3]*x+m[7]*y+m[11]*z+m[15];return [(m[0]*x+m[4]*y+m[8]*z+m[12])/w,(m[1]*x+m[5]*y+m[9]*z+m[13])/w,(m[2]*x+m[6]*y+m[10]*z+m[14])/w]}};
+// Smooth body: blend all parts (smooth union) and polygonise with surface nets. Runs once (~0.2 s).
+const B3K=.032;
+function b3Smin(a,b,k){k=k||B3K;const h=Math.max(k-Math.abs(a-b),0)/k;return Math.min(a,b)-h*h*k*.25}
+const b3UniS=(x,y,z,ps)=>{let t=.2,o=.2;for(const pr of ps){const d=b3Sdf(x,y,z,pr);if(pr.k>=2&&pr.k<=4)t=b3Smin(t,d,.09);else o=b3Smin(o,d)}return b3Smin(t,o,.045)};
+const b3Uni=(q,ps)=>b3UniS(q[0],q[1],q[2],ps);
+function b3Kind(x,y,z){let d=1e9,k=-1;for(const pr of B3PRIMS){const s=b3Sdf(x,y,z,pr);if(s<d){d=s;k=pr.k}}return k}
+function b3Mesh(){if(B3.mesh)return B3.mesh;B3.mesh=b3MeshBuild();return B3.mesh}
+function b3MeshBuild(){
+ const H=.0122,X0=-.385,Y0=-.012,Z0=-.2,nx=64,ny=149,nz=34,V=new Float32Array(nx*ny*nz).fill(.2);
+ // bounding box per part (padded for the smooth blend) so empty space is skipped
+ const bb=B3PRIMS.map(p=>{const c=p.c?[p.c,p.c]:[p.a,p.b],r=(p.r?Math.max(...p.r):Math.max(p.ra,p.rb))+(p.k>=2&&p.k<=4?.1:.05)+H;return [0,1,2].map(a=>[Math.min(c[0][a],c[1][a])-r,Math.max(c[0][a],c[1][a])+r])});
+ for(let j=0;j<ny;j++){const y=Y0+j*H,sl=B3PRIMS.map((p,i)=>i).filter(i=>y>=bb[i][1][0]&&y<=bb[i][1][1]);if(!sl.length)continue;
+  for(let k=0;k<nz;k++){const z=Z0+k*H,sz=sl.filter(i=>z>=bb[i][2][0]&&z<=bb[i][2][1]);if(!sz.length)continue;
+   for(let i=0;i<nx;i++){const x=X0+i*H,ps=[];for(const n of sz)if(x>=bb[n][0][0]&&x<=bb[n][0][1])ps.push(B3PRIMS[n]);if(ps.length)V[(k*ny+j)*nx+i]=b3UniS(x,y,z,ps)}}}
+ const at=(i,j,k)=>V[(k*ny+j)*nx+i],cell=new Int32Array((nx-1)*(ny-1)*(nz-1)).fill(-1),vp=[];
+ const E=[[0,1],[2,3],[4,5],[6,7],[0,2],[1,3],[4,6],[5,7],[0,4],[1,5],[2,6],[3,7]],O=[[0,0,0],[1,0,0],[0,1,0],[1,1,0],[0,0,1],[1,0,1],[0,1,1],[1,1,1]];
+ const v=new Float32Array(8),sx_=1,sy_=nx,sz_=nx*ny,off=O.map(o=>o[0]*sx_+o[1]*sy_+o[2]*sz_);
+ for(let k=0;k<nz-1;k++)for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++){const b0=(k*ny+j)*nx+i;let neg=0;for(let c=0;c<8;c++){const x=V[b0+off[c]];v[c]=x;if(x<0)neg++}if(!neg||neg===8)continue;
+  let sx=0,sy=0,sz=0,n=0;for(const [a,b] of E){if((v[a]<0)!==(v[b]<0)){const t=v[a]/(v[a]-v[b]);sx+=O[a][0]+(O[b][0]-O[a][0])*t;sy+=O[a][1]+(O[b][1]-O[a][1])*t;sz+=O[a][2]+(O[b][2]-O[a][2])*t;n++}}
+  cell[(k*(ny-1)+j)*(nx-1)+i]=vp.length/3;vp.push(X0+(i+sx/n)*H,Y0+(j+sy/n)*H,Z0+(k+sz/n)*H)}
+ const C=(i,j,k)=>cell[(k*(ny-1)+j)*(nx-1)+i],quads=[];
+ for(let k=1;k<nz-1;k++)for(let j=1;j<ny-1;j++)for(let i=1;i<nx-1;i++){const a=at(i,j,k)<0;
+  if(i<nx-1&&a!==(at(i+1,j,k)<0))quads.push([C(i,j-1,k-1),C(i,j,k-1),C(i,j,k),C(i,j-1,k)]);
+  if(j<ny-1&&a!==(at(i,j+1,k)<0))quads.push([C(i-1,j,k-1),C(i,j,k-1),C(i,j,k),C(i-1,j,k)]);
+  if(k<nz-1&&a!==(at(i,j,k+1)<0))quads.push([C(i-1,j-1,k),C(i,j-1,k),C(i,j,k),C(i-1,j,k)])}
+ const near=q=>B3PRIMS.filter((p,n)=>q[0]>=bb[n][0][0]&&q[0]<=bb[n][0][1]&&q[1]>=bb[n][1][0]&&q[1]<=bb[n][1][1]&&q[2]>=bb[n][2][0]&&q[2]<=bb[n][2][1]);
+ const nrm=new Float32Array(vp.length);for(let v=0;v<vp.length;v+=3){const x=vp[v],y=vp[v+1],z=vp[v+2],e=.004,ps=near([x,y,z]),f=(a,b,c)=>b3UniS(a,b,c,ps);
+  const gx=f(x+e,y,z)-f(x-e,y,z),gy=f(x,y+e,z)-f(x,y-e,z),gz=f(x,y,z+e)-f(x,y,z-e),gl=Math.hypot(gx,gy,gz)||1;nrm[v]=gx/gl;nrm[v+1]=gy/gl;nrm[v+2]=gz/gl}
+ const pos=[],nor=[],kd=[];
+ for(const qd of quads){if(qd.some(x=>x<0))continue;let cx=0,cy=0,cz=0;for(const x of qd){cx+=vp[x*3];cy+=vp[x*3+1];cz+=vp[x*3+2]}const kk=b3Kind(cx/4,cy/4,cz/4);
+  for(const x of [qd[0],qd[1],qd[2],qd[0],qd[2],qd[3]]){pos.push(vp[x*3],vp[x*3+1],vp[x*3+2]);nor.push(nrm[x*3],nrm[x*3+1],nrm[x*3+2]);kd.push(kk)}}
+ const bodyN=pos.length/3;
+ // floor disc (kind 20)
+ for(let j=0;j<48;j++){const a=j/48*Math.PI*2,b=(j+1)/48*Math.PI*2;pos.push(0,.001,0,Math.cos(a)*.62,.001,Math.sin(a)*.62,Math.cos(b)*.62,.001,Math.sin(b)*.62);for(let t=0;t<3;t++){nor.push(0,1,0);kd.push(20)}}
+ return {pos:new Float32Array(pos),nor:new Float32Array(nor),kd:new Float32Array(kd),bodyN,floorN:pos.length/3-bodyN}}
+const B3VS=`attribute vec3 aP;attribute vec3 aN;attribute float aK;uniform mat4 uM;uniform mat4 uVP;uniform mat3 uR;uniform float uBr;
+varying vec3 vP;varying vec3 vN;varying vec3 vW;varying float vK;
+void main(){vec3 p=aP;float ch=smoothstep(1.02,1.2,p.y)*smoothstep(1.47,1.34,p.y);p.x*=1.0+uBr*.010*ch;p.z*=1.0+uBr*.022*ch;vP=aP;vK=aK;vec4 w=uM*vec4(p,1.0);vW=w.xyz;vN=uR*aN;gl_Position=uVP*w;}`;
+const B3FS=`precision mediump float;uniform sampler2D uTx;uniform vec3 uCam;uniform float uT;uniform float uScan;uniform vec3 uBase;uniform vec3 uAcc;uniform float uDk;
+varying vec3 vP;varying vec3 vN;varying vec3 vW;varying float vK;
+float region(float k,vec3 p){float L=p.x>0.0?1.0:0.0;bool F=p.z>=0.0;
+ if(k<0.5)return 0.0;if(k<1.5)return 1.0;if(k<2.5)return F?2.0:3.0;if(k<3.5)return F?4.0:5.0;if(k<4.5)return 18.0+L;
+ if(k<10.5)return 6.0+2.0*(floor(k+0.5)-5.0)+L;if(k<11.5)return (F?20.0:22.0)+L;return 24.0+2.0*(floor(k+0.5)-12.0)+L;}
+void main(){
+ if(vK>19.5){float r=length(vP.xz)/0.62;float rings=smoothstep(0.035,0.0,abs(fract(r*3.0-uT*0.25)-0.5)-0.44)*(1.0-r);float g=(1.0-r)*(1.0-r)*0.4+rings*0.35;g*=step(0.0,uScan-0.02);gl_FragColor=vec4(uAcc*g,g);return;}
+ if(vP.y>uScan)discard;
+ float rg=region(vK,vP);vec4 d=texture2D(uTx,vec2((rg+0.5)/32.0,0.5));
+ vec3 n=normalize(vN);vec3 v=normalize(uCam-vW);
+ float dif=max(dot(n,normalize(vec3(0.45,0.85,0.65))),0.0);float back=max(dot(n,normalize(vec3(-0.6,0.2,-0.7))),0.0);float hemi=0.5+0.5*n.y;
+ float fr=pow(1.0-max(dot(n,v),0.0),2.2);
+ vec3 col=uBase*(0.32+0.62*dif+0.22*hemi)+uAcc*back*0.10;
+ float spec=pow(max(dot(reflect(-normalize(vec3(0.45,0.85,0.65)),n),v),0.0),24.0);col+=vec3(spec)*0.18;
+ if(d.r>0.01){vec3 pc=d.r<0.35?vec3(0.88,0.66,0.0):d.r<0.65?vec3(0.9,0.42,0.1):vec3(0.86,0.2,0.17);float pu=0.5+0.5*sin(uT*3.2);col=mix(col,pc*(0.55+0.55*dif),0.5+0.25*pu);col+=pc*fr*(0.7+0.5*pu);}
+ if(d.g>0.5){float pu=0.5+0.5*sin(uT*5.0);col=mix(col,uAcc*(0.65+0.5*dif),0.3+0.2*pu);col+=uAcc*fr*(1.1+0.6*pu);}
+ else if(d.b>0.5){col+=uAcc*0.18+uAcc*fr*0.6;}
+ else col+=uAcc*fr*(0.28+0.14*uDk);
+ col+=uAcc*smoothstep(0.07,0.0,abs(vP.y-uScan))*1.6;
+ col+=uAcc*0.05*fr*step(0.55,fract(vP.y*70.0+uT*0.5));
+ gl_FragColor=vec4(col,1.0);}`;
+const B3={on:null,stage:null,mesh:null};
+setTimeout(()=>{const go=()=>{try{if(!B3.mesh&&b3Ok())b3Mesh()}catch(e){}};(window.requestIdleCallback||(f=>setTimeout(f,1500)))(go,{timeout:5000})},3000);
+function b3Ok(){if(B3.on!==null)return B3.on;try{const c=document.createElement('canvas'),g=c.getContext&&(c.getContext('webgl',{antialias:true})||c.getContext('experimental-webgl'));B3.on=!!g}catch(e){B3.on=false}return B3.on}
+const b3Ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function b3Build(){
+ const st=document.createElement('div');st.className='b3';st.id='b3stage';
+ st.innerHTML=`<canvas role="img" aria-label="3D body. Drag to turn, pinch to zoom, tap where it hurts. Or search below."></canvas><div class="b3pins" aria-hidden="true"></div>
+  <div class="b3top"><div class="b3lab" aria-live="polite"><small>Tap where it hurts</small><b>Your body</b></div>
+   <div class="b3ctl"><button type="button" data-b3="turn" aria-label="Turn around"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg></button>
+   <button type="button" data-b3="reset" aria-label="Show whole body"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg></button></div></div>
+  <div class="b3hint">Drag to turn · pinch to zoom</div><div class="b3toast" role="status"></div>
+  <div class="b3search"><div class="b3sug" role="listbox" aria-label="Body parts"></div>
+   <label class="b3q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+   <input id="b3q" type="search" autocomplete="off" enterkeyhint="search" placeholder="Search: knee, lats, tennis elbow…" aria-label="Search a body part"></label></div>`;
+ const cv=st.querySelector('canvas'),gl=cv.getContext('webgl',{antialias:true,premultipliedAlpha:true,alpha:true})||cv.getContext('experimental-webgl');
+ if(!gl){B3.on=false;return null}
+ const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o};
+ const pg=gl.createProgram();gl.attachShader(pg,sh(gl.VERTEX_SHADER,B3VS));gl.attachShader(pg,sh(gl.FRAGMENT_SHADER,B3FS));gl.linkProgram(pg);gl.useProgram(pg);
+ const m=b3Mesh(),buf=(data,loc,n)=>{const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);const l=gl.getAttribLocation(pg,loc);gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,n,gl.FLOAT,false,0,0)};
+ buf(m.pos,'aP',3);buf(m.nor,'aN',3);buf(m.kd,'aK',1);
+ const U={};for(const n of ['uM','uVP','uR','uBr','uTx','uCam','uT','uScan','uBase','uAcc','uDk'])U[n]=gl.getUniformLocation(pg,n);
+ const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);for(const [p,v] of [[gl.TEXTURE_MIN_FILTER,gl.NEAREST],[gl.TEXTURE_MAG_FILTER,gl.NEAREST],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,p,v);
+ gl.uniform1i(U.uTx,0);gl.enable(gl.DEPTH_TEST);
+ const red=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const cam={yaw:red?0:-2.4,pitch:.1,dist:red?3.05:3.7,tg:[0,.9,0]};let tw=null,vel=0,idle=true,t0=performance.now(),scan0=red?-9:t0,hover=-1;
+ const S3={st,gl,cv,cam,m,U,tx,sel:-1,dirty:true,run:false,vp:null,mm:null};
+ B3.api=S3;
+ S3.tween=(to,ms=900)=>{idle=false;let dy=((to.yaw??cam.yaw)-cam.yaw)%(Math.PI*2);if(dy>Math.PI)dy-=Math.PI*2;if(dy<-Math.PI)dy+=Math.PI*2;
+  tw={t:performance.now(),ms:red?1:ms,f:{yaw:cam.yaw,pitch:cam.pitch,dist:cam.dist,tg:cam.tg.slice()},to:{yaw:cam.yaw+dy,pitch:to.pitch??cam.pitch,dist:to.dist??cam.dist,tg:to.tg||cam.tg}}};
+ const home=()=>S3.tween({yaw:0,pitch:.1,dist:3.05,tg:[0,.9,0]});
+ S3.home=home;
+ if(!red)S3.tween({yaw:0,dist:3.05},1500);
+ S3.tex=()=>{const P=pains(),d=new Uint8Array(32*4);B3REG.forEach((k,i)=>{const l=(P[k]&&P[k].lvl)||0;d[i*4]=Math.round(l*25.5);d[i*4+1]=i===S3.sel?255:0;d[i*4+2]=i===hover?255:0;d[i*4+3]=255});
+  gl.bindTexture(gl.TEXTURE_2D,tx);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,32,1,0,gl.RGBA,gl.UNSIGNED_BYTE,d)};
+ const lab=st.querySelector('.b3lab b'),sub=st.querySelector('.b3lab small'),toast=st.querySelector('.b3toast');
+ S3.label=()=>{const k=view.painSel,P=pains();if(k&&B3REG.includes(k)){const l=(P[k]&&P[k].lvl)||0;lab.textContent=b3Lab(k);sub.textContent=l?`Pain ${l}/10`:(view.painPt&&view.painPt.k===k)?'Spot marked: rate it below':'Tap the exact spot, then rate it'}else{lab.textContent='Your body';sub.textContent='Tap where it hurts'}};
+ let toastT=0;S3.toast=msg=>{toast.textContent=msg;toast.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>toast.classList.remove('on'),2200)};
+ // camera matrices
+ S3.mats=()=>{const w=cv.clientWidth||1,h=cv.clientHeight||1,M=M4.rotY(cam.yaw),tg=M4.xf(M,cam.tg),eye=[tg[0],tg[1]+Math.sin(cam.pitch)*cam.dist,tg[2]+Math.cos(cam.pitch)*cam.dist];
+  const V=M4.look(eye,tg,[0,1,0]),Pm=M4.persp(.6,w/h,.05,30),VP=M4.mul(Pm,V);return {M,VP,eye,w,h}};
+ S3.pick=(cx,cy)=>{const {M,VP,eye,w,h}=S3.mats(),iv=M4.inv(VP),nx=cx/w*2-1,ny=1-cy/h*2,a=M4.xf(iv,[nx,ny,-1]),b=M4.xf(iv,[nx,ny,1]);
+  const Mi=M4.rotY(-cam.yaw),o=M4.xf(Mi,eye),dir=v3.sub(M4.xf(Mi,b),M4.xf(Mi,a));return b3Ray(o,dir)};
+ S3.focus=(r,pt)=>{const an=b3Anchor(r);S3.sel=r;S3.tween({yaw:pt?cam.yaw:an.yaw,pitch:.06,dist:pt?Math.min(cam.dist,1.3):an.dist,tg:pt||an.p});S3.tex();S3.label()};
+ // pins
+ const pinBox=st.querySelector('.b3pins');
+ const pins=()=>{const P=pains(),list=Object.entries(P).filter(([k,v])=>v&&v.lvl>0&&v.pt).map(([k,v])=>({k,p:v.pt,l:v.lvl}));
+  if(view.painPt&&!list.some(x=>x.k===view.painPt.k))list.push({k:view.painPt.k,p:view.painPt.p,l:0});return list};
+ let frame=0;
+ const draw=now=>{if(!st.isConnected||document.hidden){S3.run=false;return}requestAnimationFrame(draw);frame++;
+  const dpr=Math.min(devicePixelRatio||1,2),w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+  if(tw){const f=Math.min(1,(now-tw.t)/tw.ms),e=b3Ease(f);cam.yaw=tw.f.yaw+(tw.to.yaw-tw.f.yaw)*e;cam.pitch=tw.f.pitch+(tw.to.pitch-tw.f.pitch)*e;cam.dist=tw.f.dist+(tw.to.dist-tw.f.dist)*e;cam.tg=tw.f.tg.map((v,i)=>v+(tw.to.tg[i]-v)*e);if(f>=1)tw=null}
+  else if(Math.abs(vel)>.0004&&!S3.drag){cam.yaw+=vel;vel*=.93}
+  else if(idle&&!red&&!S3.drag)cam.yaw=Math.sin((now-t0)/2600)*.32;
+  const T=(now-t0)/1000,scan=red?9:Math.min(9,-.05+(now-scan0)/1000*1.5);
+  gl.viewport(0,0,cv.width,cv.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  const {M,VP,eye}=S3.mats(),c=Math.cos(cam.yaw),s=Math.sin(cam.yaw);S3.vp=VP;S3.mm=M;
+  const dk=document.documentElement.dataset.theme==='dark'||(document.documentElement.dataset.theme!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  gl.uniformMatrix4fv(U.uM,false,M);gl.uniformMatrix4fv(U.uVP,false,VP);gl.uniformMatrix3fv(U.uR,false,new Float32Array([c,0,-s,0,1,0,s,0,c]));
+  gl.uniform1f(U.uBr,red?0:Math.sin(T*1.6));gl.uniform3fv(U.uCam,eye);gl.uniform1f(U.uT,red?0:T);gl.uniform1f(U.uScan,scan);gl.uniform1f(U.uDk,dk?1:0);
+  gl.uniform3fv(U.uBase,dk?[.30,.34,.42]:[.80,.83,.88]);gl.uniform3fv(U.uAcc,dk?[.32,.64,1.0]:[.16,.39,.85]);
+  gl.disable(gl.BLEND);gl.depthMask(true);gl.drawArrays(gl.TRIANGLES,0,m.bodyN);
+  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.drawArrays(gl.TRIANGLES,m.bodyN,m.floorN);gl.depthMask(true);
+  // pins (DOM), occlusion test every 3rd frame
+  const list=pins();let html='';const Mi=M4.rotY(-cam.yaw),eb=M4.xf(Mi,eye);
+  for(const pn of list){const wp=M4.xf(M,pn.p),sc=M4.xf(VP,wp);if(sc[2]>1)continue;const x=(sc[0]+1)/2*w,y=(1-sc[1])/2*h;
+   let vis=pn._v;if(frame%3===0||vis==null){const d=v3.sub(pn.p,eb),L=v3.len(d),hit=b3Ray(eb,d);vis=!hit||hit.t>L-.03}
+   if(scan<pn.p[1])vis=false;
+   html+=`<i class="b3pin${vis?'':' hid'}${view.painSel===pn.k?' on':''}" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;--pc:${pn.l?painCol(pn.l):'var(--b3acc)'}"><b>${pn.l||''}</b></i>`}
+  if(pinBox._h!==html){pinBox.innerHTML=html;pinBox._h=html}
+ };
+ S3.start=()=>{if(S3.run)return;S3.run=true;requestAnimationFrame(draw)};
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&st.isConnected)S3.start()});
+ cv.addEventListener('webglcontextlost',e=>{e.preventDefault();B3.on=false;B3.stage=null;if(view.tab==='body')render()});
+ // gestures
+ const pts=new Map();let down=null,pinch=0,lastX=0,lastT=0;
+ cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);if(pts.size===1){down={x:e.clientX,y:e.clientY,t:performance.now()};lastX=e.clientX;lastT=down.t;vel=0}
+  if(pts.size===2){const [a,b]=[...pts.values()];pinch=Math.hypot(a[0]-b[0],a[1]-b[1]);down=null}st.classList.add('touched')});
+ cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId)){if(e.pointerType==='mouse'){const r=cv.getBoundingClientRect(),h=S3.pick(e.clientX-r.left,e.clientY-r.top),nh=h?h.r:-1;if(nh!==hover){hover=nh;S3.tex();cv.style.cursor=h?'pointer':'grab'}}return}
+  const pv=pts.get(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
+  if(pts.size===2){const [a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch){cam.dist=Math.min(3.6,Math.max(.75,cam.dist*pinch/d));tw=null;idle=false}pinch=d;return}
+  const dx=e.clientX-pv[0],dy=e.clientY-pv[1];if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<7)return;
+  S3.drag=true;idle=false;tw=null;cam.yaw+=dx*.011;cam.pitch=Math.min(.7,Math.max(-.45,cam.pitch+dy*.005));const now=performance.now();vel=dx*.011/Math.max(1,(now-lastT)/16);lastT=now});
+ const up=e=>{if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);if(pts.size)return;const wasDrag=S3.drag;S3.drag=false;pinch=0;
+  if(down&&!wasDrag&&performance.now()-down.t<600){const r=cv.getBoundingClientRect(),h=S3.pick(e.clientX-r.left,e.clientY-r.top);if(h)b3Choose(h);}
+  down=null};
+ cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+ cv.addEventListener('wheel',e=>{e.preventDefault();idle=false;tw=null;cam.dist=Math.min(3.6,Math.max(.75,cam.dist*Math.exp(e.deltaY*.0012)))},{passive:false});
+ // controls + search
+ st.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.b3==='turn'){haptic(8);S3.tween({yaw:cam.yaw+Math.PI},800)}
+  if(b.dataset.b3==='reset'){haptic(8);home()}
+  if(b.dataset.b3go!=null){const r=+b.dataset.b3go;q.value='';sug.innerHTML='';sug.classList.remove('on');q.blur();haptic(10);
+   view.painSel=B3REG[r];if(!(view.painPt&&view.painPt.k===B3REG[r]))view.painPt=null;S3.focus(r,null);S3.toast('Tap the exact spot that hurts');render()}});
+ const q=st.querySelector('#b3q'),sug=st.querySelector('.b3sug');
+ const showSug=()=>{const rs=b3Search(q.value);sug.innerHTML=rs.length?rs.map((r,i)=>`<button type="button" role="option" data-b3go="${r}" style="--i:${i}"><span>${esc(b3Lab(B3REG[r]))}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`).join(''):(q.value.trim()?'<p class="b3none">No match. Try "knee", "lats" or "shin".</p>':'');sug.classList.toggle('on',!!q.value.trim())};
+ q.addEventListener('input',showSug);
+ q.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();const f=sug.querySelector('[data-b3go]');f&&f.click()}if(e.key==='Escape'){q.value='';showSug();q.blur()}if(e.key==='ArrowUp'){const f=sug.querySelector('[data-b3go]');if(f){e.preventDefault();f.focus()}}});
+ sug.addEventListener('keydown',e=>{const all=[...sug.querySelectorAll('[data-b3go]')],i=all.indexOf(document.activeElement);if(e.key==='ArrowUp'&&i>0){e.preventDefault();all[i-1].focus()}if(e.key==='ArrowDown'){e.preventDefault();(all[i+1]||q).focus()}});
+ st.addEventListener('keydown',e=>e.stopPropagation());st.addEventListener('input',e=>e.stopPropagation());
+ S3.tex();S3.label();
+ return S3}
+async function b3Choose(h){const S3=B3.api;haptic(12);const k=h.key;view.painSel=k;view.painPt={k,p:h.p};S3.focus(h.r,h.p);
+ const P=pains();if(P[k]&&P[k].lvl>0){await setPain(k,P[k].lvl)}else render()}
+window.__b3={mesh:b3Mesh,search:b3Search,ray:b3Ray,region:b3Region,anchor:b3Anchor,map:b3Map,keys:B3REG,label:b3Lab};
+function b3Mount(){if(!b3Ok())return false;try{if(!B3.stage){const s=b3Build();if(!s)return false;B3.stage=s}}catch(e){B3.on=false;B3.stage=null;return false}
+ const host=$('#b3host');if(!host)return false;host.replaceWith(B3.stage.st);const S3=B3.stage;
+ const r=B3REG.indexOf(view.painSel);if(r!==S3.sel){S3.sel=r;if(r<0)S3.home()}S3.tex();S3.label();S3.start();return true}
+
 function renderBody(){
   if(needsSetup())return renderSetup();
   const P=pains(),sel=view.painSel,log=(S.profile&&S.profile.painLog)||[],now=today();
@@ -963,7 +1269,7 @@ function renderBody(){
    ${SPOTS.map(([k,x,y])=>{const l=(P[k]&&P[k].lvl)||0,c=painCol(l);return `<g data-pk="${k}" role="button" tabindex="0" aria-label="${esc(painLabel(k))}${l?', pain '+l+' of 10':''}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="14" fill="${c==='none'?'var(--card)':c}" stroke="${sel===k?'var(--ink)':c==='none'?'var(--mute)':c}" stroke-width="${sel===k?4:2}" ${c==='none'?'stroke-dasharray="3 3"':''}/>${l?`<text x="${x}" y="${y+5}" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">${l}</text>`:''}</g>`}).join('')}</svg>`;
   let side='';
   if(sel){const l=(P[sel]&&P[sel].lvl)||0;
-    side+=`<div class="card" style="--c:${painCol(l)==='none'?'var(--line)':painCol(l)}"><h3>${esc(painLabel(sel)[0].toUpperCase()+painLabel(sel).slice(1))}</h3><p class="meta" style="margin:2px 0 8px">How much does it hurt right now? 0 = no pain.</p>
+    side+=`<div class="card" style="--c:${painCol(l)==='none'?'var(--line)':painCol(l)}"><h3>${esc(painLabel(sel)[0].toUpperCase()+painLabel(sel).slice(1))}</h3><p class="meta" style="margin:2px 0 8px">How much does it hurt right now? 0 = no pain.${b3Ok()?((view.painPt&&view.painPt.k===sel)||(P[sel]&&P[sel].pt)?' Spot marked on the body.':' Tip: tap the exact spot on the body to mark it.'):''}</p>${sel==='head'?'<div class="hint pain">Head pain doesn\'t change your exercises. A sudden or severe headache while lifting needs a doctor right away.</div>':''}
     <div class="pscale">${Array.from({length:11},(_,v)=>`<button data-pl="${v}" aria-pressed="${v===l}" style="--pc:${v?painCol(v):'var(--ok)'}">${v}</button>`).join('')}</div>
     <p class="meta" style="margin-top:8px">1–3: go by feel · 4–6: joint-friendlier swaps · 7–10: skip exercises that load it</p><button class="btn" data-pdone="1">Done</button></div>`}
   const act=Object.entries(P).filter(([k,v])=>v&&v.lvl>0).sort((a,b)=>b[1].lvl-a[1].lvl);
@@ -972,13 +1278,16 @@ function renderBody(){
     const ch=[];for(const d of prog().days){for(const e of d.ex){const n=(prog().ppl&&swaps()[d.k+'|'+e.n])||e.n,x=painAdjust({n,sets:e.sets,reps:e.reps,rpe:null},'');if(x.pain&&!x.mild)ch.push(`<tr><td>${esc(d.n)}</td><td>${esc(n)}</td><td>${x.skip?'Skipped':x.porig?'→ '+esc(x.n):'Lighter'}</td></tr>`)}}
     if(ch.length)side+=`<h2 style="margin:14px 0 6px;font-size:24px">What changes in your program</h2><table><thead><tr><th>Day</th><th>Exercise</th><th>Change</th></tr></thead><tbody>${[...new Set(ch)].join('')}</tbody></table>`;
   }else if(!sel)side+=`<div class="empty">No pain logged. Tap a spot on the body if something hurts.</div>`;
-  $('#main').innerHTML=`<h2 style="margin:0;font-size:30px">Pain and injuries</h2><p class="meta">Tap where it hurts and rate it. Your workouts adjust automatically until it's back to 0.</p>
-  <div class="bodywrap"><div class="bodymap">${fig}</div><div>${side}</div></div>
+  const use3=b3Ok();
+  $('#main').innerHTML=`<h2 style="margin:0;font-size:30px">Pain and injuries</h2><p class="meta">${use3?'Spin the body, tap the exact spot that hurts, or search for a body part. Then rate it.':'Tap where it hurts and rate it.'} Your workouts adjust automatically until it's back to 0.</p>
+  <div class="bodywrap${use3?' b3on':''}">${use3?'<div id="b3host"></div>':`<div class="bodymap">${fig}</div>`}<div>${side}</div></div>
   <p class="meta" style="margin-top:16px">This is a training aid, not medical advice. Sharp pain, swelling, numbness, or pain that lasts more than about 2 weeks: see a doctor or physical therapist.</p>`;
+  if(use3&&!b3Mount())return renderBody();
 }
 async function setPain(k,lvl){
   const P=Object.assign({},pains()),log=((S.profile&&S.profile.painLog)||[]).slice(-150),d=iso(today());
-  if(lvl>0)P[k]={lvl,date:d};else delete P[k];
+  const pt=view.painPt&&view.painPt.k===k?view.painPt.p:(P[k]&&P[k].pt);
+  if(lvl>0)P[k]=pt?{lvl,date:d,pt}:{lvl,date:d};else{delete P[k];if(view.painPt&&view.painPt.k===k)view.painPt=null}
   const prev=log.filter(e=>e.k===k).slice(-1)[0];if(!prev||prev.l!==lvl||prev.d!==d)log.push({d,k,l:lvl});
   await putProfile({pain:P,painLog:log});
 }
@@ -1307,8 +1616,8 @@ $('#main').addEventListener('click',async e=>{
   const spot=e.target.closest('[data-pk]');if(spot){view.painSel=spot.dataset.pk;render();return}
   const b=e.target.closest('button');if(!b)return;unfocus();
   if(b.dataset.pl!=null){await setPain(view.painSel,+b.dataset.pl);return}
-  if(b.dataset.pdone){view.painSel=null;render();return}
-  if(b.dataset.pedit){view.painSel=b.dataset.pedit;render();return}
+  if(b.dataset.pdone){view.painSel=null;view.painPt=null;render();return}
+  if(b.dataset.pedit){view.painSel=b.dataset.pedit;view.painPt=null;render();if(B3.stage&&B3.stage.st.isConnected){const r=B3REG.indexOf(b.dataset.pedit),pt=(pains()[b.dataset.pedit]||{}).pt;if(r>=0)B3.stage.focus(r,pt||null)}return}
   if(b.dataset.pclear){if(view.painSel===b.dataset.pclear)view.painSel=null;await setPain(b.dataset.pclear,0);return}
   if(b.dataset.pseg&&!b.dataset.gotab){view.pseg=b.dataset.pseg;render();return}
   if(b.dataset.gotab){if(b.dataset.pseg)view.pseg=b.dataset.pseg;view.tab=b.dataset.gotab;armed=null;flash='';view.bwFlash=false;render();window.scrollTo(0,0);if(b.dataset.bwfocus){const i=$('#bww');if(i)i.focus()}return}
