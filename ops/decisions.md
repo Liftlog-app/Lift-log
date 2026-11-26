@@ -14,3 +14,9 @@ Newest first. Each entry: date, decision, why.
 - **2026-11-23 · Accounts and cloud sync will use Supabase.** Free tier, Postgres tables with row-level security, works offline-first; blocked until Nheil creates a project.
 - **2026-11-23 · Focus on app features before accounts and store release.** Nheil's call.
 - **2026-11-23 · One fixed signing key for all Android builds.** Lets updates install over old versions and keep data. Before the Play Store, switch to a private release key.
+
+## 2026-11-26: Pro feature queue
+- **Decision:** Nheil queued five premium features for the future Pro tier, in this order: PR forecast, "Only got X minutes", Cut coach, Ghost race a friend, Velocity Coach. "Gym's packed" mode was not picked.
+- **Why:** PR forecast and the time-cap mode are quick, easy to show in short videos, and make Pro feel worth it on day one. Cut coach serves Nheil's Feb cut. Ghost race needs accounts. Velocity Coach is the wow feature but the hardest, so it comes after launch.
+- **Monetization direction (discussed, not final):** free app with a Pro subscription later, plus paid programs from Nheil. No ads.
+

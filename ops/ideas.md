@@ -4,6 +4,12 @@ Researcher adds ideas; Product Lead scores and moves winners to the roadmap. ICE
 
 | Idea | User problem | Evidence / source | I | C | E | ICE | Status |
 |---|---|---|---|---|---|---|---|
+| **PR forecast** (Pro) | Lifters want a date to chase, not just a chart | Nheil's pick, 2026-11-26 | 7 | 7 | 8 | 392 | Queued by Nheil: Pro features #1 |
+| **"Only got X minutes"** (Pro) | Short on time, lifters skip the whole workout | Nheil's pick, 2026-11-26 | 7 | 7 | 6 | 294 | Queued by Nheil: Pro features #2 |
+| **Cut coach** (Pro): Cut guard plus volume adjustment | Strength crashes during cuts | Nheil's pick, 2026-11-26; builds on Cut guard | 8 | 6 | 6 | 288 | Queued by Nheil: Pro features #3 |
+| **Ghost race a friend** (Pro) | Training alone is less motivating; spreads the app through friend groups | Nheil's pick, 2026-11-26 | 7 | 6 | 5 | 210 | Queued by Nheil: Pro features #4, needs accounts |
+| **Velocity Coach**: camera bar path and rep speed (Pro) | RPE is a guess; velocity devices cost $300+ | Nheil's pick, 2026-11-26 | 9 | 4 | 2 | 72 | Queued by Nheil: Pro features #5, research spike first |
+| "Gym's packed" mode: rebuild the workout around free equipment | Equipment taken at busy gyms | Suggested 2026-11-26 | 6 | 6 | 5 | 180 | Not queued (Nheil's choice, 2026-11-26) |
 | Compact bodyweight strip on Progress (Designer) | Bodyweight now fills the first Progress screen; lift charts sit below the fold | Designer review of PR #1, 2026-11-24 | 5 | 7 | 8 | 280 | New |
 | Quick weight log inside the Home card (Designer) | Logging a weigh-in takes a tab switch | Designer review of PR #1 | 6 | 7 | 7 | 294 | New |
 | Goal line and projection on the weight chart (Designer) | "Needs X lb/wk" is abstract; a line to the goal date is instant | Designer review of PR #1 | 5 | 6 | 6 | 180 | New |

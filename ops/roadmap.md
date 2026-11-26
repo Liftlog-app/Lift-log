@@ -75,6 +75,16 @@ Fix 1:
 - **Set cap on a grinder**: after an RPE 10 set or missed target reps, offer to drop the remaining sets or cut their load.
 - **PR share cards**: one tap turns a new personal record into a branded image to post. Growth loop for Nheil's gym content. Needs a native share/save bridge in the Android and iPhone wrappers.
 
+## Pro features (queued by Nheil, 2026-11-26)
+
+Nheil picked these as the premium features to build toward the Pro tier. Build them in this order. They can ship free at first and be put behind Pro later, once accounts and store billing exist (see Blocked). Idea #3 ("Gym's packed" mode) was left out on purpose.
+
+1. **PR forecast** (easy): "At your current rate you'll bench 225 on Mar 14." Projects each main lift's e1RM trend to a target the user sets, updates after every workout, shows a countdown. Must say it's an estimate. Share-card ready later.
+2. **"Only got X minutes"** (easy to medium): pick 20/30/45/60 min and today's workout shrinks to fit, keeping the main lifts' work sets and dropping accessories and extra sets first. Uses rest times to estimate length. Saved sessions keep their normal format.
+3. **Cut coach** (medium): grows the **Cut guard** item above. Links the bodyweight trend to main-lift e1RM, warns when strength drops during a cut and offers to trim training volume to protect strength. Training guidance only: no calorie, macro or diet advice. Must be live before 2027-02-15.
+4. **Ghost race a friend** (medium, needs accounts): race a friend's numbers set by set, like the current ghost race against your own past. Needs accounts and sharing (Blocked until Supabase is set up).
+5. **Velocity Coach** (hard, headline feature after launch): film a set, track the bar path and rep speed on the device, estimate reps left from slow-down, and draw the bar path on the video for sharing. Must run on the phone with no uploads. Replaces "Video form check" under Later. Start with a research spike on camera access in the Android/iPhone web views.
+
 ## Next
 
 - Exercise library: browse exercises with photos, muscles and how-to steps (Free Exercise DB). Bundling the instruction text into the one-file app needs a size check first.
@@ -92,7 +102,7 @@ Fix 1:
 - Hands-free voice logging (web version first)
 - Wearable data (heart rate variability, sleep) feeding the readiness score
 - Coach view for trainers with several athletes
-- Video form check tied to a set
+- (Video form check moved to Pro features: Velocity Coach)
 
 ## Blocked (needs Nheil)
 
