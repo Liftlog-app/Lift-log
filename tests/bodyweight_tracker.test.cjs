@@ -9,7 +9,7 @@ const allErrors=[];
 function boot(seed){
   const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){const RD=w.Date;class FD extends RD{constructor(...a){if(a.length)super(...a);else super(FD.now())}static now(){return w.__now||NOW}};w.Date=FD;w.ResizeObserver=class{observe(){}disconnect(){}};w.scrollTo=()=>{};w.localStorage.setItem('liftlog.v1',JSON.stringify(seed));w.__now=NOW;w.__e=[];w.addEventListener('error',e=>w.__e.push(e.message))}});
   const w=dom.window,d=w.document;
-  const $=s=>d.querySelector(s),tab=async t=>{$(`[data-tab=${t}]`).click();await sleep(15)};
+  const $=s=>d.querySelector(s),tab=async t=>{$(`[data-tab=${t}]`).click();await sleep(15);if(t==='progress'){const b=$('[data-pseg=body]');if(b){b.click();await sleep(15)}}};
   const store=()=>JSON.parse(w.localStorage.getItem('liftlog.v1'));
   const set=(sel,v,evt)=>{const el=$(sel);el.value=v;el.dispatchEvent(new w.Event(evt||'input',{bubbles:true}))};
   const logW=async(v,date)=>{if(date)set('#bwd',date);set('#bww',v);$('#bwlog').click();await sleep(20)};
@@ -32,7 +32,7 @@ const ema=a=>{let t=null;for(const e of a)t=t==null?e.w:t+0.1*(e.w-t);return t};
   hb.click();await sleep(20);
   ok(A.$('[data-tab=progress]').getAttribute('aria-current')==='true','home button did not open Progress');
   ok(A.d.activeElement&&A.d.activeElement.id==='bww','#bww not focused');
-  const sec=A.$('#bwsec');ok(sec&&A.$('#main').firstElementChild===sec,'Bodyweight section is not at the top of Progress');
+  const sec=A.$('#bwsec');ok(sec&&A.$('#main').firstElementChild.classList.contains('seg')&&A.$('#main').children[1]===sec&&A.$('[data-pseg=body]').getAttribute('aria-selected')==='true','Home button should open Progress on the Body view with the Bodyweight section first');
   ok(A.$('#bww').type==='number'&&A.$('#bww').getAttribute('inputmode')==='decimal','weight input attrs');
   ok(A.$('label[for=bww]').textContent==='Morning weight (lb)','weight label');
   ok(A.$('#bwd').type==='date'&&A.$('#bwd').value==='2026-11-24'&&A.$('#bwd').max==='2026-11-24','date input default/max');

@@ -22,5 +22,5 @@ const w=dom.window,d=w.document;(async()=>{await sleep(100);/*GOTODAY*/d.querySe
  console.log('focus:',[...d.querySelectorAll('.focus li')].map(l=>l.textContent).join(' || '));
  d.querySelector('[data-rw="2"]').click();await sleep(10);console.log('wk2:',d.querySelector('.report h2').textContent,'|',[...d.querySelectorAll('.report tbody tr')].map(r=>r.textContent).join(' / '));
  d.querySelector('[data-tab=settings]').click();await sleep(10);const pl=d.querySelector('#gpl');pl.value='45, 25, 10, 5';pl.dispatchEvent(new w.Event('change',{bubbles:true}));await sleep(10);
- d.querySelector('[data-tab=today]').click();await sleep(10);d.querySelector('[data-s=legsA]').click();await sleep(10);console.log('plates w/o 35s & 2.5:',d.querySelector('.card[data-card="0"] .sug .meta').textContent);
+ d.querySelector('[data-tab=today]').click();await sleep(10);d.querySelector('[data-s=legsA]').click();await sleep(10);console.log('plates w/o 35s & 2.5:',d.querySelector('.card[data-card="0"] .sug .sugpl').textContent);
  console.log('errors',w.__e);process.exit(0)})();

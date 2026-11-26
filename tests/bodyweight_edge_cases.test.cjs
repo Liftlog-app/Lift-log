@@ -27,7 +27,7 @@ function fakeDb(initialProfile){
 function boot(seed,opts={}){
   const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){const RD=w.Date;class FD extends RD{constructor(...a){if(a.length)super(...a);else super(FD.now())}static now(){return NOW}};w.Date=FD;w.ResizeObserver=class{observe(){}disconnect(){}};w.scrollTo=()=>{};if(seed)w.localStorage.setItem('liftlog.v1',JSON.stringify(seed));if(opts.claude)w.claude=opts.claude;w.__e=[];w.addEventListener('error',e=>w.__e.push(e.message))}});
   const w=dom.window,d=w.document;
-  const $=s=>d.querySelector(s),tab=async t=>{$(`[data-tab=${t}]`).click();await sleep(15)};
+  const $=s=>d.querySelector(s),tab=async t=>{$(`[data-tab=${t}]`).click();await sleep(15);if(t==='progress'){const b=$('[data-pseg=body]');if(b){b.click();await sleep(15)}}};
   const store=()=>JSON.parse(w.localStorage.getItem('liftlog.v1')||'null');
   const set=(sel,v,evt)=>{const el=$(sel);el.value=v;el.dispatchEvent(new w.Event(evt||'input',{bubbles:true}))};
   const logW=async(v,date)=>{if(date)set('#bwd',date);set('#bww',v);$('#bwlog').click();await sleep(30)};
