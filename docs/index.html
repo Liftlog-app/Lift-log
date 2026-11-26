@@ -388,9 +388,93 @@ h1{display:flex;align-items:center;gap:8px}
 .exth{width:52px!important;height:52px!important;border-radius:12px;border:0;flex:none}
 .card .ch{gap:12px;justify-content:flex-start}
 .card .ch h3{flex:1}
+/* ---------- tactile buttons ---------- */
+button,.btn,.cfield,label.check{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+@media(prefers-reduced-motion:no-preference){
+button{transition:transform .22s cubic-bezier(.34,1.56,.64,1),filter .15s,background-color .2s,box-shadow .2s,color .2s}
+button:active:not(:disabled){transform:scale(.94);filter:brightness(.9);transition-duration:.07s}
+.startbtn:active:not(:disabled),.cmenu button:active,.ddlist button:active,.bnav button:active,.cday:active{transform:scale(.97)}
+}
+button:disabled{cursor:default}
+/* ---------- custom dropdown + date fields ---------- */
+.nat{position:absolute!important;width:1px!important;opacity:0!important;pointer-events:none!important;clip-path:inset(50%)}
+.cfield{width:100%;min-width:0;flex:1 1 auto;min-height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink);font:600 16px Barlow,sans-serif;text-align:left;cursor:pointer}
+.cfield .cv{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cfield svg{flex:none;width:18px;height:18px;color:var(--mute)}
+@media(prefers-reduced-motion:no-preference){.csel svg{transition:transform .25s cubic-bezier(.34,1.56,.64,1)}}
+.csel[aria-expanded=true]{border-color:var(--acc,var(--pull))}.csel[aria-expanded=true] svg{transform:rotate(180deg)}
+.hnav .cfield{width:auto;flex:none;max-width:150px;min-height:40px;border:0;background:none;color:var(--mute);font-size:14px;padding:0 4px;gap:5px}
+.hnav .cfield svg{width:15px;height:15px}
+.wbanner .hnav .cfield,.wbanner .hnav .cfield svg{color:#fff}
+.clayer{position:fixed;inset:0;z-index:200}
+.cbd{position:absolute;inset:0}
+.cbd.dim{background:rgb(5 7 10/.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.cmenu{position:fixed;display:flex;flex-direction:column;padding:6px;overflow:auto;overscroll-behavior:contain;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px rgb(0 0 0/.32),0 2px 8px rgb(0 0 0/.12)}
+.cmenu button{display:flex;align-items:center;gap:10px;min-height:46px;padding:0 12px;border:0;border-radius:10px;background:none;color:var(--ink);font:600 16px Barlow,sans-serif;text-align:left;cursor:pointer;flex:none}
+.cmenu button span{flex:1}
+.cmenu button:hover,.cmenu button:focus-visible{background:color-mix(in srgb,var(--ink) 7%,transparent);outline:0}
+.cmenu button[aria-selected=true]{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--ink)}
+.cmenu button svg{width:18px;height:18px;color:var(--acc)}
+.csheet{position:absolute;left:0;right:0;bottom:0;max-width:440px;margin:0 auto;padding:10px 18px calc(18px + env(safe-area-inset-bottom));background:var(--card);border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgb(0 0 0/.35)}
+.cgrab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.ctop{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.ctop small{display:block;color:var(--mute);font:600 13px Barlow,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.cbig{font:800 34px/1.05 "Barlow Condensed",Barlow,sans-serif;color:var(--ink)}
+.cbig.none{color:var(--mute)}
+.cmrow{display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px}
+.cmon{font:800 22px "Barlow Condensed",Barlow,sans-serif;color:var(--ink)}.cmon span{color:var(--mute);font-weight:600}
+.cnav{display:flex;gap:6px}
+.cnav button{width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.cnav svg{width:20px;height:20px}
+.cdow,.cgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+.cdow span{font:700 12px Barlow,sans-serif;color:var(--mute);padding:4px 0}
+.cgw{overflow:hidden;touch-action:pan-y}
+.cday{position:relative;height:44px;border:0;border-radius:50%;background:none;color:var(--ink);font:600 16px Barlow,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer;aspect-ratio:1;max-width:44px;margin:0 auto;width:100%}
+.cday.td{box-shadow:inset 0 0 0 2px var(--acc);color:var(--acc);font-weight:800}
+.cday.on{background:var(--acc);color:var(--onacc);font-weight:800;box-shadow:0 6px 16px color-mix(in srgb,var(--acc) 45%,transparent)}
+.cday:disabled{color:var(--mute);opacity:.35}
+.cday.has::after{content:"";position:absolute;left:50%;bottom:5px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--acc)}
+.cday.on.has::after{background:var(--onacc)}
+.cfoot{display:flex;align-items:center;gap:8px;margin-top:12px}
+.cfoot .lg{flex:1;color:var(--mute);font:600 13px Barlow,sans-serif;display:flex;align-items:center;gap:6px}
+.cfoot .lg i{width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.cfoot button{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--ink);font:700 15px Barlow,sans-serif;cursor:pointer}
+@media(prefers-reduced-motion:no-preference){
+.cmenu{animation:cmIn .22s cubic-bezier(.2,.9,.3,1.2) both}
+.cmenu button{animation:cmItem .26s ease-out both;animation-delay:calc(var(--i,0)*22ms)}
+.clayer.out .cmenu{animation:cmOut .14s ease-in both}
+.cbd.dim{animation:fadeIn .2s ease-out both}.clayer.out .cbd.dim{animation:fadeOut .18s ease-in both}
+.csheet{animation:shIn .36s cubic-bezier(.2,.9,.25,1.08) both}.clayer.out .csheet{animation:shOut .2s ease-in both}
+.cgrid.nx{animation:gNext .28s cubic-bezier(.2,.8,.3,1) both}.cgrid.pv{animation:gPrev .28s cubic-bezier(.2,.8,.3,1) both}
+.cday.pop{animation:dPop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cmIn{from{opacity:0;transform:translateY(var(--dy,-6px)) scale(.94)}}
+@keyframes cmOut{to{opacity:0;transform:translateY(var(--dy,-6px)) scale(.96)}}
+@keyframes cmItem{from{opacity:0;transform:translateY(-4px)}}
+@keyframes fadeIn{from{opacity:0}}@keyframes fadeOut{to{opacity:0}}
+@keyframes shIn{from{transform:translateY(100%)}}@keyframes shOut{to{transform:translateY(100%)}}
+@keyframes gNext{from{opacity:0;transform:translateX(40px)}}@keyframes gPrev{from{opacity:0;transform:translateX(-40px)}}
+@keyframes dPop{40%{transform:scale(1.18)}}
+}
+/* ---------- intro ---------- */
+#intro{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at 50% 42%,#1d2330 0,#13161b 60%);animation:iOut .4s cubic-bezier(.5,0,.75,0) 1.45s both}
+#intro svg{width:150px;height:150px;overflow:visible;animation:iZoom .4s cubic-bezier(.5,0,.75,0) 1.45s both}
+#intro .ick{stroke-dasharray:801;stroke-dashoffset:801;animation:iDraw .5s cubic-bezier(.65,0,.35,1) .1s forwards}
+#intro .ipl{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:iPop .45s cubic-bezier(.34,1.7,.64,1) forwards}
+#intro .ipl1{animation-delay:.5s}#intro .ipl2{animation-delay:.6s}#intro .ipl3{animation-delay:.42s}
+#intro .iword{display:flex;gap:.25em;overflow:hidden;font:800 44px/1 "Barlow Condensed",Barlow,sans-serif;letter-spacing:.06em;color:#f1f3f6}
+#intro .iword span{display:inline-block;transform:translateY(110%);animation:iRise .45s cubic-bezier(.2,.9,.3,1.15) .72s forwards}
+#intro .iword span+span{animation-delay:.8s;color:#d8342c}
+#intro .itag{font:600 14px Barlow,sans-serif;letter-spacing:.32em;text-transform:uppercase;color:#9aa3b1;opacity:0;animation:iShow .4s ease-out .98s forwards}
+@keyframes iDraw{to{stroke-dashoffset:0}}
+@keyframes iPop{to{transform:scale(1)}}
+@keyframes iRise{to{transform:none}}@keyframes iShow{to{opacity:1}}
+@keyframes iZoom{to{transform:scale(1.25)}}
+@keyframes iOut{to{opacity:0;visibility:hidden}}
+@media(prefers-reduced-motion:reduce){#intro,#intro *{animation-duration:.01s!important;animation-delay:0s!important}#intro{animation:iOut .3s ease .5s both!important}}
 </style>
 </head>
 <body>
+<div id="intro" aria-hidden="true"><svg viewBox="0 0 1024 1024"><polyline class="ick" points="250,560 430,740 790,330" fill="none" stroke="#ffffff" stroke-width="92" stroke-linecap="round" stroke-linejoin="round"/><g class="ipl ipl1"><g transform="translate(790,330) rotate(-48.7)"><rect x="-34" y="-150" width="68" height="300" rx="22" fill="#d8342c"/></g></g><g class="ipl ipl2"><g transform="translate(790,330) rotate(-48.7)"><rect x="-86" y="-105" width="46" height="210" rx="16" fill="#2a63d4"/></g></g><g class="ipl ipl3"><g transform="translate(250,560) rotate(45)"><rect x="-30" y="-110" width="60" height="220" rx="20" fill="#e0a800"/></g></g></svg><div class="iword"><span>LIFT</span><span>LOG</span></div><div class="itag">Coach every set</div></div>
 <header><div class="wrap">
   <div class="top"><div><h1><svg class="logo" viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" rx="224" fill="#13161b"/><polyline points="250,560 430,740 790,330" fill="none" stroke="#ffffff" stroke-width="92" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(790,330) rotate(-48.7)"><rect x="-34" y="-150" width="68" height="300" rx="22" fill="#d8342c"/><rect x="-86" y="-105" width="46" height="210" rx="16" fill="#2a63d4"/></g><g transform="translate(250,560) rotate(45)"><rect x="-30" y="-110" width="60" height="220" rx="20" fill="#e0a800"/></g></svg>Lift Log</h1><div class="sub" id="sub">Your training log</div></div>
   <button class="gear" data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
@@ -1033,7 +1117,7 @@ function bwHTML(){
   ${list}
   <h3 class="bwh">Goal</h3>${bwGoalHTML(st)}
   <div class="bwin"><div><label for="bwgoal">Goal weight (${u})</label><input id="bwgoal" type="number" inputmode="decimal" step="0.1" value="${gv}"></div>
-  <div><label for="bwby">Goal date</label><input id="bwby" type="date" value="${c?esc(c.by):''}"></div></div>
+  <div><label for="bwby">Goal date</label><input id="bwby" type="date" data-clear value="${c?esc(c.by):''}"></div></div>
   <div class="bwin bwbtns"><button class="btn" id="bwgoalsave">Save goal</button><button class="btn" id="bwgoalclr"${c?'':' disabled'}>Clear goal</button></div>
   <p class="meta bwnote">Rate colours follow research guidelines for keeping strength while cutting (about 0.5–1% of bodyweight a week). This is training guidance, not medical or diet advice.</p></section>`;
 }
@@ -1130,6 +1214,7 @@ function renderSettings(){
   <div class="sec"><h2>Rest timer</h2>
   <label class="check"><input type="checkbox" id="tauto"${t.auto?' checked':''}> Start the rest timer when I enter reps</label>
   <label class="check"><input type="checkbox" id="tsound"${t.sound?' checked':''}> Beep and vibrate when rest is over</label>
+  <label class="check"><input type="checkbox" id="haptics"${S.profile&&S.profile.haptics===false?'':' checked'}> Vibrate lightly on taps</label>
   <label class="check"><input type="checkbox" id="tadapt"${t.adapt?' checked':''}> Rest longer after hard sets (RPE 9+) and shorter after easy ones (RPE 7 or less)</label>
   <div class="row" style="gap:12px"><div style="flex:1"><label for="trest">Rest between sets (seconds)</label><input type="number" id="trest" min="15" max="600" value="${t.rest}"></div>
   <div style="flex:1"><label for="tmain">Rest after first lift of the day (seconds)</label><input type="number" id="tmain" min="15" max="900" value="${t.main}"></div></div></div>
@@ -1220,6 +1305,7 @@ $('#main').addEventListener('change',e=>{const t=e.target;
   if(t.id==='per')editProg(p=>{p.periodize=t.checked});
   if(t.id==='start'&&t.value){putProfile({start:t.value})}
   if(t.id==='unit')putProfile({unit:t.value});
+  if(t.id==='haptics')putProfile({haptics:t.checked});
   if(t.id==='gbar'||t.id==='gpl'){const b=parseFloat($('#gbar').value),pl=$('#gpl').value.split(/[,\s]+/).map(Number).filter(v=>v>0&&v<=100);const G=Object.assign({},(S.profile&&S.profile.gear)||{});G[unit()]={bar:b>0&&b<=60?b:GEAR[unit()].bar,plates:pl.length?[...new Set(pl)].sort((a,c)=>c-a):GEAR[unit()].plates};putProfile({gear:G})}
   if(t.dataset.wu){view.wu=Object.assign({},view.wu,{[t.dataset.wu]:t.checked})}
   if(t.id==='rpedef')putProfile({rpeDef:+t.value});
@@ -1296,6 +1382,101 @@ $('#main').addEventListener('click',async e=>{
 });
 
 render();
+
+/* ---------- haptics, custom dropdowns and calendar ---------- */
+const haptic=ms=>{if(S.profile&&S.profile.haptics===false)return;try{navigator.vibrate&&navigator.vibrate(ms||8)}catch(e){}};
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('button');if(b&&!b.disabled)haptic(7)},{passive:true});
+const IC={chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  l:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  r:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>'};
+const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const fieldLabel=el=>{const l=el.id&&document.querySelector(`label[for="${el.id}"]`);return ((l&&l.textContent)||el.getAttribute('aria-label')||'').trim()};
+const fmtCD=(v,long)=>{if(!v)return '';const d=new Date(v+'T00:00');if(isNaN(d))return v;const o={weekday:'short',month:'short',day:'numeric'};if(long||d.getFullYear()!==today().getFullYear())o.year='numeric';return d.toLocaleDateString(undefined,o)};
+function syncField(el){const b=el._cf;if(!b)return;const isSel=el.tagName==='SELECT',o=isSel&&el.options[el.selectedIndex];
+  const txt=isSel?(o?o.text:''):(fmtCD(el.value)||'Pick a date');
+  b.innerHTML=`<span class="cv">${esc(txt)}</span>${isSel?IC.chev:IC.cal}`;b.setAttribute('aria-label',`${fieldLabel(el)||(isSel?'Choose':'Date')}: ${txt}`)}
+function enhance(){
+  for(const el of document.querySelectorAll('select:not([data-cf]),input[type=date]:not([data-cf])')){
+    el.dataset.cf='1';el.classList.add('nat');el.tabIndex=-1;el.setAttribute('aria-hidden','true');
+    const b=document.createElement('button');b.type='button';b.className='cfield '+(el.tagName==='SELECT'?'csel':'cdate');
+    b.setAttribute('aria-haspopup',el.tagName==='SELECT'?'listbox':'dialog');b.setAttribute('aria-expanded','false');
+    b._nat=el;el._cf=b;el.after(b);syncField(el)}
+}
+new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true});
+document.addEventListener('change',e=>{if(e.target&&e.target._cf)syncField(e.target)},true);
+const accOf=b=>{const c=getComputedStyle(b).getPropertyValue('--c').trim()||'#2a63d4';return c};
+const commit=(el,v)=>{if(el.value===v)return;el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}))};
+let pop=null;
+function closePop(back){if(!pop)return;const p=pop;pop=null;p.btn.setAttribute('aria-expanded','false');document.body.style.overflow=p.ov;
+  p.L.classList.add('out');setTimeout(()=>p.L.remove(),window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?0:200);
+  if(back!==false&&p.btn.isConnected)try{p.btn.focus({preventScroll:true})}catch(e){}}
+function openLayer(btn,html,sheet){closePop(false);const L=document.createElement('div');L.className='clayer';const acc=accOf(btn);
+  L.style.setProperty('--acc',acc);L.style.setProperty('--onacc',onC(acc));L.innerHTML=`<div class="cbd${sheet?' dim':''}"></div>`+html;document.body.appendChild(L);
+  pop={L,btn,ov:document.body.style.overflow};btn.setAttribute('aria-expanded','true');if(sheet)document.body.style.overflow='hidden';
+  L.querySelector('.cbd').addEventListener('click',()=>closePop());
+  L.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closePop()}});return L}
+function openSelect(btn){const el=btn._nat,r=btn.getBoundingClientRect(),vw=innerWidth,vh=innerHeight,opts=[...el.options];
+  const L=openLayer(btn,`<div class="cmenu" role="listbox" aria-label="${esc(fieldLabel(el))}">${opts.map((o,i)=>`<button type="button" role="option" data-i="${i}" aria-selected="${o.selected}" style="--i:${Math.min(i,10)}"${o.disabled?' disabled':''}><span>${esc(o.text)}</span>${o.selected?IC.tick:''}</button>`).join('')}</div>`);
+  const m=L.querySelector('.cmenu'),w=Math.min(Math.max(r.width,230),vw-16),left=Math.min(Math.max(8,r.left),vw-w-8),below=vh-r.bottom-12,above=r.top-12,want=Math.min(380,opts.length*48+14);
+  m.style.width=w+'px';m.style.left=left+'px';
+  if(below>=want||below>=above){m.style.top=(r.bottom+6)+'px';m.style.maxHeight=Math.max(150,below)+'px';m.style.transformOrigin='top center'}
+  else{m.style.bottom=(vh-r.top+6)+'px';m.style.maxHeight=Math.max(150,above)+'px';m.style.transformOrigin='bottom center';m.style.setProperty('--dy','6px')}
+  m.addEventListener('click',e=>{const o=e.target.closest('[role=option]');if(!o||o.disabled)return;haptic(10);const i=+o.dataset.i;
+    m.querySelectorAll('[role=option]').forEach(x=>{const on=x===o;x.setAttribute('aria-selected',on);const t=x.querySelector('svg');if(t&&!on)t.remove();if(on&&!t)x.insertAdjacentHTML('beforeend',IC.tick)});
+    setTimeout(()=>{closePop();if(el.selectedIndex!==i){el.selectedIndex=i;el.dispatchEvent(new Event('change',{bubbles:true}))}},120)});
+  m.addEventListener('keydown',e=>{const all=[...m.querySelectorAll('[role=option]:not(:disabled)')],k=all.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const n=all[(k+(e.key==='ArrowDown'?1:-1)+all.length)%all.length];n&&n.focus()}
+    if(e.key==='Tab')closePop(false)});
+  const cur=m.querySelector('[aria-selected=true]')||m.querySelector('[role=option]');if(cur){cur.scrollIntoView&&cur.scrollIntoView({block:'nearest'});try{cur.focus({preventScroll:true})}catch(e){}}
+}
+function openCal(btn){const el=btn._nat,min=el.min||'',max=el.max||'',td=iso(today()),logged=new Set(Object.values(S.sessions||{}).map(s=>s&&s.date));
+  let sel=el.value||'';const base=new Date((sel||(max&&max<td?max:td))+'T00:00');let y=base.getFullYear(),mo=base.getMonth();
+  const clear=el.dataset.clear!=null;
+  const L=openLayer(btn,`<div class="csheet" role="dialog" aria-modal="true" aria-label="${esc(fieldLabel(el)||'Choose a date')}"><div class="cgrab"></div>
+    <div class="ctop"><div><small>${esc(fieldLabel(el)||'Date')}</small><div class="cbig"></div></div></div>
+    <div class="cmrow"><div class="cmon" aria-live="polite"></div><div class="cnav"><button type="button" data-m="-1" aria-label="Previous month">${IC.l}</button><button type="button" data-m="1" aria-label="Next month">${IC.r}</button></div></div>
+    <div class="cdow" aria-hidden="true">${['S','M','T','W','T','F','S'].map(d=>`<span>${d}</span>`).join('')}</div>
+    <div class="cgw"><div class="cgrid"></div></div>
+    <div class="cfoot"><span class="lg"></span>${clear?'<button type="button" data-c="clear">Clear</button>':''}<button type="button" data-c="today">Today</button></div></div>`,true);
+  const sh=L.querySelector('.csheet'),grid=()=>L.querySelector('.cgrid');
+  const head=()=>{const b=L.querySelector('.cbig');b.textContent=sel?fmtCD(sel,true):'No date';b.classList.toggle('none',!sel)};
+  const ok=v=>!(min&&v<min)&&!(max&&v>max);
+  function draw(dir){const g=grid(),first=new Date(y,mo,1).getDay(),n=new Date(y,mo+1,0).getDate();let h='',any=false;
+    for(let i=0;i<first;i++)h+='<span></span>';
+    for(let d=1;d<=n;d++){const v=iso(new Date(y,mo,d)),has=logged.has(v);any=any||has;
+      h+=`<button type="button" class="cday${v===td?' td':''}${v===sel?' on':''}${has?' has':''}" data-v="${v}"${ok(v)?'':' disabled'} aria-label="${esc(fmtCD(v,true))}${has?', workout logged':''}"${v===sel?' aria-pressed="true"':''}>${d}</button>`}
+    g.innerHTML=h;g.classList.remove('nx','pv');if(dir){void g.offsetWidth;g.classList.add(dir>0?'nx':'pv')}
+    L.querySelector('.cmon').innerHTML=`${MON[mo]} <span>${y}</span>`;
+    L.querySelector('.lg').innerHTML=any?'<i></i>Workout logged':'';
+    const pm=iso(new Date(y,mo,0)),nm=iso(new Date(y,mo+1,1));
+    L.querySelector('[data-m="-1"]').disabled=!!(min&&pm<min);L.querySelector('[data-m="1"]').disabled=!!(max&&nm>max)}
+  const shift=k=>{mo+=k;if(mo<0){mo=11;y--}if(mo>11){mo=0;y++}draw(k);haptic(5)};
+  const pick=v=>{sel=v;head();grid().querySelectorAll('.cday').forEach(b=>{const on=b.dataset.v===v;b.classList.toggle('on',on);if(on){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}});haptic(12);
+    setTimeout(()=>{closePop();commit(el,v)},230)};
+  sh.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+    if(b.dataset.m)shift(+b.dataset.m);
+    else if(b.dataset.v)pick(b.dataset.v);
+    else if(b.dataset.c==='today'){if(!ok(td))return;const t=new Date(td+'T00:00');if(t.getFullYear()!==y||t.getMonth()!==mo){const k=(t.getFullYear()-y)*12+t.getMonth()-mo;y=t.getFullYear();mo=t.getMonth();draw(k)}pick(td)}
+    else if(b.dataset.c==='clear'){sel='';head();haptic(8);setTimeout(()=>{closePop();commit(el,'')},150)}});
+  let sx=null,sy=0;const gw=L.querySelector('.cgw');
+  gw.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
+  gw.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){const nb=L.querySelector(`[data-m="${dx<0?1:-1}"]`);if(nb&&!nb.disabled)shift(dx<0?1:-1)}});
+  let gy=null;const grab=L.querySelector('.cgrab');sh.addEventListener('pointerdown',e=>{if(e.target===grab||e.target.closest('.ctop'))gy=e.clientY});
+  sh.addEventListener('pointerup',e=>{if(gy!=null&&e.clientY-gy>60)closePop();gy=null});
+  head();draw(0);
+  L.addEventListener('keydown',e=>{const a=document.activeElement;if(!a||!a.classList||!a.classList.contains('cday'))return;const st={ArrowLeft:-1,ArrowRight:1,ArrowUp:-7,ArrowDown:7}[e.key];if(!st)return;e.preventDefault();
+    const d=new Date(a.dataset.v+'T00:00');d.setDate(d.getDate()+st);const v=iso(d);if(d.getMonth()!==mo||d.getFullYear()!==y){const k=(d.getFullYear()-y)*12+d.getMonth()-mo;y=d.getFullYear();mo=d.getMonth();draw(k)}const n=L.querySelector(`.cday[data-v="${v}"]`);n&&n.focus()});
+  const f=L.querySelector('.cday.on')||L.querySelector('.cday.td')||L.querySelector('.cday:not(:disabled)');try{f&&f.focus({preventScroll:true})}catch(e){}
+}
+document.addEventListener('click',e=>{const t=e.target;
+  const b=t.closest&&t.closest('.cfield');if(b&&b._nat){e.preventDefault();if(pop&&pop.btn===b){closePop();return}(b._nat.tagName==='SELECT'?openSelect:openCal)(b);return}
+  const l=t.closest&&t.closest('label[for]');if(l){const n=document.getElementById(l.htmlFor);if(n&&n._cf){e.preventDefault();n._cf.click()}}});
+addEventListener('resize',()=>{if(pop&&!pop.L.querySelector('.csheet'))closePop(false)});
+addEventListener('scroll',()=>{if(pop&&!pop.L.querySelector('.csheet'))closePop(false)},{passive:true});
+enhance();
+{const it=document.getElementById('intro');if(it){const end=()=>it.isConnected&&it.remove();it.addEventListener('click',end);it.addEventListener('animationend',e=>{if(e.target===it)end()});setTimeout(end,2200)}}
 
 (async()=>{
   try{
