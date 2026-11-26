@@ -96,6 +96,26 @@ Fix 1:
      - Tap targets at least 44 px.
      - A test that opens the tab, previews a future week and edits an exercise.
 
+3. **History tab: calendar, more interactive, better looking** (Nheil, 2026-11-26). Designer + Coder.
+   - **Month calendar at the top**, in the style of the new date picker:
+     - days with a workout get a dot or fill in that day's colour (Push red, Pull blue, Legs yellow)
+     - today is ringed
+     - swipe or use arrows to change month
+     - tap a day to jump to or expand that day's workout below
+   - **Workout cards** instead of a plain list:
+     - day name and colour, date, duration, sets, volume, PRs hit
+     - tap to expand the sets (weight × reps, RPE), with smooth open/close animation
+   - **Small month summary:** workouts, total volume, PRs, longest streak.
+   - **Nice extras if they fit:**
+     - filter by Push/Pull/Legs
+     - search by exercise
+     - a streak/heat strip
+   - **Must keep:** existing history actions (edit or delete a session, if present) and all saved `sessions` data, untouched. Reuse the calendar code from the custom date picker where possible.
+   - **Acceptance:**
+     - Designer screenshots at 390 px, dark and light, before and after.
+     - Tap targets at least 44 px.
+     - A test that opens History, checks logged days are marked on the calendar, taps a day and expands its workout, and changes month.
+
 ## Pro features (queued by Nheil, 2026-11-26)
 
 Nheil picked these as the premium features to build toward the Pro tier. Build them in this order. They can ship free at first and be put behind Pro later, once accounts and store billing exist (see Blocked). Idea #3 ("Gym's packed" mode) was left out on purpose.

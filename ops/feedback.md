@@ -14,3 +14,4 @@ Format: `- YYYY-MM-DD · who · what happened or what you want · (status)`
 ## 2026-11-26 (Nheil, via chat)
 - Bug: on Home, the "Week 1 of 15" bar shows the 5 Peak weeks as huge yellow columns (Android screenshot). Queued; cause found (`.b3` class clash with the 3D body viewer).
 - Wants the Program tab more interactive and better looking. Queued.
+- Wants the History tab more interactive and more appealing, with a calendar. Queued.
