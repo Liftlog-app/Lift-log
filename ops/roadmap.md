@@ -116,6 +116,32 @@ Fix 1:
      - Tap targets at least 44 px.
      - A test that opens History, checks logged days are marked on the calendar, taps a day and expands its workout, and changes month.
 
+4. **Rest timer alert: more noticeable ring and vibration** (Nheil, 2026-11-26). Coder (+ Designer for the visual).
+   - **Problem:**
+     - When rest ends, the app plays a short `beep()` and calls `navigator.vibrate([250,120,250,120,400])`. Nheil doesn't notice it and wants the phone to vibrate.
+     - Android has the VIBRATE permission, but its WebView may ignore `navigator.vibrate`. iPhone WKWebView has no vibration API at all.
+     - When the screen is locked or the app is in the background, the JS timer may not fire at all.
+   - **Build:**
+     1. **Louder, more noticeable ring:** a 3-pulse chime that repeats every ~2 s until the user taps OK, or for up to ~10 s. Uses Web Audio, louder and in a higher register than now. Respects the existing "Beep and vibrate when rest is over" setting.
+     2. **On-screen alert:** a full-width "Rest over, next set!" banner that flashes or pulses in the day's colour, with a big OK button (44 px or larger). Respects reduced motion (no flashing, just a solid banner).
+     3. **Vibration that actually works:**
+        - Android: add a JavaScript interface in the WebView wrapper (`app/`) that calls the native `Vibrator` / `VibrationEffect` with a short pattern (e.g. 3 × 200 ms).
+        - iPhone: add a `WKScriptMessageHandler` in `ios/` that calls `UINotificationFeedbackGenerator` (success) or `AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)`.
+        - The web app calls the bridge when it exists and falls back to `navigator.vibrate`.
+     4. **Background / locked screen:**
+        - When a rest timer starts, schedule a local notification for its end time, with sound and vibration. Cancel it if the timer is stopped or skipped.
+        - Android: the notification channel needs vibration, plus the POST_NOTIFICATIONS permission prompt on Android 13+.
+        - iPhone: `UNUserNotificationCenter` with a permission prompt.
+   - **Must keep:**
+     - the timer only starts after a set is logged
+     - adaptive rest
+     - the existing sound setting
+     - no new third-party code
+     - one signing key, so existing installs update without losing data
+   - **Acceptance:**
+     - A jsdom test fakes the timer ending and checks that the banner shows, the chime repeats until OK, and the bridge is called (mock `window.LiftLogNative` / `webkit.messageHandlers`), with a fallback to `navigator.vibrate`.
+     - Manual check on Nheil's Android: the phone vibrates and rings with the app open, and gets a notification with the screen locked. The PR must say clearly that the native parts can't be tested in CI.
+
 ## Pro features (queued by Nheil, 2026-11-26)
 
 Nheil picked these as the premium features to build toward the Pro tier. Build them in this order. They can ship free at first and be put behind Pro later, once accounts and store billing exist (see Blocked). Idea #3 ("Gym's packed" mode) was left out on purpose.
