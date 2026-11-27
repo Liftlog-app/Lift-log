@@ -77,6 +77,8 @@ Fix 1:
 
 ## Queued by Nheil (2026-11-26), do these first
 
+**2026-11-28 run builds TWO features: item 2 (Program tab) and item 4 (History tab), as two PRs. Item 3 waits for 2026-12-05.**
+
 1. **Bug: Home "Week X of 15" bar, Peak weeks are giant yellow columns** (screenshot from Nheil's Android, 2026-11-26). **Fix in PR: https://github.com/nheilmangoba1/Lift-log/pull/6** (awaiting Nheil's merge).
    - **Cause:** CSS class clash. The 3D body viewer (PR #5) styles `.b3` (height `min(560px,70vh)`, `min-height:420px`, border, background). The plan bar marks Peak-block weeks with `<i class="b3">`, so they inherit that height.
    - **Fix:** rename the viewer's classes (e.g. `.b3` → `.body3d`, along with every `.b3*` selector and the JS that sets `className='b3'`), or scope the bar rules (`.bar15 i.b3`). The renaming option is safer.
@@ -118,6 +120,7 @@ Fix 1:
    - **Acceptance:** Nheil can finish everything in about 20 minutes from the guide, and the templates render on a 390 px phone in light and dark email clients. The PR (privacy page only) passes tests. No accounts are created and nothing is bought by agents.
 
 4. **History tab: calendar, more interactive, better looking** (Nheil, 2026-11-26). Designer + Coder.
+   - **Schedule: build in the Saturday 2026-11-28 run, together with item 2 (Program tab)** (Nheil, 2026-11-26). Do Program first, then History, each on its own branch (`agent/program-tab`, `agent/history-tab`) with its own PR. QA and the Designer check both. If time runs short, finish Program completely and open History as a draft PR saying what's left.
    - **Month calendar at the top**, in the style of the new date picker:
      - days with a workout get a dot or fill in that day's colour (Push red, Pull blue, Legs yellow)
      - today is ringed
