@@ -1,6 +1,6 @@
 # The Lift Log agent team
 
-**Live dashboard:** https://nheilmangoba1.github.io/Lift-log/agents.html (needs GitHub Pages on: Settings → Pages → main /docs)
+**Live dashboard:** https://liftlog-app.github.io/Lift-log/agents.html (needs GitHub Pages on: Settings → Pages → main /docs)
 
 Six AI agents work on Lift Log once a week. They share notes in this folder and propose app changes as pull requests that Nheil approves.
 

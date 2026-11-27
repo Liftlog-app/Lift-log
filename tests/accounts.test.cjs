@@ -34,7 +34,7 @@ async function fakeFetch(url,o={}){
   return resp(404,{message:'not found '+p})}
 
 function phone(seed,hash='',au=null){
-  const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://nheilmangoba1.github.io/Lift-log/'+hash,beforeParse(w){
+  const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://liftlog-app.github.io/Lift-log/'+hash,beforeParse(w){
     const RD=w.Date;class FD extends RD{constructor(...a){if(a.length)super(...a);else super(FD.now())}static now(){return RD.now()}};w.Date=FD;
     w.ResizeObserver=class{observe(){}disconnect(){}};w.fetch=fakeFetch;w.__e=[];w.addEventListener('error',e=>w.__e.push(e.message));
     if(seed)w.localStorage.setItem('liftlog.v1',JSON.stringify(seed));if(au)w.localStorage.setItem('liftlog.auth',JSON.stringify(au))}});
@@ -93,7 +93,7 @@ const sess=(id,date,s,upd)=>({[id]:{date,W:1,wk:1,s,dn:s,ex:{'Bench press':[{w:1
   srv.confirm=true;const C=phone(null);await sleep(100);await C.settings();C.type('acEmail','friend@example.com');C.type('acPass','squat123');await C.act('signup',200);
   ok(!C.auth()&&/confirmation link to friend@example.com/.test(C.acct()),'email confirmation: tells the user to check their email');
   await C.act('login',200);ok(/Confirm your email first/.test(C.acct()),'logging in before confirming explains why');
-  C.type('acEmail','friend@example.com');await C.act('forgot',200);ok(/reset link/.test(C.acct())&&srv.calls.some(c=>c.includes('/auth/v1/recover?redirect_to=https%3A%2F%2Fnheilmangoba1.github.io%2FLift-log%2F')),'forgot password sends a reset link back to the web app');
+  C.type('acEmail','friend@example.com');await C.act('forgot',200);ok(/reset link/.test(C.acct())&&srv.calls.some(c=>c.includes('/auth/v1/recover?redirect_to=https%3A%2F%2Fliftlog-app.github.io%2FLift-log%2F')),'forgot password sends a reset link back to the web app');
 
   // Password reset link opens the app with a recovery session → set new password
   srv.users['friend@example.com'].ok=true;const t2=tok(srv.users['friend@example.com'].id);
