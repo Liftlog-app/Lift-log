@@ -27,11 +27,11 @@ Each test file loads the app in jsdom with a fixed date and fake data, clicks th
 `gh pr …` and other GraphQL-based commands are blocked here. Use the REST API through `gh api`:
 
 ```bash
-gh api "repos/nheilmangoba1/Lift-log/pulls?state=all&per_page=10" --jq '.[]|"#\(.number) \(.state) merged=\(.merged_at!=null) \(.head.ref) \(.title)"'
-gh api repos/nheilmangoba1/Lift-log/pulls -f title='...' -f head='agent/<slug>' -f base=main -f body="$(cat /tmp/pr.md)"
-gh api repos/nheilmangoba1/Lift-log/pulls/<n>                 # one PR
-gh api repos/nheilmangoba1/Lift-log/issues/<n>/comments -f body="$(cat /tmp/comment.md)"   # comment on a PR
-gh api "repos/nheilmangoba1/Lift-log/actions/runs?branch=agent/<slug>&per_page=3"           # CI status
+gh api "repos/Liftlog-app/Lift-log/pulls?state=all&per_page=10" --jq '.[]|"#\(.number) \(.state) merged=\(.merged_at!=null) \(.head.ref) \(.title)"'
+gh api repos/Liftlog-app/Lift-log/pulls -f title='...' -f head='agent/<slug>' -f base=main -f body="$(cat /tmp/pr.md)"
+gh api repos/Liftlog-app/Lift-log/pulls/<n>                 # one PR
+gh api repos/Liftlog-app/Lift-log/issues/<n>/comments -f body="$(cat /tmp/comment.md)"   # comment on a PR
+gh api "repos/Liftlog-app/Lift-log/actions/runs?branch=agent/<slug>&per_page=3"           # CI status
 ```
 
 ## Rules for every agent

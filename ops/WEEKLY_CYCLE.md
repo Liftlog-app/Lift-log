@@ -4,7 +4,7 @@ The scheduled weekly task follows this file. One cycle = research → plan → b
 
 ## 0. Set up
 
-1. Make sure the repo is available at `/home/claude/lift-log` with push access: if it is missing, attach `nheilmangoba1/Lift-log` with push access and clone it there.
+1. Make sure the repo is available at `/home/claude/lift-log` with push access: if it is missing, attach `Liftlog-app/Lift-log` with push access and clone it there.
 2. `cd /home/claude/lift-log && git checkout main && git pull`
 3. `npm install --no-audit --no-fund` and `npm test`. If tests fail on `main`, the Coder's job this week is to fix that first.
 4. Read `CLAUDE.md`, `ops/feedback.md`, `ops/roadmap.md` and the newest `ops/weekly/` report.

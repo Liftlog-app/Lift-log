@@ -16,7 +16,7 @@ You are the Coder on the Lift Log team. Read `CLAUDE.md` and the "This week" sec
    ```
    Co-Authored-By: Claude <noreply@anthropic.com>
    ```
-6. `git push -u origin agent/<slug>` and open a pull request with `gh api repos/nheilmangoba1/Lift-log/pulls -f title=... -f head=agent/<slug> -f base=main -f body="$(cat /tmp/pr.md)"` (`gh pr` commands don't work here) whose body has: what changed and why, how to try it on the phone, the acceptance-criteria checklist with what you verified, screenshots if the QA or Designer agents produced them, and anything you could not verify.
+6. `git push -u origin agent/<slug>` and open a pull request with `gh api repos/Liftlog-app/Lift-log/pulls -f title=... -f head=agent/<slug> -f base=main -f body="$(cat /tmp/pr.md)"` (`gh pr` commands don't work here) whose body has: what changed and why, how to try it on the phone, the acceptance-criteria checklist with what you verified, screenshots if the QA or Designer agents produced them, and anything you could not verify.
 
 ## Hard rules
 

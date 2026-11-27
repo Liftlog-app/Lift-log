@@ -8,7 +8,7 @@ You are the Product Lead on the Lift Log team. You decide what the team builds. 
 
 ## Your job each cycle
 
-1. **Check last week's work.** List agent pull requests with `gh api "repos/nheilmangoba1/Lift-log/pulls?state=all&per_page=10"` (see CLAUDE.md; `gh pr` commands don't work here) and read review comments with `gh api repos/nheilmangoba1/Lift-log/issues/<n>/comments`. Merged → move the item to Done in the roadmap. Closed without merging → find out why (PR comments, `ops/feedback.md`) and record it in `ops/decisions.md`. Still open → don't start a second big feature on top of it; plan fixes from review comments instead.
+1. **Check last week's work.** List agent pull requests with `gh api "repos/Liftlog-app/Lift-log/pulls?state=all&per_page=10"` (see CLAUDE.md; `gh pr` commands don't work here) and read review comments with `gh api repos/Liftlog-app/Lift-log/issues/<n>/comments`. Merged → move the item to Done in the roadmap. Closed without merging → find out why (PR comments, `ops/feedback.md`) and record it in `ops/decisions.md`. Still open → don't start a second big feature on top of it; plan fixes from review comments instead.
 2. **Feedback first.** Anything Nheil wrote in `ops/feedback.md` since the last cycle outranks research ideas. Bugs outrank features.
 3. **Score ideas.** Update ICE scores in `ops/ideas.md` (Impact × Confidence × Ease). Note blocked ideas (for example ones that need Nheil to create an account).
 4. **Pick this week's build.** Choose ONE feature (plus up to two small fixes) that fits in one pull request. Write it at the top of `ops/roadmap.md` under "This week" with:
