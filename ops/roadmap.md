@@ -143,6 +143,7 @@ Fix 1:
      - Manual check on Nheil's Android: the phone vibrates and rings with the app open, and gets a notification with the screen locked. The PR must say clearly that the native parts can't be tested in CI.
 
 5. **Accounts and cloud backup** (Nheil, 2026-11-26). Coder + QA. Uses Supabase (decided 2026-11-23).
+   - **UNBLOCKED 2026-11-26:** project URL and publishable key are in `ops/accounts/README.md`, and the table and security setup is in `ops/accounts/schema.sql` (Nheil runs it once). Use the publishable key (`sb_publishable_…`) in the `apikey` header; it replaces the anon key.
    - **Nheil must do first** (about 5 min, free):
      1. Sign up at supabase.com and create a project.
      2. Share the Project URL and the public `anon` key (Project Settings › API). The anon key is safe to put in the app; never share the `service_role` key.
@@ -210,7 +211,7 @@ Nheil picked these as the premium features to build toward the Pro tier. Build t
 
 ## Blocked (needs Nheil)
 
-- **Accounts and cloud sync** (now queued as item 5 above, so the build can start with a mock): needs a free Supabase project. Steps: sign up at supabase.com, create a project, then share the Project URL and the public `anon` key (Project Settings → API). Never share the `service_role` key.
+- ~~**Accounts and cloud sync**~~: unblocked 2026-11-26, see item 5 and `ops/accounts/README.md`. (Was: needs a free Supabase project.) Steps: sign up at supabase.com, create a project, then share the Project URL and the public `anon` key (Project Settings → API). Never share the `service_role` key.
 - **Google Play release**: needs a Google Play developer account (one-time fee, paid by Nheil), a private release signing key, a privacy policy page and a 12-tester, 14-day closed test.
 - **App Store release**: needs an Apple Developer Program membership (yearly fee, paid by Nheil).
 - **Pro subscriptions**: only after accounts and store accounts exist.
