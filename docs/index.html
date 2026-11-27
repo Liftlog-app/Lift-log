@@ -515,6 +515,13 @@ button:disabled{cursor:default}
 @keyframes b3drop{from{transform:translateY(-14px) scale(.4);opacity:0}}
 @keyframes b3lab{from{opacity:0;transform:translateY(4px)}}
 }
+/* ---------- account ---------- */
+.acdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--mute);margin-right:8px;vertical-align:0}
+.acdot.ok{background:#22b268}.acdot.warn{background:#e0a800}.acdot.busy{background:var(--pull)}
+@media(prefers-reduced-motion:no-preference){.acdot.busy{animation:acp 1s ease-in-out infinite}@keyframes acp{50%{opacity:.3}}}
+.linkbtn{display:inline-flex;align-items:center;min-height:44px;margin-top:4px;padding:0;border:0;background:none;color:var(--pull);font:600 15px Barlow,sans-serif;cursor:pointer}
+#acct .btn{min-height:44px}
+#acct .btn.acalt{background:none;border:1px solid var(--line);color:var(--ink)}
 </style>
 </head>
 <body>
@@ -618,12 +625,14 @@ const mmss=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.flo
 const e1=(w,r,rpe)=>w*(1+(r+10-(rpe||10))/30);
 const estSet=x=>e1(+x.w||0,+x.r||0,+x.e||+x.t||10);
 
-let S={profile:null,sessions:{}};
+let S={profile:null,sessions:{},pAt:0,del:{}};
 let mode='local',profRef=null,loaded=false,slow=false,booting=!!(window.claude&&window.claude.use),status='Saved on this device.';
 let view={tab:'home',date:null,k:null,swap:null},draft={},extra={},armed=null,pendingRender=false,flash='';
 const LK='liftlog.v1';
-try{const j=JSON.parse(localStorage.getItem(LK)||'null');if(j){S.profile=j.profile||null;S.sessions=j.sessions||{}}}catch(e){}
-const saveLocal=()=>{try{localStorage.setItem(LK,JSON.stringify(S))}catch(e){}};
+try{const j=JSON.parse(localStorage.getItem(LK)||'null');if(j){S.profile=j.profile||null;S.sessions=j.sessions||{};S.pAt=j.pAt||0;S.del=j.del||{}}}catch(e){}
+// pAt: when the profile last changed; del: deleted session ids -> time (both used to merge with the cloud backup)
+let profSnap=JSON.stringify(S.profile);
+const saveLocal=quiet=>{const ps=JSON.stringify(S.profile);if(ps!==profSnap){profSnap=ps;if(!quiet)S.pAt=Date.now()}try{localStorage.setItem(LK,JSON.stringify(S))}catch(e){}if(!quiet)try{cloudSoon()}catch(e){}};
 let defProg=null;
 const prog=()=>(S.profile&&S.profile.program)||(defProg=defProg||fromPreset('ppl'));
 const swaps=()=>(S.profile&&S.profile.swaps)||{};
@@ -713,7 +722,7 @@ function nextDay(){
 async function putProfile(patch){const p=Object.assign({start:startISO(),unit:unit(),swaps:swaps(),program:prog(),timer:tm()},S.profile||{},patch);S.profile=p;saveLocal();render();if(mode==='db'){try{await profRef.set(p)}catch(e){flash='Could not save settings.';render()}}}
 let autoAt='';
 async function putSession(id,doc,quiet){S.sessions[id]=doc;saveLocal();if(!S.profile)await putProfile({});if(quiet)autoAt=new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});render();if(mode==='db'){try{await profRef.collection('sessions').doc(id).set(doc)}catch(e){flash=e&&e.code==='quota_exceeded'?'Storage is full. Delete old sessions.':'Could not save. Try again.';render()}}}
-async function delSession(id){delete S.sessions[id];saveLocal();render();if(mode==='db'){try{await profRef.collection('sessions').doc(id).delete()}catch(e){}}}
+async function delSession(id){delete S.sessions[id];S.del=S.del||{};S.del[id]=Date.now();saveLocal();render();if(mode==='db'){try{await profRef.collection('sessions').doc(id).delete()}catch(e){}}}
 function collect(){
   const P=curPlan(),ex={};
   for(const card of document.querySelectorAll('#main .card[data-card]')){
@@ -1475,9 +1484,110 @@ function renderHistory(){
     <button class="btn" data-open="${esc(id)}">Open</button><button class="btn danger" data-del="${esc(id)}">${armed===id?'Confirm':'Delete'}</button></div>`}).join('');
 }
 
+/* ================= Accounts + cloud backup (Supabase, plain fetch, no library) ================= */
+// One private row per user in public.liftlog_data (see ops/accounts/schema.sql). Local storage stays the source of truth;
+// the cloud copy is merged in on open and after changes. Only talks to Nheil's own Supabase project, only when signed in.
+const CLOUD={url:'https://dbdjwtjxairfahdfufkh.supabase.co',key:'sb_publishable_pwtPG7V9ZiKXGIYn2f5_Ww_hFpO_dqV',site:'https://nheilmangoba1.github.io/Lift-log/'};
+const AK='liftlog.auth',CK='liftlog.cloud';
+let auth=null;try{auth=JSON.parse(localStorage.getItem(AK)||'null')}catch(e){}
+const cloud={busy:false,state:'',msg:'',err:'',last:0,confirmDel:0,recovery:false,timer:0};
+try{cloud.last=(JSON.parse(localStorage.getItem(CK)||'null')||{}).last||0}catch(e){}
+const saveAuth=a=>{auth=a;try{a?localStorage.setItem(AK,JSON.stringify(a)):localStorage.removeItem(AK)}catch(e){}};
+const cloudOn=()=>mode!=='db';
+async function sb(path,o={}){
+ const h=Object.assign({apikey:CLOUD.key,'Content-Type':'application/json'},o.headers||{});if(o.token)h.Authorization='Bearer '+o.token;
+ const r=await fetch(CLOUD.url+path,{method:o.method||'GET',headers:h,body:o.body!=null?JSON.stringify(o.body):undefined});
+ const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){j=t}
+ if(!r.ok){const er=new Error((j&&(j.msg||j.error_description||j.message||j.error))||('Error '+r.status));er.status=r.status;er.code=j&&(j.error_code||j.code);throw er}
+ return j}
+const sessFrom=(j,old)=>({at:j.access_token,rt:j.refresh_token||(old&&old.rt),exp:Date.now()+(+j.expires_in||3600)*1000,uid:(j.user&&j.user.id)||(old&&old.uid),email:(j.user&&j.user.email)||(old&&old.email)});
+async function cloudToken(){
+ if(!auth)throw Object.assign(new Error('Signed out'),{status:401});
+ if(Date.now()>auth.exp-60000){try{saveAuth(sessFrom(await sb('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:auth.rt}}),auth))}
+  catch(e){if(e.status&&e.status<500){saveAuth(null);cloud.err='You were signed out. Log in again to keep backing up.'}throw e}}
+ return auth.at}
+// Merge two copies of {profile,sessions,pAt,del}: newest profile wins; sessions are combined, newest edit of each wins;
+// a deletion wins over any older copy of that session. Nothing else is dropped.
+function cloudMerge(a,b){
+ a=a||{};b=b||{};const del=Object.assign({},b.del||{});for(const [k,t] of Object.entries(a.del||{}))del[k]=Math.max(t,del[k]||0);
+ const old=Date.now()-120*864e5;for(const k of Object.keys(del))if(del[k]<old)delete del[k];
+ const sessions={},A=a.sessions||{},B=b.sessions||{};
+ for(const id of new Set([...Object.keys(A),...Object.keys(B)])){const x=A[id],y=B[id],w=!y?x:!x?y:((y.updated||0)>(x.updated||0)?y:x);if(del[id]&&del[id]>=(w.updated||0))continue;sessions[id]=w}
+ const pa=a.pAt||0,pb=b.pAt||0,useB=b.profile&&(!a.profile||pb>pa);
+ return {profile:useB?b.profile:(a.profile||null),pAt:useB?pb:pa,sessions,del}}
+const snap=x=>JSON.stringify({p:x.profile||null,s:x.sessions||{},d:x.del||{}});
+const cloudAgo=t=>{if(!t)return 'not yet';const m=Math.round((Date.now()-t)/6e4);return m<1?'just now':m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' days ago'};
+let syncing=null;
+async function cloudSync(){
+ if(!auth||!cloudOn())return;if(syncing)return syncing;
+ syncing=(async()=>{cloud.state='sync';cloud.err='';paintAcct();
+  try{let tk=await cloudToken(),rows;
+   try{rows=await sb('/rest/v1/liftlog_data?select=data,updated_at&user_id=eq.'+encodeURIComponent(auth.uid),{token:tk})}
+   catch(e){if(e.status===401){auth.exp=0;tk=await cloudToken();rows=await sb('/rest/v1/liftlog_data?select=data,updated_at&user_id=eq.'+encodeURIComponent(auth.uid),{token:tk})}else throw e}
+   const remote=rows&&rows[0]&&rows[0].data||null,local={profile:S.profile,sessions:S.sessions,pAt:S.pAt||0,del:S.del||{}},m=remote?cloudMerge(local,remote):local;
+   if(snap(m)!==snap(local)){S.profile=m.profile;S.sessions=m.sessions;S.pAt=m.pAt;S.del=m.del;profSnap=JSON.stringify(S.profile);saveLocal(true);render()}
+   if(!remote||snap(m)!==snap(remote))await sb('/rest/v1/liftlog_data',{method:'POST',token:tk,headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:{user_id:auth.uid,data:{v:1,profile:m.profile,sessions:m.sessions,pAt:m.pAt,del:m.del},updated_at:new Date().toISOString()}});
+   cloud.last=Date.now();cloud.state='ok';try{localStorage.setItem(CK,JSON.stringify({last:cloud.last}))}catch(e){}}
+  catch(e){cloud.state=e instanceof TypeError||!e.status?'offline':'err';if(cloud.state==='err'&&!cloud.err)cloud.err='Backup failed: '+e.message}
+  finally{syncing=null;if(/Backing up…$/.test(cloud.msg))cloud.msg='';paintAcct()}})();
+ return syncing}
+function cloudSoon(){if(!auth||!cloudOn())return;clearTimeout(cloud.timer);cloud.timer=setTimeout(cloudSync,3000)}
+async function acctDo(kind){
+ const em=(($('#acEmail')||{}).value||'').trim(),pw=($('#acPass')||{}).value||'',np=($('#acNew')||{}).value||'';
+ const need=(e,p)=>{if(e&&!/^\S+@\S+\.\S+$/.test(em)){cloud.err='Enter your email address.';return false}if(p&&pw.length<6){cloud.err='Password needs at least 6 characters.';return false}return true};
+ cloud.err='';cloud.msg='';
+ if(kind==='signup'||kind==='login'){if(!need(1,1))return paintAcct()}
+ if(kind==='forgot'&&!need(1,0))return paintAcct();
+ if(kind==='delete'&&Date.now()-cloud.confirmDel>6000){cloud.confirmDel=Date.now();return paintAcct()}
+ cloud.busy=true;paintAcct();
+ try{
+  if(kind==='login'){saveAuth(sessFrom(await sb('/auth/v1/token?grant_type=password',{method:'POST',body:{email:em,password:pw}})));cloud.msg='Signed in. Backing up…';await cloudSync()}
+  else if(kind==='signup'){const j=await sb('/auth/v1/signup?redirect_to='+encodeURIComponent(CLOUD.site),{method:'POST',body:{email:em,password:pw}});
+   if(j&&j.access_token){saveAuth(sessFrom(j));cloud.msg='Account created. Backing up…';await cloudSync()}
+   else cloud.msg=`Almost done: we sent a confirmation link to ${em}. Tap it, then come back and log in.`}
+  else if(kind==='forgot'){await sb('/auth/v1/recover?redirect_to='+encodeURIComponent(CLOUD.site),{method:'POST',body:{email:em}});cloud.msg=`If ${em} has an account, a password reset link is on its way.`}
+  else if(kind==='sync'){await cloudSync()}
+  else if(kind==='logout'){try{await sb('/auth/v1/logout',{method:'POST',token:auth&&auth.at})}catch(e){}saveAuth(null);cloud.state='';cloud.msg='Logged out. Your workouts are still on this phone.'}
+  else if(kind==='delete'){const tk=await cloudToken();await sb('/rest/v1/rpc/delete_my_account',{method:'POST',token:tk,body:{}});saveAuth(null);cloud.state='';cloud.confirmDel=0;cloud.msg='Account and cloud backup deleted. Your workouts are still on this phone.'}
+  else if(kind==='setpw'){if(np.length<6){cloud.err='Password needs at least 6 characters.'}else{await sb('/auth/v1/user',{method:'PUT',token:await cloudToken(),body:{password:np}});cloud.recovery=false;cloud.msg='Password updated. You are signed in.';cloudSync()}}
+ }catch(e){cloud.err=e instanceof TypeError?'No connection. Check your internet and try again.':/invalid login/i.test(e.message)?'Wrong email or password.':/not confirmed/i.test(e.message)?'Confirm your email first: tap the link we sent you, then log in.':/already registered|already exists/i.test(e.message)?'That email already has an account. Log in instead.':e.message}
+ finally{cloud.busy=false;paintAcct()}}
+function acctHTML(){
+ if(!cloudOn())return '';
+ const b=cloud.busy?' disabled':'',note=(cloud.err?`<div class="hint pain" role="alert">${esc(cloud.err)}</div>`:'')+(cloud.msg?`<p class="meta" role="status" style="color:var(--ink)">${esc(cloud.msg)}</p>`:'');
+ if(auth&&cloud.recovery)return `<div class="sec" id="acct"><h2>Set a new password</h2><p class="meta">Signed in as ${esc(auth.email||'')}. Choose a new password.</p>
+  <label for="acNew">New password</label><input id="acNew" type="password" autocomplete="new-password" minlength="6">${note}<div class="row" style="margin-top:10px"><button class="btn" data-acct="setpw"${b}>Save password</button></div></div>`;
+ if(auth){const st=cloud.state==='sync'?'Backing up…':cloud.state==='offline'?'Offline. Will back up when you are online.':cloud.state==='err'?'Backup problem, tap Back up now to retry.':'Last backed up '+cloudAgo(cloud.last);
+  return `<div class="sec" id="acct"><h2>Account and backup</h2><p class="meta">Signed in as <b style="color:var(--ink)">${esc(auth.email||'')}</b></p>
+  <p class="meta"><span class="acdot ${cloud.state==='sync'?'busy':cloud.state==='ok'||(!cloud.state&&cloud.last)?'ok':cloud.state?'warn':''}"></span>${esc(st)}</p>
+  <p class="meta">Your workouts and settings back up automatically and come back when you log in on a new phone.</p>${note}
+  <div class="row" style="gap:8px;margin-top:10px"><button class="btn" data-acct="sync"${b}>Back up now</button><button class="btn acalt" data-acct="logout"${b}>Log out</button></div>
+  <button class="btn acalt" data-acct="delete" style="margin-top:12px;color:var(--push)"${b}>${Date.now()-cloud.confirmDel<6000?'Tap again to delete your account and cloud backup':'Delete account'}</button></div>`}
+ return `<div class="sec" id="acct"><h2>Account and backup</h2><p class="meta">Optional. Make a free account to back up your workouts and get them back on a new phone. Everything still works without one.</p>
+  <label for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false">
+  <label for="acPass">Password</label><input id="acPass" type="password" autocomplete="current-password" minlength="6">${note}
+  <div class="row" style="gap:8px;margin-top:10px"><button class="btn" data-acct="login"${b}>Log in</button><button class="btn acalt" data-acct="signup"${b}>Create account</button></div>
+  <button class="linkbtn" data-acct="forgot"${b}>Forgot password?</button></div>`}
+function paintAcct(){const el=$('#acct');if(!el||view.tab!=='settings')return;const keep={acEmail:($('#acEmail')||{}).value,acPass:($('#acPass')||{}).value,acNew:($('#acNew')||{}).value};
+ el.outerHTML=acctHTML();for(const [id,v] of Object.entries(keep))if(v!=null&&$('#'+id))$('#'+id).value=v}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-acct]');if(!b||b.disabled)return;e.preventDefault();e.stopPropagation();acctDo(b.dataset.acct)},true);
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&(e.target.id==='acPass'||e.target.id==='acEmail')){e.preventDefault();acctDo('login')}if(e.key==='Enter'&&e.target&&e.target.id==='acNew'){e.preventDefault();acctDo('setpw')}});
+// Links from confirmation / password-reset emails land on the web version with the session in the URL hash.
+async function cloudHash(){const h=location.hash||'';if(!/access_token=|error_description=/.test(h))return;
+ const q=new URLSearchParams(h.slice(1));try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+ if(q.get('error_description')){cloud.err=q.get('error_description').replace(/\+/g,' ')+'. Request a new link.';view.tab='settings';render();return}
+ try{const j={access_token:q.get('access_token'),refresh_token:q.get('refresh_token'),expires_in:q.get('expires_in')};const u=await sb('/auth/v1/user',{token:j.access_token});
+  saveAuth(sessFrom(Object.assign(j,{user:u})));cloud.recovery=q.get('type')==='recovery';cloud.msg=cloud.recovery?'':'Email confirmed. You are signed in.';view.tab='settings';render();if(!cloud.recovery)cloudSync()}
+ catch(e){cloud.err='That link did not work. Request a new one.';view.tab='settings';render()}}
+setTimeout(()=>{if(!cloudOn())return;cloudHash();if(auth)cloudSync()},700);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&auth&&Date.now()-cloud.last>60000)cloudSync()});
+addEventListener('online',()=>{if(auth)cloudSync()});
+window.__cloud={merge:cloudMerge,sync:cloudSync,state:()=>({auth,cloud})};
+
 function renderSettings(){
   const p=prog(),t=tm();
   $('#main').innerHTML=`<h2 style="margin:0">Settings</h2>
+  ${acctHTML()}
   <div class="sec"><h2>Rest timer</h2>
   <label class="check"><input type="checkbox" id="tauto"${t.auto?' checked':''}> Start the rest timer when I enter reps</label>
   <label class="check"><input type="checkbox" id="tsound"${t.sound?' checked':''}> Beep and vibrate when rest is over</label>
@@ -1496,11 +1606,11 @@ function renderSettings(){
   <div class="row" style="gap:12px;align-items:flex-end"><div style="flex:1"><label for="gbar">Bar weight (${unit()})</label><input type="number" id="gbar" inputmode="decimal" value="${gear().bar}"></div>
   <div style="flex:2"><label for="gpl">Plates you have (${unit()}, comma-separated)</label><input id="gpl" value="${gear().plates.join(', ')}"></div></div></div>
   <div class="sec"><h2>Units</h2><select id="unit" aria-label="Units"><option value="lb"${unit()==='lb'?' selected':''}>Pounds (lb)</option><option value="kg"${unit()==='kg'?' selected':''}>Kilograms (kg)</option></select></div>
-  <div class="sec"><h2>Backup</h2><p class="meta">Copy your data and keep it somewhere safe, or paste a backup to restore it.</p>
+  <div class="sec"><h2>Manual backup</h2><p class="meta">Copy your data and keep it somewhere safe, or paste a backup to restore it.</p>
   <button class="btn" id="copy">Copy all data</button><textarea id="io" aria-label="Backup data" placeholder="Paste a backup here to restore it"></textarea>
   <button class="btn" id="imp" style="margin-top:8px">${armed==='imp'?'Confirm restore':'Restore from pasted backup'}</button></div>
   <p class="meta" style="margin-top:18px">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db">Free Exercise DB</a> (public domain).</p>
-  <p class="meta" style="margin-top:6px">${esc(slow?'Your saved data can\'t be reached yet; showing what is on this device.':status)}${flash?' · '+esc(flash):''}</p>`;
+  <p class="meta" style="margin-top:6px">${esc(slow?'Your saved data can\'t be reached yet; showing what is on this device.':auth&&cloudOn()?'Saved on this device and backed up to your account.':status)}${flash?' · '+esc(flash):''}</p>`;
 }
 
 function render(){
