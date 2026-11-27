@@ -96,7 +96,28 @@ Fix 1:
      - Tap targets at least 44 px.
      - A test that opens the tab, previews a future week and edits an exercise.
 
-3. **History tab: calendar, more interactive, better looking** (Nheil, 2026-11-26). Designer + Coder.
+3. **Domain + email (SMTP) setup for launch.** **Schedule: do this in the Saturday 2026-12-05 team run, NOT the 2026-11-28 run** (Nheil, 2026-11-26). In the 11-28 run, skip it and take the next item.
+   - **Why:** Supabase's built-in mailer only reaches Nheil's own address, 2 emails/hour. Real users can't get "confirm your email" or "reset password" emails until a real email service is connected. A domain also gives the Google Play privacy-policy page and the brand a home.
+   - **Agents can't buy, sign up or pay.** So this run produces a ready-to-follow kit and drafts, and Nheil does the account steps.
+     1. **`ops/launch/email-setup.md`**: a short, step-by-step phone-friendly guide for Nheil:
+        - pick and buy a domain (compare 2–3 registrars and prices, suggest available names like liftlog-style options, and check `.app` / `.com`)
+        - create a free account at an email service (compare Resend vs Brevo free tiers with current numbers and sources)
+        - verify the domain (the DNS records to add)
+        - paste the SMTP settings into Supabase → Authentication → Emails → SMTP Settings
+        - raise Authentication → Rate Limits
+        - set the sender name to "Lift Log"
+        - send a test
+     2. **Branded auth email templates** (`ops/launch/email-templates/`): "Confirm your email", "Reset your password" and "Change email". Simple HTML with the check-bar logo and plate colours, using Supabase's template variables (`{{ .ConfirmationURL }}`), mobile-friendly and with a plain-text fallback.
+     3. **Privacy policy page draft** (`docs/privacy.html`, via PR, needed for Google Play). It covers:
+        - what's stored: workouts, profile and email, and only if you make an account
+        - where: Supabase
+        - no tracking, no ads networks, no selling data
+        - how to delete: Settings → Delete account
+        - a contact email (placeholder until the domain exists)
+     4. Update `ops/accounts/README.md` and the "Waiting on Nheil" list with the exact remaining clicks.
+   - **Acceptance:** Nheil can finish everything in about 20 minutes from the guide, and the templates render on a 390 px phone in light and dark email clients. The PR (privacy page only) passes tests. No accounts are created and nothing is bought by agents.
+
+4. **History tab: calendar, more interactive, better looking** (Nheil, 2026-11-26). Designer + Coder.
    - **Month calendar at the top**, in the style of the new date picker:
      - days with a workout get a dot or fill in that day's colour (Push red, Pull blue, Legs yellow)
      - today is ringed
@@ -116,7 +137,7 @@ Fix 1:
      - Tap targets at least 44 px.
      - A test that opens History, checks logged days are marked on the calendar, taps a day and expands its workout, and changes month.
 
-4. **Rest timer alert: more noticeable ring and vibration** (Nheil, 2026-11-26). Coder (+ Designer for the visual).
+5. **Rest timer alert: more noticeable ring and vibration** (Nheil, 2026-11-26). Coder (+ Designer for the visual).
    - **Problem:**
      - When rest ends, the app plays a short `beep()` and calls `navigator.vibrate([250,120,250,120,400])`. Nheil doesn't notice it and wants the phone to vibrate.
      - Android has the VIBRATE permission, but its WebView may ignore `navigator.vibrate`. iPhone WKWebView has no vibration API at all.
@@ -142,7 +163,7 @@ Fix 1:
      - A jsdom test fakes the timer ending and checks that the banner shows, the chime repeats until OK, and the bridge is called (mock `window.LiftLogNative` / `webkit.messageHandlers`), with a fallback to `navigator.vibrate`.
      - Manual check on Nheil's Android: the phone vibrates and rings with the app open, and gets a notification with the screen locked. The PR must say clearly that the native parts can't be tested in CI.
 
-5. **Accounts and cloud backup** (Nheil, 2026-11-26). **Built 2026-11-26 at Nheil's request, in PR: https://github.com/nheilmangoba1/Lift-log/pull/8** Coder + QA. Uses Supabase (decided 2026-11-23).
+6. **Accounts and cloud backup** (Nheil, 2026-11-26). **Built 2026-11-26 at Nheil's request, in PR: https://github.com/nheilmangoba1/Lift-log/pull/8** Coder + QA. Uses Supabase (decided 2026-11-23).
    - **UNBLOCKED 2026-11-26:** project URL and publishable key are in `ops/accounts/README.md`, and the table and security setup in `ops/accounts/schema.sql` was run by Nheil on 2026-11-26. Use the publishable key (`sb_publishable_…`) in the `apikey` header; it replaces the anon key.
    - **Nheil must do first** (about 5 min, free):
      1. Sign up at supabase.com and create a project.
@@ -166,7 +187,7 @@ Fix 1:
      - log out keeps local data
      - delete account
    - **Unlocks:** Pro subscriptions, Ghost race a friend, PR Perks.
-6. **PR Perks + partner cards** (Nheil, 2026-11-26). Do this after accounts and the Google Play launch.
+7. **PR Perks + partner cards** (Nheil, 2026-11-26). Do this after accounts and the Google Play launch.
    - **What it is:** brands advertise without being obnoxious.
      - Milestone rewards: a new PR or a streak unlocks a partner discount code (e.g. a bench PR → 15% off a belt).
      - At most one contextual gear tip or partner card per week, only after a workout. Never during sets, and no pop-ups.

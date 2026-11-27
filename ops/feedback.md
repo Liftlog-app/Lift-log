@@ -18,3 +18,4 @@ Format: `- YYYY-MM-DD · who · what happened or what you want · (status)`
 - Wants a more noticeable ring when the rest timer ends and the phone to vibrate. Queued (needs native vibration and notification bridges in the Android and iPhone wrappers).
 - Queue accounts and cloud backup. Queued as item 5 (needs Nheil's Supabase URL and anon key to go live).
 - Wants a way for fitness brands to advertise without being obnoxious. Queued "PR Perks + partner cards" (after accounts and the store launch).
+- Queue "domain + email (SMTP) setup" for the **2026-12-05** run (not 2026-11-28). Queued as item 3 with that date.
