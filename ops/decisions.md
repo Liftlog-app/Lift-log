@@ -20,3 +20,6 @@ Newest first. Each entry: date, decision, why.
 - **Why:** PR forecast and the time-cap mode are quick, easy to show in short videos, and make Pro feel worth it on day one. Cut coach serves Nheil's Feb cut. Ghost race needs accounts. Velocity Coach is the wow feature but the hardest, so it comes after launch.
 - **Monetization direction (discussed, not final):** free app with a Pro subscription later, plus paid programs from Nheil. No ads.
 
+## 2026-11-26: Ads, only as PR Perks and partner cards
+- **Decision:** no ad networks. Brands appear only as labelled milestone rewards, one partner card a week after workouts, or sponsored programs, served from a JSON file in our own repo with no tracking. Pro can turn them off.
+- **Why:** keeps the no-tracking rule and the premium feel. Rewards at PR moments feel like perks, not ads.

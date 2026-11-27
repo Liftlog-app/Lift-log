@@ -16,3 +16,5 @@ Format: `- YYYY-MM-DD · who · what happened or what you want · (status)`
 - Wants the Program tab more interactive and better looking. Queued.
 - Wants the History tab more interactive and more appealing, with a calendar. Queued.
 - Wants a more noticeable ring when the rest timer ends and the phone to vibrate. Queued (needs native vibration and notification bridges in the Android and iPhone wrappers).
+- Queue accounts and cloud backup. Queued as item 5 (needs Nheil's Supabase URL and anon key to go live).
+- Wants a way for fitness brands to advertise without being obnoxious. Queued "PR Perks + partner cards" (after accounts and the store launch).

@@ -142,6 +142,43 @@ Fix 1:
      - A jsdom test fakes the timer ending and checks that the banner shows, the chime repeats until OK, and the bridge is called (mock `window.LiftLogNative` / `webkit.messageHandlers`), with a fallback to `navigator.vibrate`.
      - Manual check on Nheil's Android: the phone vibrates and rings with the app open, and gets a notification with the screen locked. The PR must say clearly that the native parts can't be tested in CI.
 
+5. **Accounts and cloud backup** (Nheil, 2026-11-26). Coder + QA. Uses Supabase (decided 2026-11-23).
+   - **Nheil must do first** (about 5 min, free):
+     1. Sign up at supabase.com and create a project.
+     2. Share the Project URL and the public `anon` key (Project Settings › API). The anon key is safe to put in the app; never share the `service_role` key.
+     3. Under Authentication › Providers, keep Email on (optional: Google sign-in later).
+   - **Until then:** the Coder can build and test everything against a mock and leave the keys blank, so the feature stays hidden.
+   - **Build:**
+     - **Sign up / log in / log out** with email and password, plus a magic link or password reset. Optional: the app works fully without an account, exactly as now.
+     - **Backup:** one row per user in a `liftlog_data` table (`user_id`, `data jsonb`, `updated_at`). Row-level security so users can only read and write their own row. Ship the SQL setup script in `ops/accounts/schema.sql` for Nheil to paste into Supabase.
+     - **Sync:** offline-first. localStorage stays the source of truth. Push after changes (debounced) and pull on app open.
+     - **Merge rule:** per session and per profile field, newest `updated_at` wins. Never silently lose a workout. If both sides changed, keep both sessions.
+     - **First login on a phone with existing data:** upload it. On a new phone: download it. Show "Last backed up 2 min ago" in Settings.
+     - **Delete account:** removes the cloud data. Required by app stores.
+     - **Network:** use plain `fetch` to Supabase's REST and auth endpoints, with no supabase-js library, so the app stays one small file. This is the one approved exception to "no third-party network calls": only Nheil's own Supabase project, only when signed in, and no analytics or tracking.
+   - **Privacy:** update the privacy policy page (needed for Google Play anyway) to say what's stored: workouts, profile and email.
+   - **Must keep:** all existing data, and the `liftlog.v1` format (add fields only). Everything works offline and when signed out.
+   - **Acceptance:** jsdom tests with a mocked Supabase covering:
+     - sign up, back up, and restore onto an empty device
+     - merge conflicts (two devices edit different sessions → both kept)
+     - offline → online sync
+     - log out keeps local data
+     - delete account
+   - **Unlocks:** Pro subscriptions, Ghost race a friend, PR Perks.
+6. **PR Perks + partner cards** (Nheil, 2026-11-26). Do this after accounts and the Google Play launch.
+   - **What it is:** brands advertise without being obnoxious.
+     - Milestone rewards: a new PR or a streak unlocks a partner discount code (e.g. a bench PR → 15% off a belt).
+     - At most one contextual gear tip or partner card per week, only after a workout. Never during sets, and no pop-ups.
+     - Sponsored programs ("12-Week Strength, presented by X").
+   - **Rules:**
+     - Always labelled "Partner" or "Sponsored" (US FTC disclosure).
+     - One-tap dismiss.
+     - Fitness, gear, recovery and nutrition only. No fat burners or extreme-diet products.
+     - **No tracking:** offers are static codes or links that open in the browser, and no user data goes to brands.
+     - Pro users can turn partner cards off.
+   - **Data:** offers come from a JSON file in the repo (e.g. `docs/partners.json`) that Nheil edits. The app reads it from Nheil's own GitHub Pages, never an ad network.
+   - **Money:** affiliate commission per sale, or a flat monthly fee per slot. The Marketer (when resumed) drafts the brand pitch.
+
 ## Pro features (queued by Nheil, 2026-11-26)
 
 Nheil picked these as the premium features to build toward the Pro tier. Build them in this order. They can ship free at first and be put behind Pro later, once accounts and store billing exist (see Blocked). Idea #3 ("Gym's packed" mode) was left out on purpose.
@@ -173,7 +210,7 @@ Nheil picked these as the premium features to build toward the Pro tier. Build t
 
 ## Blocked (needs Nheil)
 
-- **Accounts and cloud sync**: needs a free Supabase project. Steps: sign up at supabase.com, create a project, then share the Project URL and the public `anon` key (Project Settings → API). Never share the `service_role` key.
+- **Accounts and cloud sync** (now queued as item 5 above, so the build can start with a mock): needs a free Supabase project. Steps: sign up at supabase.com, create a project, then share the Project URL and the public `anon` key (Project Settings → API). Never share the `service_role` key.
 - **Google Play release**: needs a Google Play developer account (one-time fee, paid by Nheil), a private release signing key, a privacy policy page and a 12-tester, 14-day closed test.
 - **App Store release**: needs an Apple Developer Program membership (yearly fee, paid by Nheil).
 - **Pro subscriptions**: only after accounts and store accounts exist.
