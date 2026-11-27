@@ -19,7 +19,7 @@ Supabase project created by Nheil on 2026-11-26.
 - [x] Project created and keys shared (2026-11-26)
 - [x] `schema.sql` run in the SQL Editor (Nheil, 2026-11-26)
 - [x] Accounts feature built: https://github.com/nheilmangoba1/Lift-log/pull/8 (awaiting Nheil's merge)
-- [ ] Supabase → Authentication → URL Configuration: Site URL and Redirect URL = `https://nheilmangoba1.github.io/Lift-log/` (Nheil)
+- [ ] Supabase → Authentication → URL Configuration: Site URL and Redirect URL = `https://liftlog-app.github.io/Lift-log/` (Nheil)
 - [ ] Before launch: custom SMTP for auth emails (the built-in sender is rate-limited)
 
 Note: Claude's build workspace can't reach supabase.co, so the Coder builds and tests against a mock. The real connection gets checked on Nheil's phone.

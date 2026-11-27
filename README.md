@@ -19,7 +19,7 @@ Every push to `main` builds a new APK automatically (see the Actions tab).
 
 iPhones can't install the APK. Use the web version instead:
 
-1. Open https://nheilmangoba1.github.io/Lift-log/ in **Safari**.
+1. Open https://liftlog-app.github.io/Lift-log/ in **Safari**.
 2. Tap the **Share** button, then **Add to Home Screen**.
 3. Open Lift Log from the new icon. It runs full screen and saves workouts on the phone.
 

@@ -1479,7 +1479,7 @@ function renderHistory(){
 /* ================= Accounts + cloud backup (Supabase, plain fetch, no library) ================= */
 // One private row per user in public.liftlog_data (see ops/accounts/schema.sql). Local storage stays the source of truth;
 // the cloud copy is merged in on open and after changes. Only talks to Nheil's own Supabase project, only when signed in.
-const CLOUD={url:'https://dbdjwtjxairfahdfufkh.supabase.co',key:'sb_publishable_pwtPG7V9ZiKXGIYn2f5_Ww_hFpO_dqV',site:'https://nheilmangoba1.github.io/Lift-log/'};
+const CLOUD={url:'https://dbdjwtjxairfahdfufkh.supabase.co',key:'sb_publishable_pwtPG7V9ZiKXGIYn2f5_Ww_hFpO_dqV',site:'https://liftlog-app.github.io/Lift-log/'};
 const AK='liftlog.auth',CK='liftlog.cloud';
 let auth=null;try{auth=JSON.parse(localStorage.getItem(AK)||'null')}catch(e){}
 const cloud={busy:false,state:'',msg:'',err:'',last:0,confirmDel:0,recovery:false,timer:0};
