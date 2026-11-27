@@ -142,7 +142,7 @@ Fix 1:
      - A jsdom test fakes the timer ending and checks that the banner shows, the chime repeats until OK, and the bridge is called (mock `window.LiftLogNative` / `webkit.messageHandlers`), with a fallback to `navigator.vibrate`.
      - Manual check on Nheil's Android: the phone vibrates and rings with the app open, and gets a notification with the screen locked. The PR must say clearly that the native parts can't be tested in CI.
 
-5. **Accounts and cloud backup** (Nheil, 2026-11-26). Coder + QA. Uses Supabase (decided 2026-11-23).
+5. **Accounts and cloud backup** (Nheil, 2026-11-26). **Built 2026-11-26 at Nheil's request, in PR: https://github.com/nheilmangoba1/Lift-log/pull/8** Coder + QA. Uses Supabase (decided 2026-11-23).
    - **UNBLOCKED 2026-11-26:** project URL and publishable key are in `ops/accounts/README.md`, and the table and security setup in `ops/accounts/schema.sql` was run by Nheil on 2026-11-26. Use the publishable key (`sb_publishable_…`) in the `apikey` header; it replaces the anon key.
    - **Nheil must do first** (about 5 min, free):
      1. Sign up at supabase.com and create a project.
