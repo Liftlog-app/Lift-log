@@ -17,7 +17,7 @@ Supabase project created by Nheil on 2026-11-26.
 
 ## Status
 - [x] Project created and keys shared (2026-11-26)
-- [ ] `schema.sql` run in the SQL Editor (Nheil)
+- [x] `schema.sql` run in the SQL Editor (Nheil, 2026-11-26)
 - [ ] Accounts feature built (roadmap: Queued by Nheil, item 5)
 
 Note: Claude's build workspace can't reach supabase.co, so the Coder builds and tests against a mock. The real connection gets checked on Nheil's phone.
