@@ -2,128 +2,164 @@
 
 Owned by the Product Lead. Newest decisions at the top of each section.
 
-## This week (2026-W48, planned 2026-11-24)
+## This week (2026-W48 run 2, planned 2026-11-28)
 
-**Branch:** `agent/bodyweight-tracker` · one pull request · test file `tests/bodyweight_tracker.test.cjs`
+Three pull requests, in this order, following Nheil's queue. Item 3 (domain + email) waits for the 2026-12-05 run.
 
-### Feature: Bodyweight and cut tracker
+| PR | What | Branch | Test file | Status |
+|---|---|---|---|---|
+| A | Item 0: Start Workout in every week, auto-advance to the next week | (PR #10) | (in PR #10) | Built, open as https://github.com/Liftlog-app/Lift-log/pull/10, in QA. Fix QA findings on that branch only |
+| B | Item 2: Program tab, interactive and better looking | `agent/program-tab` | `tests/program_tab.test.cjs` | To build |
+| C | Item 4: History tab with month calendar and workout cards | `agent/history-tab` | `tests/history_tab.test.cjs` | To build after B. If time runs short, open C as a draft PR that lists what is left |
 
-**User problem:** A lifter who is cutting (Nheil: 180 → 165 lb by 2027-06-01, cut from about 2027-02-15) has no way in Lift Log to log weight, see the real trend through daily noise, or tell whether he is losing at a pace that keeps his strength.
+### Rules for B and C (both branch from `main`, not from PR #10)
 
-**Why now:** Highest-value item that fits one PR. Starting to log now gives Nheil about 12 weeks of baseline before the cut, and the tracker is what next feature, **Cut guard**, needs. Cut guard compares this weight trend with main-lift e1RM, and none of the six main competitors does that automatically. See `ops/research/2026-11-24-cut-coaching.md`.
+- **Do not use anything PR #10 adds.** It adds the session field `pw`, `sW(session)` (the program week of a session) and `curW()`. None of these exist on `main`.
+  - Program (B): get the current program week from one small helper, `progNowWk=()=>wkOf(wOf(iso(today())))`, with a comment `// swap to curW() after PR #10 merges`. Call it everywhere and never inline the formula.
+  - History (C): needs no program week at all. Work from `date`, `s`, `dn`, `ex`, `dur` and `live`. Do not show week numbers.
+- **Merge-conflict risk:** A, B and C all edit `src/index.html`, and so the generated `docs/index.html` and `app/src/main/assets/index.html` too. PR #10 touches `renderHome`, `renderToday`, the header week strip, `startWorkout`/`sessionDoc` and the week helpers near `wOf`/`wkOf`. B and C share the global click handler and the `<style>` block. To keep conflicts small:
+  - Only edit your own tab's render function. Put new functions right after it, inside a comment block such as `/* ---------- program tab ---------- */`.
+  - Add click handling in **your own delimited block**: either a separate `document.addEventListener('click',…)` that returns early for other targets, or a clearly marked group of `if` lines. Do not reorder or reformat existing handler lines.
+  - Put new CSS in one block at the end of `<style>` with a `/* program tab */` or `/* history tab */` comment. Do not edit shared rules (`.card`, `.hist`, `.cday`, `.btn`, `.small`).
+  - Do not touch `renderHome`, `renderToday`, `wOf`, `wkOf`, `startWorkout`, `sessionDoc` or `openCal`.
+  - Suggested merge order for Nheil: A (#10), then B, then C. After each merge, the next branch merges `main` back in and re-runs `python3 scripts/sync.py`. Generated-file conflicts are always solved by re-running sync, never by hand-editing.
+- **Data:** B and C add no new stored fields. B writes only through the existing `putProfile({swaps})` and `editProg(...)`. C is read-only apart from the existing Delete. `sessions` must be byte-for-byte unchanged after opening and using either tab.
 
-**What to build**
+---
 
-1. **Data (profile only, sessions untouched)**
-   - `profile.bw`: array of `{d:'YYYY-MM-DD', w:Number, u:'lb'|'kg'}`, sorted by `d`, at most one entry per date. Logging the same date again replaces that entry. Missing `bw` means `[]`.
-   - `profile.cut`: `{goal:Number, u:'lb'|'kg', by:'YYYY-MM-DD'}` or missing/null.
-   - Save with `putProfile({bw})` / `putProfile({cut})` so local storage, the hosted `db` sync and backup/restore all keep working with no new code paths.
-   - Each entry keeps the unit it was logged in. Display converts to the current `unit()` (1 kg = 2.20462 lb). Changing units never rewrites stored entries.
-2. **Progress tab: new "Bodyweight" section at the very top** (above the weekly report)
-   - Inputs: weight (`#bww`, `type=number`, `inputmode=decimal`, label "Morning weight (lb|kg)"), date (`#bwd`, `type=date`, default today, `max` = today), and a "Log weight" button (`#bwlog`, at least 44 px). Accept 30–700 lb (14–318 kg). Otherwise show a flash message and save nothing. Future dates are rejected.
-   - Stat tiles (reuse `.prs`/`.pr`): **Trend** (exponential moving average: seed = first weigh-in, then `trend += 0.1 × (weight − trend)` per weigh-in in date order, shown to 1 decimal) and **Rate**.
-   - **Rate** = 7 × least-squares slope of weight vs. day number for weigh-ins dated in the last 14 days (today − 13 … today). Shown as `−1.4 lb/wk · 0.78%/wk`, where % = rate ÷ mean weight of those weigh-ins. Needs at least 4 weigh-ins spanning at least 7 days. Otherwise show "Log 4 weigh-ins over a week to see your rate."
-   - Rate colour (class on the rate tile or pill): loss 0.25–0.75 %/wk = `good` (green), loss above 0.75 up to 1.0 = `warn` (yellow), loss above 1.0 = `pain` (red, reuse existing pain colours), anything else (loss under 0.25 or a gain) = neutral, with the text "About steady" or "Gaining".
-   - Chart: SVG of the last 56 days. Raw weigh-ins are faint dots, the trend is a solid line. Follow `mountChart` style, readable at 390 px in both themes. Give it `role="img"` and an aria-label.
-   - "Recent" list: last 7 weigh-ins, newest first. Each has a remove button that needs a second tap to confirm (same "armed" pattern as restore).
-   - **Goal**: goal weight (`#bwgoal`) and goal date (`#bwby`), plus "Save goal" and "Clear goal" buttons. When set, show "Goal: 165 lb by Jun 1 · needs 0.56 lb/wk (0.31%/wk)", where needed = (current trend − goal) ÷ weeks left (days ÷ 7). If needed %/wk > 1.0, show a `.hint.plat` warning: "That's faster than 1% a week. A later date or a smaller target keeps more strength." If the goal date has passed, or the trend is already at or below the goal, show a short neutral message instead of a rate.
-   - Footnote (always shown, `.meta`): "Rate colours follow research guidelines for keeping strength while cutting (about 0.5–1% of bodyweight a week). This is training guidance, not medical or diet advice." No calorie, macro or diet advice anywhere.
-3. **Home tab: one small card** (`.hcard`, below the week card, above Recent records)
-   - If today is logged: "Bodyweight · 180.2 lb today · trend 180.6 lb", plus the rate when one exists.
-   - Otherwise: "Bodyweight" with a "Log today's weight" button (`data-gotab="progress"`) that opens Progress and focuses `#bww`.
-   - Never nag: no badge, no repeated prompts, no streak pressure for weigh-ins.
+### PR B: Program tab (`agent/program-tab`)
 
-### Small fix 1: Suggested barbell weights you can actually load
+**User problem:** The Program tab is a plain text editor, so a lifter can't see where they are in the 15-week plan, what any coming week asks of them, or what changes next week.
 
-**Problem:** `roundW` always rounds to 5 lb / 2.5 kg, even when Settings → Bar and plates says the smallest plate is bigger, so the coach suggests weights the user can't load. The plateau hint also says "add just 2.5 lb", which needs 1.25 lb plates the default gear doesn't have.
+**What to build** (top to bottom on the tab):
 
-**Build:** For barbell lifts (`isBarbell(name)`), round suggested, warm-up, deload, back-off and PR-chance weights to `bar + k × step`, where `step = 2 × smallest plate in gear()`. Non-barbell lifts keep today's 5 lb / 2.5 kg step. With default gear (45 lb bar + 2.5 lb plates, or 20 kg bar + 1.25 kg plates) every number must stay exactly the same as today. In the 2-workout plateau hint for barbell lifts, show the real smallest jump ("add just 5 lb (2.5 per side)"). Non-barbell text stays as it is.
+1. **Header with progress ring.** Show this only for periodized plans (`p.ppl` or `p.periodize`).
+   - An SVG ring (`.pring`, `role="img"`, aria-label "Week 3 of 15, 14% through the block") sits next to the plan name and block name.
+   - Fill = `(wk − 1 + days done this week ÷ days in program) ÷ 15`. `wk = progNowWk()`, and "days done this week" uses the existing `doneThisWeek(k, wOf(today))`.
+   - The centre text reads "Wk 3/15".
+2. **Tappable 15-week timeline.** Show this only for periodized plans.
+   - 15 buttons (`data-ptl="1".."15"`), coloured by block like the Home bar (Hypertrophy red, Strength blue, Peak yellow). Deload weeks 5 and 10 and test week 15 get a small marker.
+   - The current week is outlined (`.now`) and the selected week is filled (`.sel`, `aria-pressed="true"`). Block labels sit underneath.
+   - Each button is at least 44 px tall. 15 buttons fit in 390 px as a two-row grid (8 + 7) or a horizontal scroller with scroll-snap. Pick whichever looks better, but nothing may cause page-level horizontal scroll.
+   - The selected week starts as the current week. It is kept in a module variable, so it survives re-renders, until the tab is reopened.
+3. **Week preview: one day card per program day.**
+   - Each card shows the day colour as the card accent (`--c: day.c`) and the day name. The heading reads "Week N · Block name", plus "deload" or "test week" where that applies.
+   - Each card lists its exercises for the selected week. Each row has:
+     - a photo thumbnail from `exPic(name)` (falls back to the drawn figure)
+     - the name, with swaps applied
+     - "sets × reps · RPE x" and the note, if any (for example "~85% of 1RM" or "Deload: ~60% of last week")
+   - The data comes from the existing pure functions: `pplPlan(N,k)` for PPL plans, `periodize(day.ex,N)` for periodized custom plans, and the raw `day.ex` for other plans. Do not apply pain adjustments here; this is the plan.
+   - Non-periodized custom plans have no ring and no timeline, just these cards with plain sets × reps.
+4. **"This week vs next" changes.** On each exercise row in the preview, compare week N with week N+1 for the same exercise and show a small change chip: "RPE 8 → 9", "Sets 4 → 2", "Reps 8–10 → 6–8", or "New lift next week" / "Not in next week". Put a one-line banner above the cards when the next week starts a new phase: "Next week: Deload", "Next week: Strength block", "Next week: Peak block", "Next week: Test week", or "Next week: New cycle" after week 15. Unchanged exercises show no chip. Chips must also make sense without colour (the text carries the meaning).
+5. **Tap to swap.**
+   - A swap button (`data-pswap="di.ei"`, at least 44 px, same icon as the Workout tab) on each preview row opens an inline panel. The panel lists `alts(base)` with photos, reusing the Workout tab's photo dropdown markup and CSS if possible, and has "Use it", "Back to <original>" (when swapped) and "Cancel" buttons.
+   - Saving copies the Workout tab logic (`data-swapgo` handler, around line 1723). PPL plan: `putProfile({swaps})` with key `k+'|'+base`, and the plan stays `ppl:true`. Custom plan: `editProg` renames that exercise.
+   - Week 11–15 rows whose name comes from `B3MAIN`/`TEST` swap under their own base name, exactly as the Workout tab does today.
+6. **Editor (kept, restyled).** All existing editor controls stay on the tab, visible without extra taps, with the same `data-` attributes: `data-pd`, `data-pdel`, `data-pe`/`data-pf`, `data-padd`, `data-pdayadd`, `data-pup`, `data-pxdel`, and the `#exlist` datalist.
+   - Make the editor's day sections plate-coloured to match the preview, and add a photo thumbnail to each row.
+   - **Reorder:** add a **Move down** button (`data-pdown="di.ei"`, disabled on the last row) next to the existing Move up. Make both at least 44 × 44 px. **No drag-to-reorder in this PR** (see `decisions.md`, 2026-11-28).
+   - Keep the existing note that editing a PPL plan switches it to the custom block pattern.
+7. **Transitions.** Changing the selected week cross-fades or slides the preview (CSS only, about 200 ms). Opening the swap panel expands smoothly. Everything is instant under `prefers-reduced-motion: reduce`.
 
-### Acceptance criteria (QA verifies with jsdom, fixed date 2026-11-24)
+**Acceptance criteria** (`tests/program_tab.test.cjs`, jsdom, fixed date **2026-11-28T12:00**, throws an Error on any failure, and the page logs no errors):
 
-Bodyweight tracker:
-- [ ] Old data with no `bw`/`cut` loads with no page errors. Home, Progress, Workout, History and Settings all render.
-- [ ] Logging 180.4 on Progress saves `profile.bw = [{d:'2026-11-24', w:180.4, u:'lb'}]` to `localStorage['liftlog.v1']`. Logging 180.0 on the same date replaces it (still 1 entry).
-- [ ] Logging a past date via `#bwd` adds a second entry, and the array stays sorted by date.
-- [ ] Inputs of 0, 5, 900 and empty are rejected (nothing saved, message shown). A future date is rejected.
-- [ ] Seed 14 daily weigh-ins from 2026-11-11 to 2026-11-24 going 180.0 → 177.4 (−0.2/day). Rate shows −1.4 lb/wk and 0.78%/wk (±0.02) with the yellow class. The same test with −0.1/day gives about 0.39%/wk, green. With −0.3/day it gives about 1.18%/wk, red.
-- [ ] With only 3 weigh-ins, the rate tile shows the "Log 4 weigh-ins over a week" text and no number.
-- [ ] Trend equals the EMA defined above, to 1 decimal, for the −0.2/day fixture.
-- [ ] Goal 165 lb by 2027-06-01 with one weigh-in of 180 lb today shows needed ≈ 0.56 lb/wk and ≈ 0.31%/wk, with no warning. Goal 165 by 2027-01-05 shows the "faster than 1% a week" warning. Clear goal removes `profile.cut`.
-- [ ] Switching Settings → Units to kg shows the 180 lb entry as 81.6 kg. The stored entry still reads `{w:180, u:'lb'}`.
-- [ ] Remove needs two taps. After the second tap the entry is gone from storage.
-- [ ] Home shows the "Log today's weight" button when today isn't logged. Tapping it opens Progress. After logging, Home shows today's weight and trend.
-- [ ] Settings → Copy all data includes `bw`. Restoring a backup that has no `bw` keeps the existing `bw`. Restoring a backup that has `bw` brings it back.
-- [ ] The disclaimer footnote is present on Progress. No text mentions calories, macros or diets.
-- [ ] Layout check at 390 px: inputs and buttons at least 44 px high, no horizontal scroll (`document.documentElement.scrollWidth <= 390`).
+Seed: PPL user, `profile.start:'2026-11-14'`. Weeks 1 and 2 are complete, with all six PPL days logged on dates inside those weeks, plus `pushA` logged on 2026-11-28. So the calendar week and the completed-workout week are both **week 3**, and the test still holds after PR #10 merges.
 
-Fix 1:
-- [ ] Default gear (lb): bench/squat suggestions and warm-ups are exactly the same as on `main`. The existing tests pass unchanged, apart from updating printed expectations in `warmups_plates_report.test.cjs` if they move.
-- [ ] Plates set to `45, 25, 10, 5` (smallest 5 → step 10): every barbell suggestion and warm-up on Legs A is `45 + 10k`, and its "Load:" line has no "short" note. Leg press and other non-barbell suggestions are still multiples of 5.
-- [ ] kg with default gear: suggestions are still multiples of 2.5.
-- [ ] Barbell 2-workout plateau hint names the real jump (5 lb with default gear). The text for non-barbell lifts is unchanged.
+- [ ] Opening Program shows the ring with "Wk 3/15" and an aria-label containing "Week 3 of 15". The fill fraction is (2 + 1/6) / 15 ≈ 14% (check the stroke-dasharray/offset value or a `data-pct="14"` attribute).
+- [ ] The timeline has exactly 15 `[data-ptl]` buttons. `[data-ptl="3"]` has `.now` and `aria-pressed="true"`.
+- [ ] There are 6 preview day cards. Push A's first row is "Bench press" with "RPE 8", and it has a change chip containing "RPE 8 → 9" (week 3 vs 4).
+- [ ] Tapping `[data-ptl="5"]` marks it selected. Push A shows the deload: half the sets of week 4 (rounded up), "RPE 6", and a note containing "Deload". The banner reads "Next week: Strength block".
+- [ ] Tapping `[data-ptl="11"]` shows Push A's first row as Bench press "4 × 4 · RPE 8" with "~85% of 1RM", matching `window.pplPlan(11,'pushA')[0]`.
+- [ ] Each preview row has an `img` or drawn-figure `svg` thumbnail.
+- [ ] Swap (PPL): tap `[data-pswap]` on Push A row 0, pick the 2nd alternative and tap Use it. Then `profile.swaps['pushA|Bench press']` equals that name, `profile.program` is unchanged and `ppl` is still true, the preview row shows the new name, and on the Workout tab Push A's first card `h3` shows it too. "Back to Bench press" removes the key.
+- [ ] Swap (custom plan, second jsdom instance with a Full Body preset): swapping renames `profile.program.days[0].ex[0].n` in storage.
+- [ ] Reorder: on the custom plan, `[data-pdown="0.0"]` swaps `ex[0]` and `ex[1]` in storage, and `[data-pup="0.1"]` swaps them back. The last row's `data-pdown` is disabled.
+- [ ] Editor still works: `data-padd`, editing `data-pf=n`, `data-pdayadd` and `data-pdel` (two taps) all save as before.
+- [ ] A non-periodized custom plan renders day cards with no `.pring` and no `[data-ptl]`, and logs no errors.
+- [ ] `JSON.stringify(sessions)` in storage is identical before and after the whole test.
+- [ ] CSS: `[data-ptl]`, `[data-pswap]`, `[data-pup]` and `[data-pdown]` have `min-height` (and, for the icon buttons, `min-width`) of at least 44 px. A `prefers-reduced-motion` rule disables the new transitions.
+- [ ] Designer: screenshots at 390 px in dark and light mode, before and after. No horizontal page scroll. Text contrast is readable on all three plate colours.
 
-### Must not break
-- Start/End workout, workout clock, rest timer (only after a set), RPE suggestions, plateau fixer, readiness check, pain log and its disclaimer, ghost race, warm-ups and plate math, weekly report, week navigation and checkmarks, swaps with photos, backup and restore, hosted `db` sync.
-- Existing `liftlog.v1` data: add `bw` and `cut` only. Rename or remove nothing, and do not touch `sessions`.
-- All existing `tests/*.test.cjs` pass. Run `python3 scripts/sync.py` so `docs/` and `app/src/main/assets/` match `src/index.html`.
+**Must not break:** `tests/onboarding_and_program.test.cjs` unchanged (it uses `data-padd`, `data-pf=n`, `data-pdayadd` and the Workout swap); presets; periodization; the `profile.program`/`swaps` format; Workout-tab swaps with photos; header week strip and week navigation; all features listed in CLAUDE.md rule 5; all existing tests.
 
-## Now (next 2–4 weeks)
+---
 
-- **Cut guard** (after the tracker merges; must ship before 2027-02-15, when Nheil's cut starts): weekly card that compares weight-trend %/wk with main-lift (`MAIN`) e1RM trend. Warns when loss is above 1%/wk *and* main-lift e1RM has fallen 2+ weeks in a row. Thresholds are guesses to tune on Nheil's cut.
-- **RPE coach for beginners**: first-time explainer (RPE 7 ≈ 3 reps left) and a "how many more reps?" picker that maps to RPE. Protects the input our core suggestion feature depends on.
-- **Set cap on a grinder**: after an RPE 10 set or missed target reps, offer to drop the remaining sets or cut their load.
-- **PR share cards**: one tap turns a new personal record into a branded image to post. Growth loop for Nheil's gym content. Needs a native share/save bridge in the Android and iPhone wrappers.
+### PR C: History tab (`agent/history-tab`)
 
-## Queued by Nheil (2026-11-26), do these first
+**User problem:** History is a flat list, so a lifter can't see at a glance which days they trained, how a month went, or what they lifted in a past workout without opening it in the Workout tab.
 
-**2026-11-28 run builds THREE PRs: item 0 (Start Workout bug, do it FIRST), then item 2 (Program tab) and item 4 (History tab). Item 3 waits for 2026-12-05.**
+**What to build** (top to bottom):
 
-R. **Research: ways to monetize Lift Log** (Nheil, 2026-11-27). **Researcher, in the 2026-11-28 run.** Research only, nothing gets built.
-   - **Write `ops/research/monetization.md`**, short and phone-friendly, with sources and dates for every number.
-   - **Cover:**
-     - how top lifting apps make money (Strong, Hevy, Fitbod, JEFIT, Boostcamp and others): free vs paid features, prices, trials and lifetime deals
-     - subscription vs one-time unlock vs freemium; typical conversion rates and what users complain about in reviews
-     - store rules and fees for Google Play and the App Store, including the small-business 15% rate
-     - how paid features would work when the app is one HTML file in Android and iPhone web views (Play Billing / StoreKit bridges vs web checkout)
-     - non-subscription income: the queued "PR Perks + partner cards" brand idea, affiliate links, paid programs or coaching, and tie-ins with Nheil's gym social media
-   - **Respect the app rules:** no tracking or third-party ad networks (CLAUDE.md rule 3). Ads go in only as "considered and why not", unless a privacy-safe option exists.
-   - **End with a recommendation:** the 2–3 best options for Lift Log, what to make free vs paid, a suggested price, and what has to exist first (accounts, store launch).
-   - Add any resulting ideas to `ops/ideas.md` with scores, so the Product Lead can plan them.
+1. **Month calendar** (inline, not a popup). Use the look of the custom date picker in `openCal`. You may copy its grid maths and day-cell styling into new `.hcal*` classes, but do not change `openCal`, `.cday` or the `custom_pickers` behaviour.
+   - Month title, with previous and next arrows (`data-hm="-1"` / `data-hm="1"`, at least 44 px). Next is disabled after the current month.
+   - Swipe: a horizontal swipe on the grid (more than 50 px, mostly horizontal, using `pointerdown`/`pointerup` like `openCal`) changes the month.
+   - Each day is a button `data-hd="YYYY-MM-DD"` with an aria-label like "Tue, Nov 24, Push B logged".
+   - Days with workouts show up to 2 dots in `dayColor(s)` (Push red, Pull blue, Legs yellow).
+   - Today has a ring (`.td`). The selected day is filled (`.on`, `aria-pressed="true"`).
+   - Opening month: today's month. If that month has no workouts but older ones exist, open the month of the most recent workout.
+   - Live (in-progress) sessions count as logged.
+2. **Month summary strip** (4 tiles under the calendar, reusing `.prs`/`.pr` styling):
+   - **Workouts:** sessions in the month that have sets, plus live sessions.
+   - **Volume:** Σ w × r, rounded, in `unit()`, the same maths as today's list.
+   - **PRs:** PR events dated in the month. A PR is a lift whose `bestEst` beats that lift's previous best from all earlier sessions by more than 0.5% (the same rule as the Home "Recent records"). A first-ever log is not a PR.
+   - **Longest streak:** the longest run of consecutive calendar days with a workout inside the month, labelled "days in a row".
+   - The summary always covers all workouts in the month (filters do not change it).
+3. **Workout cards** for the shown month, newest first (same sort as today).
+   - **Keep the root class `hist`** (add a modifier such as `hist wcard`) and keep a first `.meta` line with the same text as today: "date · N sets · volume unit · N min", with the "In progress" tag for live sessions.
+   - Keep the `[data-open]` and `[data-del]` buttons, with Delete needing two taps (`armed`).
+   - Each card adds: the day colour accent and name (`dn`, or the `SESS` name), and a PR badge ("2 PRs") when the session has PRs.
+   - Tapping the card header (a button, `aria-expanded`, `data-hx="<id>"`, at least 44 px) expands it smoothly (CSS `grid-template-rows` 0fr → 1fr or similar, instant under reduced motion). The expanded card lists every exercise with a small photo, and every set as "155 × 8 · RPE 8" (leave out RPE when it was not logged). PR sets are marked.
+   - Tapping it again collapses it. Several cards can be open at once, and the open state survives re-renders.
+4. **Tap a day.**
+   - Tapping a calendar day with workouts selects it, expands that day's card(s), collapses the others and scrolls the first one into view (`scrollIntoView` guarded for jsdom).
+   - Tapping a day with no workout shows a quiet line: "No workout on Tue, Nov 10."
+   - Tapping the selected day again clears the selection.
+5. **Filters and search** (in scope; if time runs out, ship without them and say so in the PR):
+   - Chips All / Push / Pull / Legs (`data-hf="all|push|pull|legs"`, at least 44 px) narrow the card list by day colour (red = Push, blue = Pull, yellow = Legs; other colours appear only under All).
+   - A search box (`#hq`, `type=search`, label "Search exercise") narrows cards to sessions with a matching exercise name (case-insensitive substring) **across all months**, under the heading "Results in all months".
+   - Filter and search combine. With no results, show "No workouts match."
+   - The calendar and summary are not filtered.
+6. **Empty state** stays the same: "No workouts logged yet." when there are no sessions at all.
 
-0. **Bug: no Start Workout button after Week 1, and the app doesn't move on to the next week** (Nheil, 2026-11-27). Separate small PR, built first, before the Program and History tabs.
-   - **What happens:** only Week 1 workouts have a Start Workout button. Workouts in any other week can't be started.
-   - **What Nheil wants:**
-     - Every week's workouts can be started.
-     - When all the workouts in a week are completed, Home and the Workout tab automatically show the next week (Week 2 after Week 1, and so on): the "Week X of 15" text and bar, the next workout and the day list.
-     - Looking back at past weeks and ahead at future weeks still works.
-   - **Must keep:** saved sessions, week checkmarks, week navigation, start/end workout, ghost sets, and RPE suggestions for the right week's targets.
-   - **Acceptance:**
-     - A test with fake data where every Week 1 workout is done. Home and Workout both show Week 2, the Start Workout button is there, and starting and ending a Week 2 workout saves a session tagged to Week 2.
-     - A second test with Week 2 also complete shows Week 3.
-     - A test that opens a future week and finds a Start Workout button (or a clear rule for why not, agreed in the PR).
-     - All existing tests pass, including `week_checkmarks`, `week_navigation` and `start_end_workout`.
+Not in this PR: a streak/heat strip (moved to Next).
 
-1. **Bug: Home "Week X of 15" bar, Peak weeks are giant yellow columns** (screenshot from Nheil's Android, 2026-11-26). **Fix in PR: https://github.com/nheilmangoba1/Lift-log/pull/6** (awaiting Nheil's merge).
-   - **Cause:** CSS class clash. The 3D body viewer (PR #5) styles `.b3` (height `min(560px,70vh)`, `min-height:420px`, border, background). The plan bar marks Peak-block weeks with `<i class="b3">`, so they inherit that height.
-   - **Fix:** rename the viewer's classes (e.g. `.b3` → `.body3d`, along with every `.b3*` selector and the JS that sets `className='b3'`), or scope the bar rules (`.bar15 i.b3`). The renaming option is safer.
-   - **Acceptance:** on Home, all 15 week squares are 10 px tall with Peak weeks in yellow, in dark and light mode at 390 px. The Body tab 3D viewer looks unchanged. Add a test that checks `.bar15 i` heights are equal.
-2. **Program tab: more interactive and better looking** (Nheil, 2026-11-26). Designer + Coder. The current tab is mostly a static editor and list.
-   - **Ideas to choose from:**
-     - a visual 15-week timeline (Hypertrophy → Strength → Peak) you can tap to preview any week's sets, reps and RPE
-     - day cards in plate colours (Push red, Pull blue, Legs yellow) with exercise photos
-     - drag to reorder exercises
-     - tap an exercise to swap it using the photo dropdown
-     - a progress ring for how far through the block you are
-     - "this week vs next week" changes highlighted
-     - smooth transitions between views
-   - **Must keep:** the program editor features, presets, swaps, periodization and saved data (`profile.program`, `swaps`) working.
-   - **Acceptance:**
-     - Designer screenshots at 390 px, dark and light, before and after.
-     - Tap targets at least 44 px.
-     - A test that opens the tab, previews a future week and edits an exercise.
+**Acceptance criteria** (`tests/history_tab.test.cjs`, jsdom, fixed date **2026-11-28T12:00**, throws an Error on any failure, and the page logs no errors):
 
-3. **Domain + email (SMTP) setup for launch.** **Schedule: do this in the Saturday 2026-12-05 team run, NOT the 2026-11-28 run** (Nheil, 2026-11-26). In the 11-28 run, skip it and take the next item.
+Seed (lb, PPL; sets without `e` count as RPE 10 in `estSet`, so the 11-02 bench is not a PR):
+- 2026-10-15 `pushA`: Bench press 135×8
+- 2026-11-02 `pushA`: Bench press 135×8, 135×8
+- 2026-11-04 `pullA`: Barbell row 135×8
+- 2026-11-06 `legsA`: Back squat 185×5
+- 2026-11-24 `pushB`: Bench press 155×8 `e:8` (the only PR)
+- 2026-11-25 `pullB`: Pull-up (weighted) 25×6, with `dur:52`
+- 2026-11-26 `legsB`: Deadlift 225×5
+
+- [ ] History opens on November 2026. The cells for 02, 04, 06, 24, 25 and 26 have a dot whose colour is `dayColor` of that session. `[data-hd="2026-11-28"]` has `.td`. Days with no workout have no dot.
+- [ ] Summary: Workouts **6**, Volume **6,680 lb**, PRs **1**, Longest streak **3** days in a row.
+- [ ] Six `.hist` cards, newest first, each with `[data-open]` and `[data-del]`. The 11-25 card's `.meta` contains "52 min". The 11-24 card shows a PR badge.
+- [ ] Tapping `[data-hx]` on the 11-24 card sets `aria-expanded="true"`, and the card shows "155 × 8" and "RPE 8". Tapping again sets it to false.
+- [ ] Tapping `[data-hd="2026-11-02"]` expands only the 11-02 card (the others collapse) and marks the day `.on`. Tapping `[data-hd="2026-11-10"]` shows "No workout on" and logs no error.
+- [ ] `[data-hm="-1"]` shows October 2026: one dot (the 15th), summary Workouts 1, PRs 0 (first-ever log). `[data-hm="1"]` returns to November, and in November `[data-hm="1"]` is disabled.
+- [ ] Swipe: dispatching `pointerdown` (clientX 300) then `pointerup` (clientX 200) on the grid in November goes to October. (jsdom: `new w.MouseEvent('pointerdown',{clientX:300,clientY:100,bubbles:true})` is enough, because the handler reads `clientX`/`clientY`.)
+- [ ] Filters: `[data-hf="pull"]` leaves only the 11-04 and 11-25 cards, and the summary still says 6. Search "bench" (input event on `#hq`) shows the 10-15, 11-02 and 11-24 cards under "Results in all months". Search "zzz" shows "No workouts match."
+- [ ] A second jsdom instance at **2026-12-03** with the same seed opens on November (latest workout's month).
+- [ ] In a third instance (seed plus a live `pushA` session dated 2026-11-28), the 28th shows as logged and its card has "In progress". `[data-open]` on it opens the Workout tab on that day.
+- [ ] Delete still needs two taps and removes only that session.
+- [ ] `JSON.stringify(sessions)` is unchanged by everything except the Delete step.
+- [ ] CSS: `[data-hd]`, `[data-hm]`, `[data-hx]` and `[data-hf]` are at least 44 px tall. 7 day columns fit in 390 px with no horizontal page scroll. A reduced-motion rule is present.
+- [ ] Designer: screenshots at 390 px in dark and light mode, before and after.
+
+**Must not break:** `tests/onboarding_and_program.test.cjs` (`.hist` text, `[data-open]`), `tests/start_end_workout.test.cjs` (`.hist .meta`), `tests/pain_log.test.cjs` (`.hist b` on the Body tab, so the `.hist` CSS must stay), `tests/custom_pickers.test.cjs` and the date picker, week navigation from the History tab (`data-jw` in the header strip, `tests/week_navigation.test.cjs`), all `sessions` data, all features in CLAUDE.md rule 5, and all existing tests.
+
+---
+
+## Queued by Nheil (2026-11-26), status after the 2026-11-28 planning
+
+R. **Research: ways to monetize Lift Log.** **Done 2026-11-28** → `ops/research/monetization.md`. Outcome: Pro groundwork added to Now/Next/Blocked below. Nothing paid is built.
+0. **Bug: no Start Workout button after Week 1 / no auto-advance.** **Built as PR #10, in QA** (This week, PR A).
+1. **Bug: Home week bar Peak columns.** **Done, PR #6 merged.**
+2. **Program tab.** **This week, PR B.**
+3. **Domain + email (SMTP) setup for launch.** **Schedule: do this in the Saturday 2026-12-05 team run, NOT the 2026-11-28 run** (Nheil, 2026-11-26).
    - **Why:** Supabase's built-in mailer only reaches Nheil's own address, 2 emails/hour. Real users can't get "confirm your email" or "reset password" emails until a real email service is connected. A domain also gives the Google Play privacy-policy page and the brand a home.
    - **Agents can't buy, sign up or pay.** So this run produces a ready-to-follow kit and drafts, and Nheil does the account steps.
      1. **`ops/launch/email-setup.md`**: a short, step-by-step phone-friendly guide for Nheil:
@@ -141,31 +177,11 @@ R. **Research: ways to monetize Lift Log** (Nheil, 2026-11-27). **Researcher, in
         - no tracking, no ads networks, no selling data
         - how to delete: Settings → Delete account
         - a contact email (placeholder until the domain exists)
+        - (added 2026-11-28) a short line that no payment data is handled by Lift Log; future purchases go through Google Play / the App Store
      4. Update `ops/accounts/README.md` and the "Waiting on Nheil" list with the exact remaining clicks.
    - **Acceptance:** Nheil can finish everything in about 20 minutes from the guide, and the templates render on a 390 px phone in light and dark email clients. The PR (privacy page only) passes tests. No accounts are created and nothing is bought by agents.
-
-4. **History tab: calendar, more interactive, better looking** (Nheil, 2026-11-26). Designer + Coder.
-   - **Schedule: build in the Saturday 2026-11-28 run, together with item 2 (Program tab)** (Nheil, 2026-11-26). Do Program first, then History, each on its own branch (`agent/program-tab`, `agent/history-tab`) with its own PR. QA and the Designer check both. If time runs short, finish Program completely and open History as a draft PR saying what's left.
-   - **Month calendar at the top**, in the style of the new date picker:
-     - days with a workout get a dot or fill in that day's colour (Push red, Pull blue, Legs yellow)
-     - today is ringed
-     - swipe or use arrows to change month
-     - tap a day to jump to or expand that day's workout below
-   - **Workout cards** instead of a plain list:
-     - day name and colour, date, duration, sets, volume, PRs hit
-     - tap to expand the sets (weight × reps, RPE), with smooth open/close animation
-   - **Small month summary:** workouts, total volume, PRs, longest streak.
-   - **Nice extras if they fit:**
-     - filter by Push/Pull/Legs
-     - search by exercise
-     - a streak/heat strip
-   - **Must keep:** existing history actions (edit or delete a session, if present) and all saved `sessions` data, untouched. Reuse the calendar code from the custom date picker where possible.
-   - **Acceptance:**
-     - Designer screenshots at 390 px, dark and light, before and after.
-     - Tap targets at least 44 px.
-     - A test that opens History, checks logged days are marked on the calendar, taps a day and expands its workout, and changes month.
-
-5. **Rest timer alert: more noticeable ring and vibration** (Nheil, 2026-11-26). Coder (+ Designer for the visual).
+4. **History tab with calendar.** **This week, PR C.**
+5. **Rest timer alert: more noticeable ring and vibration** (Nheil, 2026-11-26). Coder (+ Designer for the visual). **Next build after this week.** It creates the first native bridge, which Pro billing and share cards will reuse (see Now).
    - **Problem:**
      - When rest ends, the app plays a short `beep()` and calls `navigator.vibrate([250,120,250,120,400])`. Nheil doesn't notice it and wants the phone to vibrate.
      - Android has the VIBRATE permission, but its WebView may ignore `navigator.vibrate`. iPhone WKWebView has no vibration API at all.
@@ -177,6 +193,7 @@ R. **Research: ways to monetize Lift Log** (Nheil, 2026-11-27). **Researcher, in
         - Android: add a JavaScript interface in the WebView wrapper (`app/`) that calls the native `Vibrator` / `VibrationEffect` with a short pattern (e.g. 3 × 200 ms).
         - iPhone: add a `WKScriptMessageHandler` in `ios/` that calls `UINotificationFeedbackGenerator` (success) or `AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)`.
         - The web app calls the bridge when it exists and falls back to `navigator.vibrate`.
+        - (added 2026-11-28) Design the bridge as one general `window.LiftLogNative` object so billing and share can be added later. **Do not change how the page is loaded (`file://`) in this PR.** Moving to `WebViewAssetLoader` changes where localStorage lives and needs its own migration PR (see Now).
      4. **Background / locked screen:**
         - When a rest timer starts, schedule a local notification for its end time, with sound and vibration. Cancel it if the timer is stopped or skipped.
         - Android: the notification channel needs vibration, plus the POST_NOTIFICATIONS permission prompt on Android 13+.
@@ -190,60 +207,50 @@ R. **Research: ways to monetize Lift Log** (Nheil, 2026-11-27). **Researcher, in
    - **Acceptance:**
      - A jsdom test fakes the timer ending and checks that the banner shows, the chime repeats until OK, and the bridge is called (mock `window.LiftLogNative` / `webkit.messageHandlers`), with a fallback to `navigator.vibrate`.
      - Manual check on Nheil's Android: the phone vibrates and rings with the app open, and gets a notification with the screen locked. The PR must say clearly that the native parts can't be tested in CI.
-
-6. **Accounts and cloud backup** (Nheil, 2026-11-26). **Built 2026-11-26 at Nheil's request, in PR: https://github.com/nheilmangoba1/Lift-log/pull/8** Coder + QA. Uses Supabase (decided 2026-11-23).
-   - **UNBLOCKED 2026-11-26:** project URL and publishable key are in `ops/accounts/README.md`, and the table and security setup in `ops/accounts/schema.sql` was run by Nheil on 2026-11-26. Use the publishable key (`sb_publishable_…`) in the `apikey` header; it replaces the anon key.
-   - **Nheil must do first** (about 5 min, free):
-     1. Sign up at supabase.com and create a project.
-     2. Share the Project URL and the public `anon` key (Project Settings › API). The anon key is safe to put in the app; never share the `service_role` key.
-     3. Under Authentication › Providers, keep Email on (optional: Google sign-in later).
-   - **Until then:** the Coder can build and test everything against a mock and leave the keys blank, so the feature stays hidden.
-   - **Build:**
-     - **Sign up / log in / log out** with email and password, plus a magic link or password reset. Optional: the app works fully without an account, exactly as now.
-     - **Backup:** one row per user in a `liftlog_data` table (`user_id`, `data jsonb`, `updated_at`). Row-level security so users can only read and write their own row. Ship the SQL setup script in `ops/accounts/schema.sql` for Nheil to paste into Supabase.
-     - **Sync:** offline-first. localStorage stays the source of truth. Push after changes (debounced) and pull on app open.
-     - **Merge rule:** per session and per profile field, newest `updated_at` wins. Never silently lose a workout. If both sides changed, keep both sessions.
-     - **First login on a phone with existing data:** upload it. On a new phone: download it. Show "Last backed up 2 min ago" in Settings.
-     - **Delete account:** removes the cloud data. Required by app stores.
-     - **Network:** use plain `fetch` to Supabase's REST and auth endpoints, with no supabase-js library, so the app stays one small file. This is the one approved exception to "no third-party network calls": only Nheil's own Supabase project, only when signed in, and no analytics or tracking.
-   - **Privacy:** update the privacy policy page (needed for Google Play anyway) to say what's stored: workouts, profile and email.
-   - **Must keep:** all existing data, and the `liftlog.v1` format (add fields only). Everything works offline and when signed out.
-   - **Acceptance:** jsdom tests with a mocked Supabase covering:
-     - sign up, back up, and restore onto an empty device
-     - merge conflicts (two devices edit different sessions → both kept)
-     - offline → online sync
-     - log out keeps local data
-     - delete account
-   - **Unlocks:** Pro subscriptions, Ghost race a friend, PR Perks.
-7. **PR Perks + partner cards** (Nheil, 2026-11-26). Do this after accounts and the Google Play launch.
+6. **Accounts and cloud backup.** **Done, PR #8 merged.** Live with Nheil's Supabase project (`ops/accounts/README.md`). Real users' confirm/reset emails still need item 3.
+7. **PR Perks + partner cards** (Nheil, 2026-11-26). Do this after accounts and the Google Play launch. Research ranks it the #2 income source (`research/monetization.md` §5).
    - **What it is:** brands advertise without being obnoxious.
      - Milestone rewards: a new PR or a streak unlocks a partner discount code (e.g. a bench PR → 15% off a belt).
      - At most one contextual gear tip or partner card per week, only after a workout. Never during sets, and no pop-ups.
      - Sponsored programs ("12-Week Strength, presented by X").
    - **Rules:**
-     - Always labelled "Partner" or "Sponsored" (US FTC disclosure).
+     - Always labelled "Partner" or "Sponsored" (US FTC disclosure), plus the line "Lift Log earns a commission" right next to the link (added 2026-11-28, per the FTC FAQ in the research).
      - One-tap dismiss.
      - Fitness, gear, recovery and nutrition only. No fat burners or extreme-diet products.
      - **No tracking:** offers are static codes or links that open in the browser, and no user data goes to brands.
      - Pro users can turn partner cards off.
    - **Data:** offers come from a JSON file in the repo (e.g. `docs/partners.json`) that Nheil edits. The app reads it from Nheil's own GitHub Pages, never an ad network.
    - **Money:** affiliate commission per sale, or a flat monthly fee per slot. The Marketer (when resumed) drafts the brand pitch.
+   - **Later extension:** the gear-gap partner card (`ideas.md`).
+
+## Now (next 2–4 weeks, after this week's three PRs)
+
+1. **Item 5, rest timer alert + first native bridge** (above). This is Nheil's next queued item, and the bridge it adds is reused by Pro billing and PR share cards.
+2. **Cut guard** (must ship before 2027-02-15, when Nheil's cut starts; the bodyweight tracker has merged): a weekly card that compares weight-trend %/wk with main-lift (`MAIN`) e1RM trend. It warns when loss is above 1%/wk *and* main-lift e1RM has fallen 2+ weeks in a row. The thresholds are guesses to tune on Nheil's cut. Grows into Pro #3 Cut coach.
+3. **PR forecast** (Pro #1, ships **free at first**; it goes behind Pro only when the paywall exists). Research says at least 2 Pro features must be live before charging.
+4. **Android origin spike + localStorage migration test** (agent-doable, no account needed): check whether Play Billing over `addWebMessageListener` needs `WebViewAssetLoader` (`https://appassets.androidplatform.net`) instead of `file://`. If it does, build a one-time copy of `liftlog.v1`, `liftlog.auth` and `liftlog.cloud` to the new origin, with a test, **before** any billing code. This protects user data.
+5. **RPE coach for beginners**: a first-time explainer (RPE 7 ≈ 3 reps left) and a "how many more reps?" picker that maps to RPE.
+6. **Set cap on a grinder**: after an RPE 10 set or missed target reps, offer to drop the remaining sets or cut their load.
+7. **PR share cards**: one tap turns a new personal record into a branded image to post. Research: growth matters more than price (about $740/yr at 1,000 downloads), so this is the main growth loop. Needs a share/save call on the native bridge.
 
 ## Pro features (queued by Nheil, 2026-11-26)
 
-Nheil picked these as the premium features to build toward the Pro tier. Build them in this order. They can ship free at first and be put behind Pro later, once accounts and store billing exist (see Blocked). Idea #3 ("Gym's packed" mode) was left out on purpose.
+Nheil picked these as the premium features to build toward the Pro tier. Build them in this order. They can ship free at first and be put behind Pro later, once accounts and store billing exist (see Blocked). Idea #3 ("Gym's packed" mode) was left out on purpose. Research suggests **$4.99/mo or $29.99/yr, with a 7-day trial on yearly only** (a guess to test, not decided; see Blocked).
 
-1. **PR forecast** (easy): "At your current rate you'll bench 225 on Mar 14." Projects each main lift's e1RM trend to a target the user sets, updates after every workout, shows a countdown. Must say it's an estimate. Share-card ready later.
+1. **PR forecast** (easy): "At your current rate you'll bench 225 on Mar 14." Projects each main lift's e1RM trend to a target the user sets, updates after every workout, shows a countdown. Must say it's an estimate. Share-card ready later. **In Now.**
 2. **"Only got X minutes"** (easy to medium): pick 20/30/45/60 min and today's workout shrinks to fit, keeping the main lifts' work sets and dropping accessories and extra sets first. Uses rest times to estimate length. Saved sessions keep their normal format.
 3. **Cut coach** (medium): grows the **Cut guard** item above. Links the bodyweight trend to main-lift e1RM, warns when strength drops during a cut and offers to trim training volume to protect strength. Training guidance only: no calorie, macro or diet advice. Must be live before 2027-02-15.
-4. **Ghost race a friend** (medium, needs accounts): race a friend's numbers set by set, like the current ghost race against your own past. Needs accounts and sharing (Blocked until Supabase is set up).
-5. **Velocity Coach** (hard, headline feature after launch): film a set, track the bar path and rep speed on the device, estimate reps left from slow-down, and draw the bar path on the video for sharing. Must run on the phone with no uploads. Replaces "Video form check" under Later. Start with a research spike on camera access in the Android/iPhone web views.
+4. **Ghost race a friend** (medium, needs accounts, which are now merged): race a friend's numbers set by set, like the current ghost race against your own past. Needs a sharing design on top of PR #8.
+5. **Velocity Coach** (hard, headline feature after launch): film a set, track the bar path and rep speed on the device, estimate reps left from slow-down, and draw the bar path on the video for sharing. Must run on the phone with no uploads. Start with a research spike on camera access in the Android/iPhone web views.
 
 ## Next
 
+- **Pro paywall + Play Billing** (after the Blocked steps below, the origin spike and 2 live Pro features): `window.LiftLogNative.buy('pro_yearly')` → `profile.pro = {plan, until, store}` (new field) → receipt check in a Supabase Edge Function → "Restore purchases". The paywall shows the **free-forever pledge** and an **honest trial** (exact charge date and price, reminder 2 days before, one-tap "How to cancel"). No dark patterns: no pre-checked yearly upsells, no fake countdowns.
+- **"Only got X minutes"** (Pro #2).
+- Streak/heat strip on History (split out of PR C).
 - Exercise library: browse exercises with photos, muscles and how-to steps (Free Exercise DB). Bundling the instruction text into the one-file app needs a size check first.
 - Year recap card ("Lift Log Wrapped"): reuse the PR share card renderer. Aim for late December if share cards land first.
-- Equipment-aware suggestions, part 2: dumbbell steps, Smith/EZ bar weights per exercise (part 1, barbell rounding, ships this week).
+- Equipment-aware suggestions, part 2: dumbbell steps, Smith/EZ bar weights per exercise.
 - Boxing mode: round timer for bag work that logs rounds
 - Competition or event dates: plan peaking and tapering backward from a date
 - Total training load: lifting + sport/cardio sessions and a this-week-vs-4-week-average warning
@@ -253,20 +260,40 @@ Nheil picked these as the premium features to build toward the Pro tier. Build t
 
 ## Later
 
+- Founding Lifter lifetime ($79.99, first 90 days after Pro launch only) and Nheil's own programs as paid packs. Both reuse the billing bridge.
+- Gear-gap partner card (extends PR Perks).
+- Web checkout (Stripe) for the GitHub Pages version and maybe iPhone. Revisit after the Supreme Court ruling (argued 2027-01-11).
 - Hands-free voice logging (web version first)
 - Wearable data (heart rate variability, sleep) feeding the readiness score
 - Coach view for trainers with several athletes
-- (Video form check moved to Pro features: Velocity Coach)
 
 ## Blocked (needs Nheil)
 
-- ~~**Accounts and cloud sync**~~: unblocked 2026-11-26, see item 5 and `ops/accounts/README.md`. (Was: needs a free Supabase project.) Steps: sign up at supabase.com, create a project, then share the Project URL and the public `anon` key (Project Settings → API). Never share the `service_role` key.
-- **Google Play release**: needs a Google Play developer account (one-time fee, paid by Nheil), a private release signing key, a privacy policy page and a 12-tester, 14-day closed test.
-- **App Store release**: needs an Apple Developer Program membership (yearly fee, paid by Nheil).
-- **Pro subscriptions**: only after accounts and store accounts exist.
+- **Confirm Pro pricing and the free-forever pledge** (a decision only, about 2 minutes). Reply in `ops/feedback.md` or chat:
+  1. OK to promise "everything free today stays free, your data is never locked"? (PL recommends yes.)
+  2. OK with $4.99/mo or $29.99/yr, with a 7-day trial on yearly only? Or name other prices.
+  3. Want a Founding Lifter lifetime at launch (yes/no, price)?
+- **Google Play release** (needed before any Play Billing):
+  1. Create a Google Play developer account at play.google.com/console ($25 one-time) and complete identity verification.
+  2. Item 3 (2026-12-05) gives the privacy policy page and support email that the listing needs.
+  3. Run a closed test with 12+ testers for 14 days (Nheil's gym friends).
+  4. Agents then switch the build to a private release signing key (an agent task, but Nheil must store the key backup safely).
+- **Selling Pro on Android** (after the Play account): in Play Console, set up a **payments profile** (Setup → Payments profile: legal name, address, bank account for payouts) and create subscription products `pro_monthly` and `pro_yearly`. Check that the 15% service-fee rate applies to the account (research §3).
+- **App Store release + selling Pro on iPhone**: join the Apple Developer Program ($99/yr), apply to the App Store Small Business Program (15%), and accept the Paid Apps agreement with tax and banking info in App Store Connect.
+- ~~**Accounts and cloud sync**~~: done (PR #8 merged; Supabase project live).
 
 ## Done
 
+- 2026-11-28 · Research: ways to monetize (item R) → `ops/research/monetization.md`
+- PR #9 · new GitHub Pages address after the repo moved to `Liftlog-app`
+- PR #8 · Accounts and cloud backup (Supabase, plain fetch, offline-first; item 6)
+- PR #7 · Agent dashboard and Saturday run time (ops only)
+- PR #6 · Home week bar fix: Peak weeks no longer giant columns (item 1)
+- PR #5 · 3D interactive body for the pain map
+- PR #4 · Tactile buttons, logo intro, custom dropdowns and date picker
+- PR #3 · New check-bar logo for app icons and header
+- PR #2 · Simpler, calmer, more eye-catching UI
+- PR #1 · Bodyweight and cut tracker + barbell weights rounded to the user's real plates (equipment-aware part 1)
 - Home screen with today's workout, week strip, streak, plan progress, recent records (build 17)
 - Real exercise photos in the swap dropdown (build 16)
 - Rest timer only while resting; swap dropdown with pictures (build 15)
