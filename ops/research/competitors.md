@@ -20,19 +20,19 @@ Y = documented, P = partial, N = not found in the sources we read (not proof it 
 
 Sources for each cell are in the app sections below.
 
-## Pricing snapshot (USD, checked 2026-11-24)
+## Pricing snapshot (USD, updated 2026-11-28)
 
 | App | Free tier | Monthly | Yearly | Lifetime |
 |---|---|---|---|---|
-| Strong | Unlimited logging, 3 routines | $4.99 | $29.99 | $99.99 |
+| Strong | Unlimited logging, 3 templates, some charts, no ads | $4.99 (also $19.99/6 mo) | $29.99 | $99.99 |
 | Hevy | Unlimited logging, 4 routines, no ads | $2.99 | $23.99 | $74.99 |
 | Fitbod | None (trial only) | $15.99 | $95.99 | none |
 | JEFIT | Yes, with ads | $12.99 | $69.99 | none |
-| Boostcamp | Program library free | $14.99 | $59.99 | not found |
+| Boostcamp | Tracker + most programs free | $14.99 | $59.99 (7-day trial) | **none (confirmed)** |
 | JuggernautAI | None (trial only) | $34.99–$43.99 (sources differ) | ~$349.99 | none |
 | MacroFactor Workouts | None (7-day trial) | $11.99 | $71.99 | none |
 
-Sources: [SensAI pricing article (competitor source)](https://www.sensai.fit/blog/fitness-app-pricing-free-tier-comparison), store pages linked below.
+Sources: [SensAI pricing article (competitor source), prices checked 2026-09-08](https://www.sensai.fit/blog/fitness-app-pricing-free-tier-comparison), [SensAI Strong review 2026-10-04](https://www.sensai.fit/blog/strong-app-review-2026), [Boostcamp "Is it free?" 2026-10-15](https://www.boostcamp.app/is-boostcamp-free), store pages linked below. Full money analysis: `monetization.md`.
 
 ---
 
@@ -40,6 +40,8 @@ Sources: [SensAI pricing article (competitor source)](https://www.sensai.fit/blo
 
 **Positioning:** fast, simple logger. No program generation.
 
+- **2026-11-28:** Store lists Strong PRO 1 Month $4.99, 6 Months $19.99, 1 Year $29.99, PRO Forever $99.99, plus older SKUs ($3.99, $23.99/yr, $79.99 lifetime). Rating 4.9 from 109K, v6.6.0 (Nov 19). [App Store](https://apps.apple.com/app/strong/id464254577) · checked 2026-11-28
+- **Free vs PRO:** free has unlimited logging, no ads, 3 templates and some charts. PRO adds all charts, measurements, plate and warm-up calculators, and themes. Strong says free users are never locked out of their data. [SensAI review (competitor source), 2026-10-04](https://www.sensai.fit/blog/strong-app-review-2026) · checked 2026-11-28
 - **Pricing:** free with unlimited workouts but only 3 custom routines; PRO is $4.99/mo or $29.99/yr, lifetime $99.99. [App Store](https://apps.apple.com/app/strong/id464254577) · checked 2026-11-24
 - **Standouts:** full Apple Watch app that logs without the phone; warm-up and plate calculators; e1RM and volume charts; supersets, set tags; CSV export. [App Store](https://apps.apple.com/app/strong/id464254577) · checked 2026-11-24
 - **Recent:** v6.6.0 (late Nov 2026) improved iPhone–Watch live sync, formatted notes, timezone per workout. [App Store](https://apps.apple.com/app/strong/id464254577) · checked 2026-11-24
@@ -52,6 +54,8 @@ Sources: [SensAI pricing article (competitor source)](https://www.sensai.fit/blo
 
 **Positioning:** cheapest Pro, strongest social feed, big user base (claims 15M+ lifters).
 
+- **2026-11-28:** App Store IAPs: Pro Monthly $2.99 and $3.99, Yearly $23.99, Lifetime $74.99 (crawled 2026-04-15). [App Pricing Lab](https://apppricinglab.com/iap/apple/1458862350) · checked 2026-11-28
+- **Hevy Coach (for trainers):** $25/mo for 1–10 clients, $50 for 11–25, $90 for 26–50, $160 for 51–100. Free trial, no card needed. [Capterra](https://www.capterra.com/p/10015732/Hevy-Coach/pricing/) · checked 2026-11-28
 - **Pricing:** free tier has unlimited logging, no ads, 4 routines, 7 custom exercises, 3 months of graph history; Pro $2.99/mo (a $3.99 SKU also exists), $23.99/yr, $74.99 lifetime. [SensAI (competitor source)](https://www.sensai.fit/blog/fitness-app-pricing-free-tier-comparison) · checked 2026-11-24
 - **Hevy Trainer (Pro only):** questionnaire builds a program; shows one routine at a time; suggests when and how much to add weight. Help page does not mention RPE, readiness or deloads. [Hevy help](https://help.hevyapp.com/hc/en-us/articles/38385724273047-Hevy-Trainer-Explained-How-It-Builds-Your-Workout-Program) · checked 2026-11-24
 - **Compare-to-last:** a "previous" column shows last time's numbers, from any workout or the same routine (setting). [Hevy help](https://help.hevyapp.com/hc/en-us/articles/34105442929943) · checked 2026-11-24
@@ -63,6 +67,12 @@ Sources: [SensAI pricing article (competitor source)](https://www.sensai.fit/blo
 
 **Positioning:** auto-generated workouts from equipment and muscle recovery. Most "hands-off" option.
 
+- **2026-11-28, Trustpilot:** still 3.0/5 from 38 reviews (7 in the last 12 months). 2026 complaints:
+  - 06-23: charges kept coming after a trial
+  - 08-04: a trial became an A$149.99 yearly charge with no reminder, and refunds were refused
+  - 10-15: about $87/yr is too expensive, and cancelling through Apple is hard to find
+
+  [Trustpilot](https://www.trustpilot.com/review/fitbod.me) · checked 2026-11-28
 - **Pricing:** no free tier (7-day trial needs a card); $15.99/mo or $95.99/yr; store also lists $12.99/$79.99 and older legacy prices. [App Store](https://apps.apple.com/us/app/fitbod-gym-fitness-planner/id1041517543), [SensAI (competitor source)](https://www.sensai.fit/blog/fitness-app-pricing-free-tier-comparison) · checked 2026-11-24
 - **Standouts:** non-linear periodization, workout modifiers, 1,000+ exercises with multi-angle videos, Strava/Fitbit/Apple Health. [App Store](https://apps.apple.com/us/app/fitbod-gym-fitness-planner/id1041517543) · checked 2026-11-24
 - **Recovery map:** shows how fresh each muscle group is. [TechRadar, 2023 review](https://www.techradar.com/health-fitness/fitbod-app-review) · checked 2026-11-24
@@ -74,6 +84,7 @@ Sources: [SensAI pricing article (competitor source)](https://www.sensai.fit/blo
 
 **Positioning:** older all-rounder, big library and community, now pushing an "Adaptive Plan".
 
+- **2026-11-28:** Store lists Elite $12.99/mo and $69.99/yr, plus other yearly SKUs ($34.99, $35.99) and legacy $6.99/$39.99. Free users get a 7-day Adaptive Plan trial. The privacy label lists Device ID used for third-party advertising. v17.4.0, 4.8 from 47K. A sampled reviewer who paid says they won't renew because of quality problems. [App Store](https://apps.apple.com/us/app/id449810000) · checked 2026-11-28
 - **Pricing:** free tier with ads; Elite $12.99/mo or $69.99/yr. [App Store](https://apps.apple.com/us/app/jefit-workout-plan-gym-tracker/id449810000) · checked 2026-11-24
 - **Standouts:** Adaptive Plan (12 weeks in blocks incl. deload, adjusts from logged sets); periodization for custom plans added Sept 2026; 1,400+ exercises; recovery chart and muscle map; 700+ official and 20,000+ community plans. [App Store](https://apps.apple.com/us/app/jefit-workout-plan-gym-tracker/id449810000), [Jefit blog (competitor source)](https://www.jefit.com/blog/fitbod-vs-strong-vs-jefit-vs-hevy) · checked 2026-11-24
 - **Rating:** 4.8 from ~47K. [App Store](https://apps.apple.com/us/app/jefit-workout-plan-gym-tracker/id449810000) · checked 2026-11-24
@@ -83,6 +94,12 @@ Sources: [SensAI pricing article (competitor source)](https://www.sensai.fit/blo
 
 **Positioning:** free library of known programs (nSuns, GZCLP, PHUL) and coach plans, with a tracker.
 
+- **2026-11-28:**
+  - **Free:** 14,000+ programs (99 of 132 coach programs), the tracker, RPE logging, PR boards, weekly report, program builder, Strength Score, and 10 uses of the plate calculator.
+  - **Pro:** the remaining coach programs, personalized programs, auto-progression, analytics and unlimited plate calculator.
+  - **Prices:** $59.99/yr with a 7-day trial, or $14.99/mo with no trial. Boostcamp says it doesn't offer a lifetime plan.
+
+  [Boostcamp, updated 2026-10-15](https://www.boostcamp.app/is-boostcamp-free) · checked 2026-11-28
 - **Pricing:** library free, no ads; Pro $14.99/mo or $59.99/yr with 7-day trial. [Boostcamp auto-progression page](https://www.boostcamp.app/features/auto-progression) · checked 2026-11-24
 - **Auto-progression (Pro):** adds weight after all targets are hit; double progression for rep ranges; after a missed set it estimates a lower hittable weight; a logged RPE above target *holds* the weight. No readiness input described. [Boostcamp](https://www.boostcamp.app/features/auto-progression) · checked 2026-11-24
 - **Standouts:** 11,000+ programs; in-session PR alerts; weekly Sunday reports and year-end "Wrapped"; Lock Screen timers; AI Coach program builder. [App Store](https://apps.apple.com/us/app/boostcamp-gym-workout-fitness/id1529354455) · checked 2026-11-24
