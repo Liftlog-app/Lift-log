@@ -522,6 +522,86 @@ button:disabled{cursor:default}
 .linkbtn{display:inline-flex;align-items:center;min-height:44px;margin-top:4px;padding:0;border:0;background:none;color:var(--pull);font:600 15px Barlow,sans-serif;cursor:pointer}
 #acct .btn{min-height:44px}
 #acct .btn.acalt{background:none;border:1px solid var(--line);color:var(--ink)}
+/* history tab */
+.hcal{background:var(--card);border-radius:14px;padding:12px 12px 4px;margin:0 0 12px;box-shadow:0 1px 0 var(--line)}
+.hcm{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 6px}
+.hcmt{margin:0;font:800 26px/1.1 "Barlow Condensed",Barlow,sans-serif;color:var(--ink)}.hcmt span{color:var(--mute);font-weight:600}
+.hcnav{display:flex;gap:6px}
+.hcnav button{width:44px;min-height:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.hcnav button:disabled{opacity:.35;cursor:default}
+.hdow,.hcg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
+.hdow span{font:700 12px Barlow,sans-serif;color:var(--mute);padding:2px 0 4px;letter-spacing:.04em}
+.hcgw{overflow:hidden;touch-action:pan-y}
+.hday{position:relative;min-height:44px;height:48px;width:100%;padding:0;border:0;border-radius:12px;background:none;color:var(--ink);font:600 16px Barlow,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.hday .hdn{line-height:1}
+.hday .hdots{display:flex;gap:3px;height:6px}
+.hday .hdots i{width:6px;height:6px;border-radius:50%}
+.hday.has{background:color-mix(in srgb,var(--c) 17%,transparent);font-weight:800}
+.hday.td{box-shadow:inset 0 0 0 2px var(--ink);font-weight:800}
+.hday.on{background:var(--ink);color:var(--bg);box-shadow:0 6px 16px rgb(0 0 0/.22)}
+.hday.on .hdots i{box-shadow:0 0 0 1.5px var(--bg)}
+.hday:disabled{color:var(--mute);opacity:.4;cursor:default}
+.hdayl{margin:6px 2px 8px;min-height:22px;font-size:14px;color:var(--mute)}.hdayl b{color:var(--ink)}
+.hdayl:empty{min-height:0;margin:0 0 8px}
+.hsum{grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 10px}
+@media(min-width:620px){.hsum{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.hsum .pr{border-radius:14px;padding:10px 12px}
+.hsum .pr b{font-size:clamp(24px,7.4vw,30px);margin:2px 0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hsum .pr b small{font:700 15px Barlow,sans-serif;color:var(--mute)}
+.hsum .pr span:last-child{font-size:13px}
+.hmix{display:flex;gap:3px;height:8px;border-radius:4px;overflow:hidden;margin:0 0 6px}
+.hmix i{display:block;min-width:6px}
+.hk-push{--k:var(--push)}.hk-pull{--k:var(--pull)}.hk-legs{--k:var(--legs)}.hk-other{--k:#8a919c}.hk-all{--k:var(--ink)}
+.hmix i,.hmixl i{background:var(--k)}
+.hmixl{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:13px;color:var(--mute);margin:0 0 14px}
+.hmixl span{display:flex;align-items:center;gap:6px}.hmixl i{width:8px;height:8px;border-radius:50%}
+.hfl{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.hf{min-height:44px;padding:0 16px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:800 17px "Barlow Condensed",Barlow,sans-serif;display:flex;align-items:center;gap:8px;cursor:pointer}
+.hf i{width:10px;height:10px;border-radius:50%;background:var(--k)}
+.hf[aria-pressed=true]{border-color:var(--k);background:color-mix(in srgb,var(--k) 16%,var(--card))}
+.hf.hk-all[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.hsrch{position:relative;margin:0 0 14px}
+.hsrch svg{position:absolute;left:12px;top:50%;width:20px;height:20px;margin-top:-10px;fill:none;stroke:var(--mute);stroke-width:2.2;stroke-linecap:round;pointer-events:none}
+.hsrch input{width:100%;min-height:44px;padding:0 12px 0 40px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 16px Barlow,sans-serif}
+.hvh{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.hlh{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:20px}.hlh span{font:700 13px Barlow,sans-serif;color:var(--mute);background:var(--card);border-radius:999px;padding:1px 9px}
+.hist.wcard{display:block;padding:0;border-radius:14px;margin-bottom:10px;overflow:hidden}
+.hist.wcard div{flex:initial}
+.hist.wcard .btn{min-height:44px}
+.whead{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.wdt{flex:none;width:46px;height:52px;border-radius:12px;background:var(--c);color:var(--on);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.wdt b{font:800 24px/1 "Barlow Condensed",Barlow,sans-serif}.wdt small{font:700 11px/1.2 Barlow,sans-serif;text-transform:uppercase;letter-spacing:.06em;opacity:.9}
+.wmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.wtl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wnm{font:800 21px/1.1 "Barlow Condensed",Barlow,sans-serif}
+.wpr{display:inline-block;font:800 12px/1.5 Barlow,sans-serif;letter-spacing:.04em;text-transform:uppercase;padding:0 8px;border-radius:999px;background:color-mix(in srgb,var(--legs) 24%,transparent);color:light-dark(#6e5100,#ffd34d);vertical-align:2px}
+.whead .meta{font-size:14px;line-height:1.35}
+.wnames{font-size:13px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wchev{flex:none;width:24px;height:24px;color:var(--mute)}.wchev svg{display:block;width:100%;height:100%}
+.wcard.open .wchev{transform:rotate(180deg)}
+.wbody{display:grid;grid-template-rows:0fr;visibility:hidden}
+.wcard.open .wbody{grid-template-rows:1fr;visibility:visible}
+.wclip{overflow:hidden;min-height:0}
+.wbin{margin:0 12px;padding:2px 0 12px;border-top:1px solid var(--line)}
+.wex{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.wex .thumb{width:44px!important;height:44px!important}
+.wexm{flex:1;min-width:0}.wexm>b{display:block;font-weight:700;line-height:1.25}
+.wsets{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.wset{font:600 14px/1.2 Barlow,sans-serif;font-variant-numeric:tabular-nums;padding:5px 9px;border-radius:8px;background:var(--field);border:1px solid var(--line)}
+.wset.ispr{border-color:var(--legs);background:color-mix(in srgb,var(--legs) 16%,var(--field))}
+.wset i{font-style:normal;font-weight:800;font-size:12px;margin-left:6px;color:light-dark(#6e5100,#ffd34d)}
+.wnone{margin:10px 0 0;color:var(--mute);font-size:14px}
+.wact{display:flex;gap:8px;padding-top:12px}.wact .btn{flex:1}
+@media(prefers-reduced-motion:no-preference){
+.wbody{transition:grid-template-rows .28s cubic-bezier(.2,.8,.3,1),visibility 0s linear .28s}
+.wcard.open .wbody{transition:grid-template-rows .28s cubic-bezier(.2,.8,.3,1)}
+.wchev{transition:transform .25s ease}
+.hcg.nx{animation:gNext .28s cubic-bezier(.2,.8,.3,1) both}.hcg.pv{animation:gPrev .28s cubic-bezier(.2,.8,.3,1) both}
+.hday.pop{animation:dPop .3s cubic-bezier(.34,1.56,.64,1)}
+.hday,.hf{transition:background .15s,color .15s}
+.hday:active:not(:disabled),.hf:active,.whead:active{transform:scale(.97)}
+}
+@media(prefers-reduced-motion:reduce){.wbody,.wcard.open .wbody,.wchev,.hday,.hf{transition:none!important}.hcg,.hday{animation:none!important}}
 </style>
 </head>
 <body>
@@ -1476,13 +1556,101 @@ function mountChart(pts){
 }
 
 function renderHistory(){
-  const rows=Object.entries(S.sessions).filter(([k,d])=>d.live||Object.keys(d.ex||{}).length).sort((a,b)=>a[1].date<b[1].date?1:a[1].date>b[1].date?-1:(b[1].updated||0)-(a[1].updated||0));
-  if(!rows.length){$('#main').innerHTML=`<div class="empty">No workouts logged yet.</div>`;return}
-  $('#main').innerHTML=rows.map(([id,d])=>{const sets=Object.values(d.ex||{}).flat(),vol=sets.reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0);
-    const nm=d.dn||(SESS[d.s]?SESS[d.s][0]:d.s);
-    return `<div class="hist" style="--c:${dayColor(d.s)}"><div><b>${esc(nm)}</b><div class="meta">${d.live?'<b class="livetag">In progress</b> · ':''}${fmtD(d.date)} · ${sets.length} set${sets.length===1?'':'s'} · ${Math.round(vol).toLocaleString()} ${unit()}${d.dur?' · '+d.dur+' min':''}</div></div>
-    <button class="btn" data-open="${esc(id)}">Open</button><button class="btn danger" data-del="${esc(id)}">${armed===id?'Confirm':'Delete'}</button></div>`}).join('');
+  const all=histRows();
+  if(!all.length){$('#main').innerHTML=`<div class="empty">No workouts logged yet.</div>`;return}
+  const H=HV,td=iso(today()),curM=td.slice(0,7);
+  if(!H.m){const past=all.filter(([,d])=>d.date<=td);H.m=all.some(([,d])=>d.date.slice(0,7)===curM)||!past.length?curM:past[0][1].date.slice(0,7)}
+  const firstM=all.reduce((m,[,d])=>d.date.slice(0,7)<m?d.date.slice(0,7):m,curM);
+  const [y,mo]=H.m.split('-').map(Number),first=new Date(y,mo-1,1).getDay(),n=new Date(y,mo,0).getDate();
+  const inM=all.filter(([,d])=>d.date.slice(0,7)===H.m),byDay={};
+  for(const r of [...inM].reverse())(byDay[r[1].date]=byDay[r[1].date]||[]).push(r[1]);
+  const prs=histPRs();
+  // calendar grid (same maths as openCal: Sunday first, blank cells before the 1st)
+  let g='';for(let i=0;i<first;i++)g+='<span></span>';
+  for(let dn=1;dn<=n;dn++){const v=iso(new Date(y,mo-1,dn)),ss=byDay[v]||[],fu=v>td,lv=ss.some(d=>d.live);
+    const nm=ss.map(d=>d.dn||(SESS[d.s]?SESS[d.s][0]:d.s)),lab=`${fmtD(v)}${v===td?', today':''}${ss.length?', '+nm.join(' and ')+(lv?' in progress':' logged'):''}`;
+    g+=`<button type="button" class="hday${v===td?' td':''}${v===H.sel?' on':''}${ss.length?' has':''}${lv?' live':''}" data-hd="${v}" style="--c:${ss.length?dayColor(ss[0].s):'transparent'}" aria-label="${esc(lab)}" aria-pressed="${v===H.sel}"${fu&&!ss.length?' disabled':''}><span class="hdn">${dn}</span><span class="hdots">${ss.slice(0,2).map(d=>`<i style="background:${dayColor(d.s)}"></i>`).join('')}</span></button>`}
+  // month summary (never filtered)
+  const vol=inM.reduce((t,[,d])=>t+Object.values(d.ex||{}).flat().reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0),0);
+  const prN=inM.reduce((t,[id])=>t+(prs[id]?Object.keys(prs[id]).length:0),0);
+  let run=0,best=0;for(let dn=1;dn<=n;dn++){if(byDay[iso(new Date(y,mo-1,dn))]){run++;best=Math.max(best,run)}else run=0}
+  const mix={push:0,pull:0,legs:0,other:0};for(const [,d] of inM)mix[histKind(d.s)]++;
+  const mixBar=inM.length?`<div class="hmix" role="img" aria-label="${esc(['push','pull','legs','other'].filter(k=>mix[k]).map(k=>mix[k]+' '+HKN[k]).join(', '))}">${['push','pull','legs','other'].filter(k=>mix[k]).map(k=>`<i class="hk-${k}" style="flex-grow:${mix[k]}"></i>`).join('')}</div><div class="hmixl" aria-hidden="true">${['push','pull','legs','other'].filter(k=>mix[k]).map(k=>`<span><i class="hk-${k}"></i>${HKN[k]} ${mix[k]}</span>`).join('')}</div>`:'';
+  const mName=new Date(y,mo-1,1).toLocaleDateString(undefined,{month:'long'});
+  const arr=d=>`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+  const a=document.activeElement,qf=a&&a.id==='hq'?[a.selectionStart,a.selectionEnd]:null;
+  $('#main').innerHTML=`<section class="hcal" aria-label="Workout calendar">
+    <div class="hcm"><h2 class="hcmt" aria-live="polite">${esc(mName)} <span>${y}</span></h2><div class="hcnav"><button type="button" data-hm="-1" aria-label="Previous month"${H.m<=firstM?' disabled':''}>${arr('M15 6l-6 6 6 6')}</button><button type="button" data-hm="1" aria-label="Next month"${H.m>=curM?' disabled':''}>${arr('M9 6l6 6-6 6')}</button></div></div>
+    <div class="hdow" aria-hidden="true">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div>
+    <div class="hcgw"><div class="hcg${H.dir?(H.dir>0?' nx':' pv'):''}">${g}</div></div>
+    <p class="hdayl" id="hday" aria-live="polite">${histDayLine()}</p></section>
+  <div class="prs hsum"><div class="pr"><span>Workouts</span><b>${inM.length}</b><span>in ${esc(mName)}</span></div><div class="pr"><span>Volume</span><b>${Math.round(vol).toLocaleString()}<small> ${unit()}</small></b><span>weight × reps</span></div><div class="pr"><span>PRs</span><b>${prN}</b><span>new est. 1RM best${prN===1?'':'s'}</span></div><div class="pr"><span>Longest streak</span><b>${best}</b><span>day${best===1?'':'s'} in a row</span></div></div>
+  ${mixBar}
+  <div class="hfl" role="group" aria-label="Filter by day type">${['all','push','pull','legs'].map(k=>`<button type="button" class="hf hk-${k}" data-hf="${k}" aria-pressed="${H.f===k}">${k==='all'?'':'<i></i>'}${k==='all'?'All':HKN[k]}</button>`).join('')}</div>
+  <div class="hsrch"><label for="hq" class="hvh">Search exercise</label><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="hq" type="search" placeholder="Search exercise" autocomplete="off" enterkeyhint="search" value="${esc(H.q)}"></div>
+  <div id="hlist">${histList(all,prs)}</div>`;
+  H.dir=0;
+  if(qf){const q=$('#hq');try{q.focus({preventScroll:true});q.setSelectionRange(qf[0],qf[1])}catch(e){}}
 }
+
+/* ---------- history tab ---------- */
+// History tab: month calendar, month summary, expandable workout cards, filters and search.
+// Read-only: it never writes sessions (Delete still goes through the shared data-del handler).
+const HV={m:null,sel:null,open:new Set(),f:'all',q:'',dir:0};
+const HKN={push:'Push',pull:'Pull',legs:'Legs',other:'Other'};
+const histReset=()=>{HV.m=null;HV.sel=null;HV.open=new Set();HV.f='all';HV.q='';HV.dir=0};
+const histRows=()=>Object.entries(S.sessions).filter(([k,d])=>d&&d.date&&(d.live||Object.keys(d.ex||{}).length)).sort((a,b)=>a[1].date<b[1].date?1:a[1].date>b[1].date?-1:(b[1].updated||0)-(a[1].updated||0));
+const histKind=s=>{const c=String(dayColor(s)).toLowerCase();return c==='#d8342c'?'push':c==='#2a63d4'?'pull':c==='#e0a800'?'legs':'other'};
+// PR events per session: {id:{lift:previous best}}. Same rule as Home "Recent records": beats every earlier session by >0.5%, first log is not a PR.
+function histPRs(){const by={},ev={};
+  const list=Object.entries(S.sessions).filter(([,d])=>d&&d.date&&d.ex).sort((a,b)=>a[1].date<b[1].date?-1:a[1].date>b[1].date?1:(a[1].updated||0)-(b[1].updated||0));
+  for(const [id,d] of list)for(const [n,st] of Object.entries(d.ex)){const v=bestEst(st);if(!v)continue;const p=by[n]||0;if(p&&v>p*1.005)(ev[id]=ev[id]||{})[n]=p;if(v>p)by[n]=v}
+  return ev}
+function histDayLine(){const v=HV.sel;if(!v)return '';const ss=histRows().filter(([,d])=>d.date===v);
+  if(!ss.length)return `No workout on ${esc(fmtD(v))}.`;
+  return `<b>${esc(fmtD(v))}</b> · ${esc(ss.map(([,d])=>d.dn||(SESS[d.s]?SESS[d.s][0]:d.s)).join(', '))} · tap the day again to clear`}
+function histList(all,prs){all=all||histRows();prs=prs||histPRs();const H=HV,q=H.q.trim().toLowerCase();
+  let rows=q?all.filter(([,d])=>Object.keys(d.ex||{}).some(n=>n.toLowerCase().includes(q))):all.filter(([,d])=>d.date.slice(0,7)===H.m);
+  const monthN=rows.length;if(H.f!=='all')rows=rows.filter(([,d])=>histKind(d.s)===H.f);
+  const head=q?`<h3 class="hlh">Results in all months <span>${rows.length}</span></h3>`:`<h3 class="hlh">${esc(new Date(H.m+'-01T00:00').toLocaleDateString(undefined,{month:'long',year:'numeric'}))} <span>${rows.length}</span></h3>`;
+  if(!rows.length)return head+`<div class="empty">${!q&&!monthN?'No workouts this month.':'No workouts match.'}</div>`;
+  return head+rows.map(([id,d],i)=>histCard(id,d,prs[id]||{},i)).join('')}
+function histCard(id,d,pr,i){const sets=Object.values(d.ex||{}).flat(),vol=sets.reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0);
+  const nm=d.dn||(SESS[d.s]?SESS[d.s][0]:d.s),c=dayColor(d.s),open=HV.open.has(id),pn=Object.keys(pr).length,dd=new Date(d.date+'T00:00');
+  const exs=Object.entries(d.ex||{}).filter(([,st])=>st&&st.length);
+  const names=exs.map(([n])=>n),sum=names.slice(0,3).map(esc).join(' · ')+(names.length>3?` · +${names.length-3}`:'');
+  const body=exs.map(([n,st])=>{const p=pr[n];return `<div class="wex"><span class="thumb">${exPic(n)}</span><div class="wexm"><b>${esc(n)}${p?' <span class="wpr">PR</span>':''}</b><div class="wsets">${st.map(x=>{const isPR=p&&estSet(x)>p*1.005&&+x.w>0&&+x.r>0;
+    return `<span class="wset${isPR?' ispr':''}">${+x.w?esc(x.w):'BW'} × ${esc(x.r||0)}${+x.e?' · RPE '+esc(x.e):''}${isPR?'<i aria-label="personal record">PR</i>':''}</span>`}).join('')}</div></div></div>`}).join('')||'<p class="wnone">No sets logged yet.</p>';
+  return `<article class="hist wcard${open?' open':''}" style="--c:${c};--on:${onC(c)}" data-hid="${esc(id)}">
+  <button type="button" class="whead" data-hx="${esc(id)}" aria-expanded="${open}" aria-controls="hb${i}"><span class="wdt" aria-hidden="true"><b>${dd.getDate()}</b><small>${esc(dd.toLocaleDateString(undefined,{weekday:'short'}))}</small></span><span class="wmain"><span class="wtl"><b class="wnm">${esc(nm)}</b>${pn?`<span class="wpr">${pn} PR${pn>1?'s':''}</span>`:''}</span><span class="meta">${d.live?'<b class="livetag">In progress</b> · ':''}${fmtD(d.date)} · ${sets.length} set${sets.length===1?'':'s'} · ${Math.round(vol).toLocaleString()} ${unit()}${d.dur?' · '+d.dur+' min':''}</span>${sum?`<span class="wnames">${sum}</span>`:''}</span><span class="wchev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button>
+  <div class="wbody" id="hb${i}"><div class="wclip"><div class="wbin">${body}<div class="wact"><button class="btn" data-open="${esc(id)}">Open</button><button class="btn danger" data-del="${esc(id)}">${armed===id?'Confirm':'Delete'}</button></div></div></div></div></article>`}
+// Apply selection and open state to the existing DOM, so expanding animates instead of re-rendering.
+function histSync(){
+  for(const b of document.querySelectorAll('#main .hday')){const on=b.dataset.hd===HV.sel;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);if(on){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}}
+  for(const c of document.querySelectorAll('#main .wcard')){const o=HV.open.has(c.dataset.hid);c.classList.toggle('open',o);const h=c.querySelector('[data-hx]');if(h)h.setAttribute('aria-expanded',o)}
+  const l=$('#hday');if(l)l.innerHTML=histDayLine()}
+function histMonth(k){const [y,mo]=HV.m.split('-').map(Number),d=new Date(y,mo-1+k,1),m=iso(d).slice(0,7);
+  if(m>iso(today()).slice(0,7))return;HV.m=m;HV.sel=null;HV.dir=k;haptic(5);render()}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-tab="history"]');if(t&&view.tab!=='history'&&!t.closest('#main'))histReset()},true);
+$('#main').addEventListener('click',e=>{if(view.tab!=='history')return;const b=e.target.closest&&e.target.closest('[data-hm],[data-hd],[data-hx],[data-hf]');if(!b||b.disabled)return;
+  if(b.dataset.hm){histMonth(+b.dataset.hm);return}
+  if(b.dataset.hx){const id=b.dataset.hx,o=!HV.open.has(id);if(o)HV.open.add(id);else HV.open.delete(id);histSync();haptic(6);return}
+  if(b.dataset.hf){HV.f=b.dataset.hf;haptic(5);render();return}
+  if(b.dataset.hd){const v=b.dataset.hd;if(HV.sel===v){HV.sel=null;histSync();return}
+    HV.sel=v;haptic(10);const ids=histRows().filter(([,d])=>d.date===v).map(([id])=>id);
+    if(!ids.length){histSync();return}
+    HV.open=new Set(ids);let re=false;if(HV.q){HV.q='';re=true}
+    if(HV.f!=='all'&&!ids.some(id=>histKind(S.sessions[id].s)===HV.f)){HV.f='all';re=true}
+    if(re)render();else histSync();
+    const el=[...document.querySelectorAll('#main .wcard')].find(c=>c.dataset.hid===ids[0]);
+    if(el&&el.scrollIntoView)try{el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})}catch(err){}}
+});
+$('#main').addEventListener('input',e=>{if(view.tab!=='history'||e.target.id!=='hq')return;HV.q=e.target.value.slice(0,60);const l=$('#hlist');if(l)l.innerHTML=histList()});
+{let sx=null,sy=0;
+  $('#main').addEventListener('pointerdown',e=>{sx=view.tab==='history'&&e.target.closest&&e.target.closest('.hcgw')?e.clientX:null;sy=e.clientY});
+  $('#main').addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){const nb=document.querySelector(`#main [data-hm="${dx<0?1:-1}"]`);if(nb&&!nb.disabled)histMonth(dx<0?1:-1)}})}
+/* ---------- end history tab ---------- */
 
 /* ================= Accounts + cloud backup (Supabase, plain fetch, no library) ================= */
 // One private row per user in public.liftlog_data (see ops/accounts/schema.sql). Local storage stays the source of truth;
