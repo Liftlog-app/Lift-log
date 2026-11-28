@@ -977,6 +977,8 @@ function renderToday(){
   if(!p.days.length){$('#main').innerHTML='<div class="empty">Your program has no days yet. Add one in the Program tab.</div>';return}
   if(!view.date)view.date=iso(today());
   if(!view.k)view.k=nextDay();
+  // A finished past week picked while ahead of the calendar lands on today: open that day's finished session instead of offering a duplicate Start.
+  if(view.W&&view.W<curW()&&view.date===iso(today())&&!S.sessions[vid()]){const dw=doneThisWeek(view.k,view.W);if(dw)view.date=dw.date}
   const id=vid(),saved=S.sessions[id],P=curPlan(),u=unit(),W=vW(),wk=wkOf(W),CW=curW();
   const day=p.days.find(d=>d.k===view.k),c=dayColor(view.k),dn=day?day.n:(saved&&saved.dn)||'Workout';
   const isToday=view.date===iso(today()),rt=readyToday();
