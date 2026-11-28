@@ -336,6 +336,7 @@ h1{font-size:24px}
 .stp,.stp.good,.stp.warn,.stp.pain{flex:none;min-height:36px;border:0;background:var(--card);color:var(--mute);font-size:13px;white-space:nowrap}
 .stp.good{color:var(--ok)}.stp.warn{color:light-dark(#8a5200,#ffcf8a)}.stp.pain{color:light-dark(#b3261e,#ff9f99)}
 .stp.live{border:0;background:color-mix(in srgb,var(--ok) 16%,var(--card))}
+.stp[data-wtoday]{min-height:44px}.stp[data-wtoday] b{color:var(--ink);font-weight:700}
 .head{margin:0 0 10px}
 .head h2{font-size:32px}
 .hnav{gap:0}
@@ -661,7 +662,8 @@ function periodize(ex,wk){
   if(wk<=14){const [st,r,rpe,pct]=B3W[wk];return [{n:ex[0].n,sets:st,reps:r,rpe,note:pct}].concat(ex.slice(1).map(e=>({n:e.n,sets:2,reps:'6–8',rpe:8})))}
   return [{n:ex[0].n,sets:5,reps:'3',rpe:10,note:'Ramp up to a new 3-rep max',test:true}];
 }
-const sidFor=(date,k)=>Object.keys(S.sessions).find(id=>S.sessions[id].date===date&&S.sessions[id].s===k)||`${date}_${k}`;
+// Default session for a date/day. When two share it (e.g. a finished Week 2 and a live Week 4 started the same day), the live one wins.
+const sidFor=(date,k)=>{const ids=Object.keys(S.sessions).filter(id=>S.sessions[id].date===date&&S.sessions[id].s===k);return ids.find(id=>S.sessions[id].live===true)||ids[0]||`${date}_${k}`};
 const AREAS={
  neck:{l:'neck',pair:false,re:/shrug|overhead press|back squat/i,sw:{'Back squat':'Leg press','Pause squat':'Leg press','DB shrug':'Face pull','Overhead press':'Landmine press'}},
  shoulder:{l:'shoulder',pair:true,re:/bench|^(?!.*leg).*press|dips|fly|lateral|push-up|pull-up|chin|skull|upright|arnold/i,sw:{'Bench press':'Floor press','DB bench press':'Floor press','Overhead press':'Landmine press','Seated DB shoulder press':'Landmine press','Arnold press':'Landmine press','Machine shoulder press':'Landmine press','Incline barbell press':'Neutral-grip DB press','Incline DB press':'Neutral-grip DB press','Weighted dips':'Machine chest press','Close-grip bench':'Triceps pushdown','Skull crusher':'Triceps pushdown','Overhead triceps extension':'Triceps pushdown','Pull-up (weighted)':'Neutral-grip pulldown','Chin-up':'Neutral-grip pulldown','Lat pulldown':'Neutral-grip pulldown','DB lateral raise':'Cable lateral raise','Upright row (wide grip)':'Cable lateral raise','Push-up (weighted)':'Machine chest press','DB fly':'Pec deck','Cable fly':'Pec deck'}},
@@ -701,22 +703,39 @@ function painAdjust(x,key){
   return Object.assign({},x,{pain:`Your ${lab} is at ${top.lvl}/10: go by feel and stop if it gets worse.`,mild:true});
 }
 function curPlan(){
-  const p=prog(),wk=wkOf(wOf(view.date)),day=p.days.find(d=>d.k===view.k);
-  let P=[];
-  if(day)P=p.ppl&&B1[view.k]?pplPlan(wk,view.k):p.periodize?periodize(day.ex,wk):day.ex.map(e=>({n:e.n,sets:e.sets,reps:e.reps,rpe:null}));
-  const sv=S.sessions[sidFor(view.date,view.k)];
-  const sid=sidFor(view.date,view.k);P=P.map(x=>painAdjust(x,sid+'|'+x.n));
+  let P=planFor(view.k,wkOf(vW()));
+  const sv=S.sessions[vid()];
+  const sid=vid();P=P.map(x=>painAdjust(x,sid+'|'+x.n));
   const own=new Set(P.filter(x=>!x.skip&&!x.porig).map(x=>x.n)),seen=new Set();
   P=P.map(x=>{if(x.porig&&(own.has(x.n)||seen.has(x.n)))return Object.assign({},x,{skip:true,n:x.porig,pain:`Skipped: its joint-friendly swap (${x.n}) is already in today's workout. Add a set there instead.`});if(x.porig)seen.add(x.n);return x});
   if(sv&&sv.ex){for(const n in sv.ex)if(!P.some(x=>x.n===n||x.orig===n||(x.porig===n&&!sv.ex[x.n])))P.push({n,sets:sv.ex[n].length,reps:'',rpe:null,extra:true})}
   return P;
 }
-const doneThisWeek=(k,W)=>Object.values(S.sessions).find(d=>d.s===k&&wOf(d.date)===W&&d.ex&&Object.keys(d.ex).length);
+// Program weeks. A session belongs to the week it was done for: `pw` (saved only when that differs from its calendar week,
+// e.g. Week 2 started early because Week 1 was finished), else its calendar week. Old sessions have no pw and keep working.
+const sW=d=>d&&d.pw>0?d.pw:wOf(d.date);
+const isLogged=d=>!!(d&&d.ex&&Object.keys(d.ex).length);
+const doneThisWeek=(k,W)=>Object.values(S.sessions).find(d=>d.s===k&&sW(d)===W&&isLogged(d));
+function planFor(k,wk){const p=prog(),day=p.days.find(d=>d.k===k);if(!day)return [];return p.ppl&&B1[k]?pplPlan(wk,k):p.periodize?periodize(day.ex,wk):day.ex.map(e=>({n:e.n,sets:e.sets,reps:e.reps,rpe:null}))}
+// A week is complete when every day that has exercises that week has a finished session with sets.
+function weekDone(W){const ds=prog().days.filter(d=>planFor(d.k,wkOf(W)).length);if(!ds.length)return false;const ss=Object.values(S.sessions);return ds.every(d=>ss.some(x=>x.s===d.k&&sW(x)===W&&isLogged(x)&&!x.live))}
+// Current week: the calendar week, moved on past every week that is already complete.
+function curW(){let c=wOf(iso(today()));for(let i=0;i<520&&weekDone(c);i++)c++;return c}
+// Week shown in the Workout tab: picked week (view.W), else the saved session's week, else the current week for today.
+function vW(){if(view.W)return view.W;const td=iso(today()),s=S.sessions[sidFor(view.date,view.k)];if(s)return sW(s);if(view.date===td)return curW();return wOf(view.date)+(view.date>td?Math.max(0,curW()-wOf(td)):0)}
+// Session id for the Workout tab. With a picked week, only a session of that week on that date matches.
+function vid(){if(!view.W)return sidFor(view.date,view.k);const dt=view.date,k=view.k,ids=Object.keys(S.sessions).filter(id=>S.sessions[id].date===dt&&S.sessions[id].s===k);return ids.find(id=>sW(S.sessions[id])===view.W)||(ids.length||S.sessions[`${dt}_${k}`]?`${dt}_${k}_w${view.W}`:`${dt}_${k}`)}
+// Jump the Workout tab to week W. This and future weeks open on today so they can be started; past weeks open on the same weekday of that week.
+function goWeek(W){const td=iso(today()),from=view.date||td;W=Math.max(1,W);view.W=W;view.swap=null;
+  if(W>=curW()){view.date=td;return}
+  const d=new Date(from+'T00:00');d.setDate(d.getDate()+(W-wOf(from))*7);const x=iso(d);view.date=x>td?td:x}
 function nextDay(){
   const days=prog().days;if(!days.length)return null;
-  const td=Object.values(S.sessions).find(d=>d.date===iso(today())&&days.some(x=>x.k===d.s));if(td)return td.s;
+  const tds=Object.values(S.sessions).filter(d=>d.date===iso(today())&&days.some(x=>x.k===d.s)),td=tds.find(d=>d.live===true)||tds[0];if(td&&(td.live||sW(td)>=curW()))return td.s;
   const last=Object.values(S.sessions).filter(d=>days.some(x=>x.k===d.s)).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(b.updated||0)-(a.updated||0))[0];
-  if(!last)return days[0].k;return days[(days.findIndex(x=>x.k===last.s)+1)%days.length].k;
+  const i0=last?(days.findIndex(x=>x.k===last.s)+1)%days.length:0,W=curW();
+  for(let j=0;j<days.length;j++){const k=days[(i0+j)%days.length].k;if(!doneThisWeek(k,W))return k}
+  return days[i0].k;
 }
 
 async function putProfile(patch){const p=Object.assign({start:startISO(),unit:unit(),swaps:swaps(),program:prog(),timer:tm()},S.profile||{},patch);S.profile=p;saveLocal();render();if(mode==='db'){try{await profRef.set(p)}catch(e){flash='Could not save settings.';render()}}}
@@ -733,16 +752,16 @@ function collect(){
   return ex;
 }
 function sessionDoc(ex){
-  const id=sidFor(view.date,view.k),old=S.sessions[id],W=wOf(view.date),day=prog().days.find(d=>d.k===view.k);
-  const doc={date:view.date,W,wk:wkOf(W),s:view.k,dn:day?day.n:(old&&old.dn)||view.k,ex,updated:Date.now()};
+  const id=vid(),old=S.sessions[id],W=vW(),day=prog().days.find(d=>d.k===view.k);
+  const doc={date:view.date,W,wk:wkOf(W),s:view.k,dn:day?day.n:(old&&old.dn)||view.k,ex,updated:Date.now()};if(W!==wOf(view.date))doc.pw=W;
   if(old){for(const f of ['start','end','dur','live'])if(old[f]!=null)doc[f]=old[f]}
   doc.act=old&&JSON.stringify(old.ex||{})===JSON.stringify(ex)?(old.act||old.updated||Date.now()):Date.now();const rt=readyToday();if(rt)doc.rd={sl:rt.sl,so:rt.so,en:rt.en};return [id,doc];
 }
 const liveSess=()=>Object.entries(S.sessions).find(([k,d])=>d.live===true);
 async function startWorkout(){
-  flush();const now=Date.now(),id=sidFor(view.date,view.k),old=S.sessions[id],W=wOf(view.date),day=prog().days.find(d=>d.k===view.k);
+  flush();const now=Date.now(),id=vid(),old=S.sessions[id],W=vW(),day=prog().days.find(d=>d.k===view.k);
   const other=liveSess();if(other&&other[0]!==id)await endSession(other[0],other[1]);
-  const doc=Object.assign({date:view.date,W,wk:wkOf(W),s:view.k,dn:day?day.n:view.k,ex:{}},old||{},{start:now,live:true,updated:now});delete doc.end;delete doc.dur;
+  const doc=Object.assign({date:view.date,W,wk:wkOf(W),s:view.k,dn:day?day.n:view.k,ex:{}},W!==wOf(view.date)?{pw:W}:{},old||{},{start:now,live:true,updated:now});delete doc.end;delete doc.dur;
   const rt=readyToday();if(rt)doc.rd={sl:rt.sl,so:rt.so,en:rt.en};
   flash='';await putSession(id,doc);
 }
@@ -788,7 +807,7 @@ function platHint(t,i,x,key){
   return `<div class="hint plat"><b>Stalled for ${t} workouts.</b> ${fix}${low!=null&&low<=3?' Low readiness today too: check sleep and food first.':''}${btn?`<div style="margin-top:6px">${btn}</div>`:''}</div>`;
 }
 function ghostFor(name,id){
-  const W=wOf(view.date),ss=Object.entries(S.sessions).filter(([k,d])=>k!==id&&d.date<=view.date&&d.ex&&d.ex[name]&&d.ex[name].length);
+  const W=vW(),ss=Object.entries(S.sessions).filter(([k,d])=>k!==id&&d.date<=view.date&&d.ex&&d.ex[name]&&d.ex[name].length);
   if(!ss.length)return null;
   if(prog().periodize){const lc=ss.find(([k,d])=>d.s===view.k&&d.W===W-15);if(lc)return {lab:'last cycle',sets:lc[1].ex[name]}}
   const l=lastFor(name,id,view.date);return l?{lab:fmtD(l.date),sets:l.sets}:null;
@@ -921,7 +940,7 @@ function exPic(n,big){const id=PHOTOS[n];if(!id)return figSVG(n);const f=`img/ex
 document.addEventListener('error',e=>{const t=e.target;if(!t||t.tagName!=='IMG')return;const box=t.closest('.phanim')||t;const n=box.dataset.fb;if(n&&box.isConnected){const d=document.createElement('div');d.innerHTML=figSVG(n);box.replaceWith(d.firstChild)}},true);
 function equipOf(n){if(/\bDB\b|dumbbell/i.test(n))return 'Dumbbells';if(/landmine|t-bar/i.test(n))return 'Landmine';if(/trap-bar/i.test(n))return 'Trap bar';if(/band/i.test(n))return 'Band';if(/cable|rope|pushdown|face pull|pulldown|crunch/i.test(n))return 'Cable';if(/machine|pec deck|leg press|leg curl|leg extension|hack|seated calf|leg-press/i.test(n))return 'Machine';if(/pull-up|chin|dips|push-up|hanging|nordic|plank|ab wheel|sissy|spanish/i.test(n))return 'Bodyweight';if(isBarbell(n))return 'Barbell';return ''}
 function refreshCard(card){
-  const i=+card.dataset.card,x0=curPlan()[i];if(!x0)return;const id=sidFor(view.date,view.k),key=id+'|'+x0.n;
+  const i=+card.dataset.card,x0=curPlan()[i];if(!x0)return;const id=vid(),key=id+'|'+x0.n;
   const x=deloadNow[key]?Object.assign({},x0,{sets:Math.ceil(x0.sets/2)}):x0;
   const ins=[...card.querySelectorAll('input[data-f=w]')],rows=[],cell=(f,k)=>card.querySelector(`input[data-f=${f}][data-k="${k}"]`);
   for(const wi of ins){const k=wi.dataset.k;if(+cell('r',k).value>0&&wi.value!=='')rows.push({w:wi.value,r:cell('r',k).value,e:cell('e',k).value,t:rpeFor(x)})}
@@ -933,13 +952,13 @@ function refreshCard(card){
 }
 
 function renderHeader(){
-  const p=prog(),W=wOf(iso(today())),wk=wkOf(W),cyc=Math.floor((W-1)/15)+1;
+  const p=prog(),W=curW(),wk=wkOf(W),cyc=Math.floor((W-1)/15)+1;
   if(needsSetup()){$('#sub').textContent='Pick a program to get started';$('#stripbox').innerHTML='';return}
   if(p.periodize&&view.tab==='home'){$('#sub').innerHTML=`<b>${(()=>{const h=new Date().getHours();return h<12?'Good morning':h<18?'Good afternoon':'Good evening'})()}</b> · ${new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}`;$('#stripbox').innerHTML='';return}
   if(view.tab==='home'){$('#sub').innerHTML=`<b>${(()=>{const h=new Date().getHours();return h<12?'Good morning':h<18?'Good afternoon':'Good evening'})()}</b> · ${new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}`;$('#stripbox').innerHTML='';return}
   if(p.periodize){
     $('#sub').innerHTML=`<b>Week ${wk} of 15 · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}</b>${cyc>1?' · Cycle '+cyc:''} · ${esc(p.name.replace(/ · 15-week blocks/,''))}`;
-    $('#stripbox').innerHTML=`<div class="strip" aria-label="Weeks 1 to 15. Tap a week to view it.">${(()=>{const VW=wOf(view.date||iso(today())),base=Math.floor((VW-1)/15)*15;return Array.from({length:15},(_,i)=>{const a=base+i+1;return `<button class="b${blk(i+1)}${(i+1)%5===0?' dl':''}${a===W?' now':''}${a===VW&&a!==W?' sel':''}" data-jw="${a}" aria-label="Week ${i+1}${a===W?', this week':''}">${i+1}</button>`}).join('')})()}</div><div class="blocks"><span>Hypertrophy</span><span>Strength</span><span>Peak</span></div>`;
+    $('#stripbox').innerHTML=`<div class="strip" aria-label="Weeks 1 to 15. Tap a week to view it.">${(()=>{const VW=view.date?vW():W,base=Math.floor((VW-1)/15)*15;return Array.from({length:15},(_,i)=>{const a=base+i+1;return `<button class="b${blk(i+1)}${(i+1)%5===0?' dl':''}${a===W?' now':''}${a===VW&&a!==W?' sel':''}" data-jw="${a}" aria-label="Week ${i+1}${a===W?', this week':''}">${i+1}</button>`}).join('')})()}</div><div class="blocks"><span>Hypertrophy</span><span>Strength</span><span>Peak</span></div>`;
   }else{$('#sub').innerHTML=`<b>Week ${W}</b> · ${esc(p.name)}`;$('#stripbox').innerHTML=''}
 }
 
@@ -959,18 +978,21 @@ function renderToday(){
   if(!p.days.length){$('#main').innerHTML='<div class="empty">Your program has no days yet. Add one in the Program tab.</div>';return}
   if(!view.date)view.date=iso(today());
   if(!view.k)view.k=nextDay();
-  const id=sidFor(view.date,view.k),saved=S.sessions[id],P=curPlan(),u=unit(),W=wOf(view.date),wk=wkOf(W);
+  // A finished past week picked while ahead of the calendar lands on today: open that day's finished session instead of offering a duplicate Start.
+  if(view.W&&view.W<curW()&&view.date===iso(today())&&!S.sessions[vid()]){const dw=doneThisWeek(view.k,view.W);if(dw)view.date=dw.date}
+  const id=vid(),saved=S.sessions[id],P=curPlan(),u=unit(),W=vW(),wk=wkOf(W),CW=curW();
   const day=p.days.find(d=>d.k===view.k),c=dayColor(view.k),dn=day?day.n:(saved&&saved.dn)||'Workout';
   const isToday=view.date===iso(today()),rt=readyToday();
   const doneW=dw=>dw&&!saved?'Done '+fmtD(dw.date):'';
   let h=`<div class="chips" role="tablist">${p.days.map(d=>{const dn2=doneThisWeek(d.k,W);return `<button class="chip${dn2?' done':''}" style="--c:${d.c}" data-s="${esc(d.k)}" aria-pressed="${d.k===view.k}" aria-label="${esc(d.n)}${dn2?', done this week':''}">${esc(d.n)}</button>`}).join('')}</div>
-  <section class="wbanner" style="--c:${c};--on:${onC(c)};${bgImg(P)}"><div class="head"><div class="ht"><h2>${esc(dn)}</h2><div class="meta">${p.periodize?`Week ${wk} · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}`:`Week ${W}`}${(()=>{const t=doneW(doneThisWeek(view.k,W));return t?' · '+t:view.k===nextDay()&&!saved&&isToday?' · up next':''})()}${saved&&saved.dur?` · ${saved.dur} min`:''}</div></div>
+  <section class="wbanner" style="--c:${c};--on:${onC(c)};${bgImg(P)}"><div class="head"><div class="ht"><h2>${esc(dn)}</h2><div class="meta">${p.periodize?`Week ${wk} · ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}`:`Week ${W}`}${(()=>{const t=doneW(doneThisWeek(view.k,W));return t?' · '+t:view.k===nextDay()&&!saved&&isToday&&W===CW?' · up next':''})()}${saved&&saved.dur?` · ${saved.dur} min`:''}</div></div>
   <div class="hnav"><button class="ib" data-wnav="-7" aria-label="Previous week">‹</button><input type="date" id="wdate" value="${view.date}" aria-label="Workout date"><button class="ib" data-wnav="7" aria-label="Next week">›</button></div></div>`;
   const live=saved&&saved.live===true;
   if(isToday&&!live&&!(saved&&saved.end)&&P.some(z=>!z.skip))h+=`<button class="startbtn" data-wstart="1" style="--c:${c};--on:${onC(c)}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>${saved?'Start timing this workout':'Start workout'}</button>`;
   h+='</section>';
   const st=[];
-  if(!isToday)st.push(`<button class="stp" data-wtoday="1">${view.date>iso(today())?`Looking ahead to ${fmtD(view.date)}`:`Viewing ${fmtD(view.date)}`} · back to today</button>`);
+  if(!isToday)st.push(`<button class="stp" data-wtoday="1">${view.date>iso(today())?`Looking ahead to ${fmtD(view.date)}`:`Viewing ${fmtD(view.date)}`} · <b>back to today</b></button>`);
+  else if(W!==CW)st.push(`<button class="stp" data-wtoday="1">${W>CW?'Looking ahead to':'Viewing'} Week ${p.periodize?wk:W} · <b>back to this week</b></button>`);
   if(rt&&isToday){const v=readyScore(rt),adj=readyAdj();st.push(`<button class="stp${v>=4.5?' good':adj<0?' warn':''}" data-rchange="1">Readiness ${v.toFixed(1)}/5 · ${adj<0?`targets −${-adj} RPE`:v>=4.5?'PR day':'normal targets'}</button>`)}
   {const td=today().getDay(),cw=wOf(iso(today())),rw=td===0?cw:cw-1;if((td===0||td===1)&&rw>=1&&isToday&&Object.values(S.sessions).some(d=>wOf(d.date)===rw))st.push(`<button class="stp good" data-report="${rw}">Week ${prog().periodize?wkOf(rw):rw} report ready →</button>`)}
   const act=Object.entries(pains()).filter(([k,v])=>v&&v.lvl>0).sort((a,b)=>b[1].lvl-a[1].lvl);
@@ -1270,7 +1292,7 @@ async function setPain(k,lvl){
 function renderHome(){
   if(needsSetup())return renderSetup();
   if(booting&&!Object.keys(S.sessions).length){$('#main').innerHTML='<div class="empty">Loading your log…</div>';return}
-  const p=prog(),td=iso(today()),W=wOf(td),wk=wkOf(W),u=unit();
+  const p=prog(),td=iso(today()),cW=wOf(td),W=curW(),wk=wkOf(W),u=unit();
   const logged=Object.values(S.sessions).filter(d=>Object.keys(d.ex||{}).length);
   const L=liveSess(),todayDone=logged.filter(d=>d.date===td&&!d.live);
   const k=L?L[1].s:nextDay(),day=p.days.find(d=>d.k===k);
@@ -1278,9 +1300,9 @@ function renderHome(){
   let hero='';
   if(!p.days.length)hero=`<section class="hero" style="--c:#596170"><div class="eyebrow">Today</div><h2>No days in your program yet</h2><button class="herobtn" data-gotab="program">Build your program</button></section>`;
   else if(L){const age=Date.now()-L[1].start;
-    hero=`<section class="hero" style="--c:${dayColor(L[1].s)};--on:${onC(dayColor(L[1].s))}"><div class="eyebrow"><span class="dot"></span>Workout in progress</div><h2>${esc(L[1].dn||day&&day.n||'Workout')}</h2><div class="hmeta"><span id="homelive">${mmss(age/1000)}</span> · ${Object.values(L[1].ex||{}).flat().length} sets logged</div><div style="margin-top:14px"><button class="herobtn" data-hgo="${esc(L[1].s)}" data-hdate="${L[1].date}">Continue workout</button></div></section>`}
+    hero=`<section class="hero" style="--c:${dayColor(L[1].s)};--on:${onC(dayColor(L[1].s))}"><div class="eyebrow"><span class="dot"></span>Workout in progress</div><h2>${esc(L[1].dn||day&&day.n||'Workout')}</h2><div class="hmeta"><span id="homelive">${mmss(age/1000)}</span> · ${Object.values(L[1].ex||{}).flat().length} sets logged</div><div style="margin-top:14px"><button class="herobtn" data-hgo="${esc(L[1].s)}" data-hdate="${L[1].date}" data-hw="${sW(L[1])}">Continue workout</button></div></section>`}
   else{
-    const saveView={date:view.date,k:view.k};view.date=td;view.k=k;const P=curPlan().filter(x=>!x.skip&&!x.extra);view.date=saveView.date;view.k=saveView.k;
+    const saveView={date:view.date,k:view.k,W:view.W};view.date=td;view.k=k;view.W=null;const P=curPlan().filter(x=>!x.skip&&!x.extra);view.date=saveView.date;view.k=saveView.k;view.W=saveView.W;
     const sets=P.reduce((a,x)=>a+(+x.sets||0),0),past=logged.filter(d=>d.s===k&&d.dur),mins=past.length?Math.round(past.reduce((a,d)=>a+d.dur,0)/past.length/5)*5:Math.max(20,Math.round(sets*2.6/5)*5);
     const done=todayDone.length?todayDone[todayDone.length-1]:null;
     hero=`<section class="hero" style="--c:${day.c};--on:${onC(day.c)};${bgImg(P)}"><div class="eyebrow">${done?'Done today ✓ · up next':'Today'}${p.periodize?` · Week ${wk} ${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test':''}`:''}</div><h2>${esc(day.n)}</h2>
@@ -1289,11 +1311,11 @@ function renderHome(){
     <div class="row" style="gap:8px;margin-top:14px"><button class="herobtn" data-hstart="${esc(k)}">Start workout</button><button class="herobtn ghostbtn" data-hgo="${esc(k)}" data-hdate="${td}">Preview</button></div>
     ${done?`<p class="hmeta" style="margin:10px 0 0">Today you did ${esc(done.dn||'a workout')}${done.dur?' in '+done.dur+' min':''}.</p>`:''}</section>`}
   // ---- this week
-  const ws=weekStartISO(W),days=Array.from({length:7},(_,i)=>{const d=new Date(ws+'T00:00');d.setDate(d.getDate()+i);return iso(d)});
-  const weekLogs=logged.filter(d=>wOf(d.date)===W);
+  const ws=weekStartISO(cW),days=Array.from({length:7},(_,i)=>{const d=new Date(ws+'T00:00');d.setDate(d.getDate()+i);return iso(d)});
+  const weekLogs=logged.filter(d=>wOf(d.date)===cW);
   const wkStrip=`<div class="wk">${days.map(dt=>{const ss=logged.filter(d=>d.date===dt),dd=new Date(dt+'T00:00');return `<div class="wd${dt===td?' today':''}${dt>td?' future':''}"><span class="wl">${dd.toLocaleDateString(undefined,{weekday:'narrow'})}</span><span class="wn">${dd.getDate()}</span><span class="wdots">${ss.slice(0,2).map(d=>`<i style="background:${dayColor(d.s)}"></i>`).join('')||'<i class="none"></i>'}</span></div>`}).join('')}</div>`;
   // streak: consecutive weeks (ending this week or last) with >=min(3,days) workouts
-  const need=Math.min(3,p.days.length||3);let streak=0;for(let w=W-(weekLogs.length>=need?0:1);w>=1;w--){if(logged.filter(d=>wOf(d.date)===w).length>=need)streak++;else break}
+  const need=Math.min(3,p.days.length||3);let streak=0;for(let w=cW-(weekLogs.length>=need?0:1);w>=1;w--){if(logged.filter(d=>wOf(d.date)===w).length>=need)streak++;else break}
   const vol=weekLogs.reduce((t,d)=>t+Object.values(d.ex).flat().reduce((x,q)=>x+(+q.w||0)*(+q.r||0),0),0);
   // recent PRs (last 21 days)
   const cut=(()=>{const d=today();d.setDate(d.getDate()-21);return iso(d)})(),prs=[];
@@ -1305,7 +1327,7 @@ function renderHome(){
     block=`<section class="hcard"><div class="hct"><b>Week ${wk} of 15</b><span class="meta">${BNAME[blk(wk)]}${wk===5||wk===10?' deload':wk===15?' test week':''}</span></div><div class="bar15">${Array.from({length:15},(_,i)=>`<i class="b${blk(i+1)}${i+1<wk?' past':i+1===wk?' now':''}"></i>`).join('')}</div><div class="meta" style="margin-top:6px">${nb.t} ${left===1?'next week':'in '+left+' weeks'}</div></section>`}
   // pains + report shortcuts
   const act=Object.entries(pains()).filter(([kk,v])=>v&&v.lvl>0);
-  const tdw=today().getDay(),rw=tdw===0?W:W-1,hasRep=rw>=1&&logged.some(d=>wOf(d.date)===rw);
+  const tdw=today().getDay(),rw=tdw===0?cW:cW-1,hasRep=rw>=1&&logged.some(d=>wOf(d.date)===rw);
   $('#main').innerHTML=hero+`
   <section class="hcard"><div class="hct"><b>This week</b><span class="meta">${weekLogs.length}${p.days.length?' of '+p.days.length:''} workouts</span></div>${wkStrip}
   <div class="hstats"><div><b>${streak}</b><span>week streak</span></div><div><b>${Math.round(vol).toLocaleString()}</b><span>${u} lifted</span></div><div><b>${weekLogs.reduce((a,d)=>a+(d.dur||0),0)}</b><span>minutes</span></div></div></section>
@@ -1656,15 +1678,14 @@ $('#tbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
 
 /* ---------- events ---------- */
 $('#stripbox').addEventListener('click',e=>{const b=e.target.closest('[data-jw]');if(!b)return;unfocus();flush();
-  const target=+b.dataset.jw,cur=wOf(view.date||iso(today())),d=new Date((view.date||iso(today()))+'T00:00');d.setDate(d.getDate()+(target-cur)*7);
-  if(target===wOf(iso(today())))view.date=iso(today());else view.date=iso(d);view.tab='today';view.swap=null;render()});
+  goWeek(+b.dataset.jw);view.tab='today';render()});
 $('#main').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&/^(bww|bwd|bwgoal|bwby)$/.test(e.target.id)){e.preventDefault();const id=e.target.id;unfocus();(id==='bww'||id==='bwd'?bwLog:bwGoal)();return}const sp=e.target.closest&&e.target.closest('[data-pk]');if(sp&&(e.key==='Enter'||e.key===' ')){e.preventDefault();view.painSel=sp.dataset.pk;render()}});
 const unfocus=()=>{const a=document.activeElement;if(a&&a.blur&&a.matches&&a.matches('#main input,#main textarea'))a.blur()};
 document.addEventListener('focusout',()=>setTimeout(()=>{if(pendingRender)render()},0));
 document.querySelector('.gear').addEventListener('click',()=>{unfocus();flush();view.swap=null;view.tab='settings';armed=null;flash='';render();window.scrollTo(0,0)});
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;window.scrollTo(0,0);unfocus();flush();view.swap=null;view.tab=b.dataset.tab;armed=null;flash='';view.bwFlash=false;render()});
 $('#main').addEventListener('input',e=>{const t=e.target;
-  if(t.dataset.f&&view.tab==='today'){const P=curPlan(),id=sidFor(view.date,view.k),n=P[+t.dataset.i].n;const d=(draft[id]=draft[id]||{}),a=(d[n]=d[n]||[]);a[+t.dataset.k]=Object.assign({},a[+t.dataset.k],{[t.dataset.f]:t.value});
+  if(t.dataset.f&&view.tab==='today'){const P=curPlan(),id=vid(),n=P[+t.dataset.i].n;const d=(draft[id]=draft[id]||{}),a=(d[n]=d[n]||[]);a[+t.dataset.k]=Object.assign({},a[+t.dataset.k],{[t.dataset.f]:t.value});
     clearTimeout(asTimer);asTimer=setTimeout(autosave,1200)}
 });
 $('#main').addEventListener('change',e=>{const t=e.target;
@@ -1673,7 +1694,7 @@ $('#main').addEventListener('change',e=>{const t=e.target;
     const base=i===0?tm().main:tm().rest,ev=parseFloat(ei&&ei.value),f=tm().adapt&&ev>0?rpeFactor(ev):1;
     startRest(Math.round(base*f),{base,i,k,why:f>1?`longer: RPE ${ev} set`:f<1?`shorter: RPE ${ev} set`:''})}
   if(t.dataset.f==='e'&&tm().adapt&&T.end>Date.now()&&T.i===+t.dataset.i&&T.k===+t.dataset.k&&Date.now()-T.start<60000){const ev=parseFloat(t.value);if(ev>0){const f=rpeFactor(ev);T.dur=Math.round(T.base*f);T.end=T.start+T.dur*1000;T.why=f>1?`longer: RPE ${ev} set`:f<1?`shorter: RPE ${ev} set`:'';tick()}}
-  if(t.id==='wdate'&&t.value){flush();view.date=t.value;view.swap=null;render()}
+  if(t.id==='wdate'&&t.value){flush();view.date=t.value;view.W=null;view.swap=null;render()}
   if(t.id==='lift'){view.lift=t.value;render()}
   if(t.dataset.pe){const [di,ei]=t.dataset.pe.split('.').map(Number),f=t.dataset.pf;let v=t.value.trim();
     editProg(p=>{const ex=p.days[di].ex[ei];if(f==='n'){if(v)ex.n=v.slice(0,60)}else if(f==='sets'){const n=parseInt(v,10);if(n>0)ex.sets=Math.min(10,n)}else{if(/\d/.test(v))ex.reps=v.slice(0,12)}})}
@@ -1701,16 +1722,16 @@ $('#main').addEventListener('click',async e=>{
   if(b.id==='bwgoalsave'){await bwGoal();return}
   if(b.id==='bwgoalclr'){const p=Object.assign({},S.profile||{});delete p.cut;S.profile=p;flash='Goal cleared.';view.bwFlash=true;await putProfile({});return}
   if(b.dataset.bwdel){const d=b.dataset.bwdel;if(armed!=='bw'+d){armed='bw'+d;render();return}armed=null;flash='Weigh-in removed.';view.bwFlash=true;await putProfile({bw:bwRaw().filter(e=>!(e&&e.d===d))});return}
-  if(b.dataset.hgo){view.tab='today';view.date=b.dataset.hdate||iso(today());view.k=b.dataset.hgo;view.swap=null;render();window.scrollTo(0,0);return}
-  if(b.dataset.hstart){view.tab='today';view.date=iso(today());view.k=b.dataset.hstart;view.swap=null;await startWorkout();window.scrollTo(0,0);return}
+  if(b.dataset.hgo){view.tab='today';view.W=+b.dataset.hw||null;view.date=b.dataset.hdate||iso(today());view.k=b.dataset.hgo;view.swap=null;render();window.scrollTo(0,0);return}
+  if(b.dataset.hstart){view.tab='today';view.W=null;view.date=iso(today());view.k=b.dataset.hstart;view.swap=null;await startWorkout();window.scrollTo(0,0);return}
   if(b.dataset.wstart){await startWorkout();return}
   if(b.dataset.wend){const key=b.dataset.wend==='2'?'wend2':'wend';if(armed!==key){armed=key;render();return}
-    armed=null;clearTimeout(asTimer);asTimer=null;const id=sidFor(view.date,view.k),ex=collect();
+    armed=null;clearTimeout(asTimer);asTimer=null;const id=vid(),ex=collect();
     if(Object.keys(ex).length){const [,doc]=sessionDoc(ex);S.sessions[id]=doc}
     const d=S.sessions[id];delete draft[id];delete extra[id];T.end=0;
     const dur=d?await endSession(id,d):0;flash=dur?`Workout saved · ${dur} min`:'Workout ended. No sets were logged, so nothing was saved.';render();window.scrollTo(0,0);return}
-  if(b.dataset.wnav){flush();const d=new Date(view.date+'T00:00');d.setDate(d.getDate()+(+b.dataset.wnav));view.date=iso(d);view.swap=null;render();return}
-  if(b.dataset.wtoday){flush();view.date=iso(today());view.k=null;view.swap=null;render();return}
+  if(b.dataset.wnav){flush();goWeek(vW()+Math.sign(+b.dataset.wnav));render();return}
+  if(b.dataset.wtoday){flush();view.date=iso(today());view.W=null;view.k=null;view.swap=null;render();return}
   if(b.dataset.rw){view.rw=Math.max(1,+b.dataset.rw);render();return}
   if(b.dataset.report){flush();view.rw=+b.dataset.report;view.pseg='report';view.tab='progress';render();return}
   if(b.dataset.gobody){flush();view.tab='body';render();return}
@@ -1721,8 +1742,8 @@ $('#main').addEventListener('click',async e=>{
   if(b.dataset.rsave){const r=view.rd||{};if(r.sl&&r.so&&r.en){view.rd=null;await putProfile({ready:{date:view.date,sl:r.sl,so:r.so,en:r.en}})}return}
   if(b.dataset.rskip){view.rdSkip=true;render();return}
   if(b.dataset.rchange){const r=readyToday();view.rd=r?{sl:r.sl,so:r.so,en:r.en}:{};view.rdSkip=false;await putProfile({ready:null});return}
-  if(b.dataset.bo!=null){const k=sidFor(view.date,view.k)+'|'+curPlan()[+b.dataset.bo].n;backoff[k]=true;render();return}
-  if(b.dataset.dl!=null){const k=sidFor(view.date,view.k)+'|'+curPlan()[+b.dataset.dl].n;deloadNow[k]=!deloadNow[k];render();return}
+  if(b.dataset.bo!=null){const k=vid()+'|'+curPlan()[+b.dataset.bo].n;backoff[k]=true;render();return}
+  if(b.dataset.dl!=null){const k=vid()+'|'+curPlan()[+b.dataset.dl].n;deloadNow[k]=!deloadNow[k];render();return}
   if(b.dataset.s){flush();view.k=b.dataset.s;view.swap=null;flash='';render();return}
   if(b.dataset.swap!=null){flush();view.swap=view.swap===+b.dataset.swap?null:+b.dataset.swap;view.swapPick=null;view.ddOpen=false;render();return}
   if(b.dataset.ddtoggle){view.ddOpen=!view.ddOpen;render();return}
@@ -1731,13 +1752,13 @@ $('#main').addEventListener('click',async e=>{
   if(b.dataset.swapgo!=null||b.dataset.swapreset!=null){
     flush();const i=+(b.dataset.swapgo!=null?b.dataset.swapgo:b.dataset.swapreset),x=curPlan()[i],base=x.orig||x.n;
     const opts0=alts(base).filter(o=>o!==x.n),name=b.dataset.swapgo!=null?(($('#swcustom').value||'').trim().slice(0,60)||(view.swapPick&&opts0.includes(view.swapPick)?view.swapPick:opts0[0])):base;view.swapPick=null;view.ddOpen=false;
-    const id=sidFor(view.date,view.k);if(draft[id]&&draft[id][x.n]){draft[id][name]=draft[id][x.n];delete draft[id][x.n]}
+    const id=vid();if(draft[id]&&draft[id][x.n]){draft[id][name]=draft[id][x.n];delete draft[id][x.n]}
     view.swap=null;flash='';
     if(prog().ppl&&B1[view.k]){const sw=Object.assign({},swaps()),key=view.k+'|'+base;if(name!==base)sw[key]=name;else delete sw[key];await putProfile({swaps:sw})}
     else{const di=prog().days.findIndex(d=>d.k===view.k);if(di>-1&&name)await editProg(p=>{const ex=p.days[di].ex.find(z=>z.n===x.n);if(ex)ex.n=name})}
     return}
-  if(b.dataset.add!=null){const id=sidFor(view.date,view.k),n=curPlan()[+b.dataset.add].n;const x=(extra[id]=extra[id]||{});x[n]=(x[n]||0)+1;render();return}
-  if(b.dataset.open){const d=S.sessions[b.dataset.open];if(d){view.date=d.date;view.k=d.s;view.tab='today';render()}return}
+  if(b.dataset.add!=null){const id=vid(),n=curPlan()[+b.dataset.add].n;const x=(extra[id]=extra[id]||{});x[n]=(x[n]||0)+1;render();return}
+  if(b.dataset.open){const d=S.sessions[b.dataset.open];if(d){view.date=d.date;view.k=d.s;view.W=sW(d);view.tab='today';render()}return}
   if(b.dataset.del){if(armed===b.dataset.del){armed=null;await delSession(b.dataset.del)}else{armed=b.dataset.del;render()}return}
   if(b.dataset.padd){const di=+b.dataset.padd;await editProg(p=>{p.days[di].ex.push({n:'New exercise',sets:3,reps:'8–12'})});return}
   if(b.dataset.pxdel){const [di,ei]=b.dataset.pxdel.split('.').map(Number);await editProg(p=>{p.days[di].ex.splice(ei,1)});return}
