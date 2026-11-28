@@ -77,7 +77,20 @@ Fix 1:
 
 ## Queued by Nheil (2026-11-26), do these first
 
-**2026-11-28 run builds TWO features: item 2 (Program tab) and item 4 (History tab), as two PRs. Item 3 waits for 2026-12-05.**
+**2026-11-28 run builds THREE PRs: item 0 (Start Workout bug, do it FIRST), then item 2 (Program tab) and item 4 (History tab). Item 3 waits for 2026-12-05.**
+
+0. **Bug: no Start Workout button after Week 1, and the app doesn't move on to the next week** (Nheil, 2026-11-27). Separate small PR, built first, before the Program and History tabs.
+   - **What happens:** only Week 1 workouts have a Start Workout button. Workouts in any other week can't be started.
+   - **What Nheil wants:**
+     - Every week's workouts can be started.
+     - When all the workouts in a week are completed, Home and the Workout tab automatically show the next week (Week 2 after Week 1, and so on): the "Week X of 15" text and bar, the next workout and the day list.
+     - Looking back at past weeks and ahead at future weeks still works.
+   - **Must keep:** saved sessions, week checkmarks, week navigation, start/end workout, ghost sets, and RPE suggestions for the right week's targets.
+   - **Acceptance:**
+     - A test with fake data where every Week 1 workout is done. Home and Workout both show Week 2, the Start Workout button is there, and starting and ending a Week 2 workout saves a session tagged to Week 2.
+     - A second test with Week 2 also complete shows Week 3.
+     - A test that opens a future week and finds a Start Workout button (or a clear rule for why not, agreed in the PR).
+     - All existing tests pass, including `week_checkmarks`, `week_navigation` and `start_end_workout`.
 
 1. **Bug: Home "Week X of 15" bar, Peak weeks are giant yellow columns** (screenshot from Nheil's Android, 2026-11-26). **Fix in PR: https://github.com/nheilmangoba1/Lift-log/pull/6** (awaiting Nheil's merge).
    - **Cause:** CSS class clash. The 3D body viewer (PR #5) styles `.b3` (height `min(560px,70vh)`, `min-height:420px`, border, background). The plan bar marks Peak-block weeks with `<i class="b3">`, so they inherit that height.
