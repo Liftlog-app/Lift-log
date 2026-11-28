@@ -1401,7 +1401,7 @@ function renderProgram(){
   const p=prog(),per=!!(p.ppl||p.periodize),now=progNowWk(),N=per?(progSel||now):1;
   const old=document.getElementById('ptl'),prevX=old?old.scrollLeft:null;
   let h=progHeadHTML(p,per,now);
-  if(per)h+=progTimelineHTML(now,N);
+  if(per)h+=progTimelineHTML(now,N,p);
   h+=progWeekHTML(p,per,N,now);
   h+=progEditorHTML(p);
   $('#main').innerHTML=h;
@@ -1423,6 +1423,12 @@ const progNowWk=()=>wkOf(wOf(iso(today())));
 // Selected week in the timeline, open swap panel ("di.ei"), swap pick, dropdown open, week-change direction, first paint after opening the tab
 let progSel=null,progSwap=null,progPick=null,progDd=false,progAnim='',progFresh=true;
 const PBC=['','#d8342c','#2a63d4','#e0a800'];
+// A day counts as done in calendar week W only when a session with sets exists and it is not still in progress.
+const progDone=(k,W)=>Object.values(S.sessions).find(d=>d.s===k&&wOf(d.date)===W&&d.live!==true&&d.ex&&Object.keys(d.ex).length);
+// Days that have lifts in program week wk (week 15 drops days without a test lift; other weeks keep every day, as before).
+const progActive=(p,wk)=>wk===15&&(p.ppl||p.periodize)?p.days.filter(d=>progRows(p,d,15).length):p.days;
+// Was program week wk (before the current week now) fully done in this cycle? Every day with lifts needs an ended session that week.
+const progWeekDone=(p,wk,now)=>{const W=wOf(iso(today()))-(now-wk),a=progActive(p,wk);return W>=1&&a.length>0&&a.every(d=>progDone(d.k,W))};
 const progCalm=()=>!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 const progTag=wk=>wk===5||wk===10?'deload':wk===15?'test week':'';
 const progNext=wk=>({4:'Deload',5:'Strength block',9:'Deload',10:'Peak block',14:'Test week',15:'New cycle'})[wk]||'';
@@ -1434,18 +1440,18 @@ const PARR=d=>`<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true
 function progHeadHTML(p,per,now){
   const nm=p.name.replace(/ · 15-week blocks/,'');
   if(!per)return `<section class="phead" style="--bc:var(--ink)"><div class="phx"><span class="pey">Your plan</span><h2>${esc(nm)}</h2><div class="meta">${p.days.length} day${p.days.length===1?'':'s'} a week · same sets and reps every week</div></div></section>`;
-  const W=wOf(iso(today())),days=p.days.length||1,done=p.days.filter(d=>doneThisWeek(d.k,W)).length;
+  const W=wOf(iso(today())),act=progActive(p,now),days=act.length||1,done=act.filter(d=>progDone(d.k,W)).length;
   const f=Math.max(0,Math.min(1,(now-1+done/days)/15)),pct=Math.round(f*100),b=blk(now),bc=PBC[b],R=40,C=2*Math.PI*R;
   const nb=now<5?{w:5,t:'Deload'}:now<6?{w:6,t:'Strength block'}:now<10?{w:10,t:'Deload'}:now<11?{w:11,t:'Peak block'}:now<15?{w:15,t:'Test week'}:{w:16,t:'New cycle'},left=nb.w-now;
   const ticks=[1/3,2/3].map(t=>{const a=t*2*Math.PI-Math.PI/2;return `<line class="prt" x1="${(50+Math.cos(a)*34).toFixed(1)}" y1="${(50+Math.sin(a)*34).toFixed(1)}" x2="${(50+Math.cos(a)*46).toFixed(1)}" y2="${(50+Math.sin(a)*46).toFixed(1)}"/>`}).join('');
   const ring=`<svg class="pring${progFresh?' fresh':''}" viewBox="0 0 100 100" role="img" aria-label="Week ${now} of 15, ${pct}% through the block" data-pct="${pct}" style="--rc:${C.toFixed(2)}"><circle class="prk" cx="50" cy="50" r="${R}"/><circle class="prf" cx="50" cy="50" r="${R}" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C*(1-f)).toFixed(2)}" transform="rotate(-90 50 50)"/>${ticks}<text x="50" y="41" text-anchor="middle" class="prw">Wk </text><text x="50" y="67" text-anchor="middle" class="prn"><tspan>${now}</tspan><tspan class="prd">/15</tspan></text></svg>`;
   return `<section class="phead" style="--bc:${bc}">${ring}<div class="phx"><span class="pey">${BNAME[b]} block${progTag(now)?' · '+progTag(now):''}</span><h2>${esc(nm)}</h2>
-  <div class="meta">${done} of ${p.days.length} workouts done this week · ${pct}% of the 15 weeks</div>
+  <div class="meta">${done} of ${act.length} workout${act.length===1?'':'s'} done this week · ${pct}% of the 15 weeks</div>
   <span class="pnx" style="--nc:${PBC[blk(nb.w>15?1:nb.w)]}"><i></i>${esc(nb.t)} ${left===1?'next week':'in '+left+' weeks'}</span></div></section>`;
 }
-function progTimelineHTML(now,N){
-  const grp=b=>{let s='';for(let w=b*5-4;w<=b*5;w++){const t=progTag(w),bc=PBC[b];
-    s+=`<button data-ptl="${w}" class="${w<now?'past':''}${w===now?' now':''}${w===N?' sel':''}" style="--bc:${bc};--bon:${onC(bc)}" aria-pressed="${w===N}" aria-label="Week ${w}, ${BNAME[b]}${t?' '+t:''}${w===now?', this week':''}"><b>${w}</b><small>${t==='deload'?'Deload':t?'Test':w===now?'Now':w<now?'✓':'&nbsp;'}</small></button>`}
+function progTimelineHTML(now,N,p){
+  const grp=b=>{let s='';for(let w=b*5-4;w<=b*5;w++){const t=progTag(w),bc=PBC[b],ok=w<now&&progWeekDone(p,w,now);
+    s+=`<button data-ptl="${w}" class="${w<now?'past':''}${w===now?' now':''}${w===N?' sel':''}" style="--bc:${bc};--bon:${onC(bc)}" aria-pressed="${w===N}" aria-label="Week ${w}, ${BNAME[b]}${t?' '+t:''}${w===now?', this week':ok?', completed':''}"><b>${w}</b><small>${t==='deload'?'Deload':t?'Test':w===now?'Now':ok?'✓':'&nbsp;'}</small></button>`}
     return `<div class="ptg" style="--bc:${PBC[b]}"><div class="ptgb">${s}</div><span>${BNAME[b]}</span></div>`};
   return `<section class="ptlw" aria-label="15-week timeline"><div class="ptl" id="ptl">${grp(1)}${grp(2)}${grp(3)}</div></section>`;
 }
@@ -1476,10 +1482,10 @@ function progWeekHTML(p,per,N,now){
   if(nb)h+=`<div class="pban" role="status" style="--bc:${PBC[blk(nxW)]}"><i aria-hidden="true"></i>Next week: ${esc(nb)}</div>`;
   h+=p.days.map((d,di)=>{
     const rows=progRows(p,d,N),nx=per?progRows(p,d,nxW):null,sets=rows.reduce((a,x)=>a+(+x.sets||0),0);
-    const done=per&&N===now&&doneThisWeek(d.k,W),add=nx?nx.filter(y=>!rows.some(x=>x.n===y.n)):[];
-    return `<section class="pday" data-pday="${di}" style="--c:${d.c};--on:${onC(d.c)}"><div class="pdh"><span class="pdot" aria-hidden="true"></span><h3>${esc(d.n)}</h3><span class="pdm">${done?'<b class="pdone">Done ✓</b>':`${rows.length} lift${rows.length===1?'':'s'} · ${sets} sets`}</span></div>
+    const done=per&&N===now&&rows.length&&progDone(d.k,W),add=nx?nx.filter(y=>!rows.some(x=>x.n===y.n)):[];
+    return `<section class="pday" data-pday="${di}" style="--c:${d.c};--on:${onC(d.c)}"><div class="pdh"><span class="pdot" aria-hidden="true"></span><h3>${esc(d.n)}</h3><span class="pdm">${done?'<b class="pdone">Done ✓</b>':per&&N===15&&!rows.length&&d.ex.length?'No lifting':`${rows.length} lift${rows.length===1?'':'s'} · ${sets} sets`}</span></div>
     ${rows.length?rows.map((x,ei)=>{const key=di+'.'+ei,op=progSwap===key;
-      return `<div class="prow${op?' open':''}"><span class="thumb pth">${exPic(x.n)}</span><div class="ptx"><b class="pxn">${esc(x.n)}</b><div class="pxs">${esc(progSetsTxt(x))}</div>${x.note?`<div class="pnote">${esc(x.note)}</div>`:''}${x.orig?`<div class="pnote">Swapped from ${esc(x.orig)}</div>`:''}${progChips(x,nx)}</div><button class="pib" data-pswap="${key}" aria-expanded="${op}" aria-label="Swap ${esc(x.n)}" title="Swap exercise">${PSWAPIC}</button></div>${op?progSwapHTML(d,x):''}`}).join(''):'<p class="meta pnone">No exercises yet. Add some below.</p>'}
+      return `<div class="prow${op?' open':''}"><span class="thumb pth">${exPic(x.n)}</span><div class="ptx"><b class="pxn">${esc(x.n)}</b><div class="pxs">${esc(progSetsTxt(x))}</div>${x.note?`<div class="pnote">${esc(x.note)}</div>`:''}${x.orig?`<div class="pnote">Swapped from ${esc(x.orig)}</div>`:''}${progChips(x,nx)}</div><button class="pib" data-pswap="${key}" aria-expanded="${op}" aria-label="Swap ${esc(x.n)}" title="Swap exercise">${PSWAPIC}</button></div>${op?progSwapHTML(d,x):''}`}).join(''):(per&&N===15&&d.ex.length?'<p class="meta pnone">Test week: no lifting on this day. Do light cardio or technique work.</p>':'<p class="meta pnone">No exercises yet. Add some below.</p>')}
     ${add.length?`<div class="pnewl"><span class="pchg new">New lift next week</span> ${add.map(y=>esc(y.n)).join(', ')}</div>`:''}</section>`}).join('');
   return h+'</div>';
 }
@@ -1510,8 +1516,10 @@ $('#main').addEventListener('click',async e=>{
     const name=ds.pswgo?(((ci&&ci.value)||'').trim().slice(0,60)||(progPick&&opts.includes(progPick)?progPick:opts[0])):base;
     progSwap=null;progPick=null;progDd=false;flash='';unfocus();
     if(p.ppl&&B1[d.k]){const sw=Object.assign({},swaps()),key=d.k+'|'+base;if(name!==base)sw[key]=name;else delete sw[key];await putProfile({swaps:sw})}
-    else if(name)await editProg(q=>{const z=q.days[di].ex.find(o=>o.n===x.n);if(z)z.n=name});
+    else if(name)await editProg(q=>{const a=q.days[di].ex,z=a[ei]&&a[ei].n===x.n?a[ei]:a.find(o=>o.n===x.n);if(z)z.n=name});
     return}
+  // Reorder/remove/day changes shift row indexes, so close any open swap panel (pup/pxdel/pdel then run in the main handler).
+  if(ds.pup||ds.pxdel||ds.pdel||ds.pdown){progSwap=null;progPick=null;progDd=false}
   if(ds.pdown){unfocus();const [di,ei]=ds.pdown.split('.').map(Number);await editProg(q=>{const a=q.days[di]&&q.days[di].ex;if(a&&ei>=0&&ei<a.length-1)[a[ei],a[ei+1]]=[a[ei+1],a[ei]]});return}
 });
 /* ---------- end program tab ---------- */
