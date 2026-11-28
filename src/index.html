@@ -653,7 +653,8 @@ function periodize(ex,wk){
   if(wk<=14){const [st,r,rpe,pct]=B3W[wk];return [{n:ex[0].n,sets:st,reps:r,rpe,note:pct}].concat(ex.slice(1).map(e=>({n:e.n,sets:2,reps:'6–8',rpe:8})))}
   return [{n:ex[0].n,sets:5,reps:'3',rpe:10,note:'Ramp up to a new 3-rep max',test:true}];
 }
-const sidFor=(date,k)=>Object.keys(S.sessions).find(id=>S.sessions[id].date===date&&S.sessions[id].s===k)||`${date}_${k}`;
+// Default session for a date/day. When two share it (e.g. a finished Week 2 and a live Week 4 started the same day), the live one wins.
+const sidFor=(date,k)=>{const ids=Object.keys(S.sessions).filter(id=>S.sessions[id].date===date&&S.sessions[id].s===k);return ids.find(id=>S.sessions[id].live===true)||ids[0]||`${date}_${k}`};
 const AREAS={
  neck:{l:'neck',pair:false,re:/shrug|overhead press|back squat/i,sw:{'Back squat':'Leg press','Pause squat':'Leg press','DB shrug':'Face pull','Overhead press':'Landmine press'}},
  shoulder:{l:'shoulder',pair:true,re:/bench|^(?!.*leg).*press|dips|fly|lateral|push-up|pull-up|chin|skull|upright|arnold/i,sw:{'Bench press':'Floor press','DB bench press':'Floor press','Overhead press':'Landmine press','Seated DB shoulder press':'Landmine press','Arnold press':'Landmine press','Machine shoulder press':'Landmine press','Incline barbell press':'Neutral-grip DB press','Incline DB press':'Neutral-grip DB press','Weighted dips':'Machine chest press','Close-grip bench':'Triceps pushdown','Skull crusher':'Triceps pushdown','Overhead triceps extension':'Triceps pushdown','Pull-up (weighted)':'Neutral-grip pulldown','Chin-up':'Neutral-grip pulldown','Lat pulldown':'Neutral-grip pulldown','DB lateral raise':'Cable lateral raise','Upright row (wide grip)':'Cable lateral raise','Push-up (weighted)':'Machine chest press','DB fly':'Pec deck','Cable fly':'Pec deck'}},
@@ -721,7 +722,7 @@ function goWeek(W){const td=iso(today()),from=view.date||td;W=Math.max(1,W);view
   const d=new Date(from+'T00:00');d.setDate(d.getDate()+(W-wOf(from))*7);const x=iso(d);view.date=x>td?td:x}
 function nextDay(){
   const days=prog().days;if(!days.length)return null;
-  const td=Object.values(S.sessions).find(d=>d.date===iso(today())&&days.some(x=>x.k===d.s));if(td&&(td.live||sW(td)>=curW()))return td.s;
+  const tds=Object.values(S.sessions).filter(d=>d.date===iso(today())&&days.some(x=>x.k===d.s)),td=tds.find(d=>d.live===true)||tds[0];if(td&&(td.live||sW(td)>=curW()))return td.s;
   const last=Object.values(S.sessions).filter(d=>days.some(x=>x.k===d.s)).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(b.updated||0)-(a.updated||0))[0];
   const i0=last?(days.findIndex(x=>x.k===last.s)+1)%days.length:0,W=curW();
   for(let j=0;j<days.length;j++){const k=days[(i0+j)%days.length].k;if(!doneThisWeek(k,W))return k}
@@ -1288,7 +1289,7 @@ function renderHome(){
   let hero='';
   if(!p.days.length)hero=`<section class="hero" style="--c:#596170"><div class="eyebrow">Today</div><h2>No days in your program yet</h2><button class="herobtn" data-gotab="program">Build your program</button></section>`;
   else if(L){const age=Date.now()-L[1].start;
-    hero=`<section class="hero" style="--c:${dayColor(L[1].s)};--on:${onC(dayColor(L[1].s))}"><div class="eyebrow"><span class="dot"></span>Workout in progress</div><h2>${esc(L[1].dn||day&&day.n||'Workout')}</h2><div class="hmeta"><span id="homelive">${mmss(age/1000)}</span> · ${Object.values(L[1].ex||{}).flat().length} sets logged</div><div style="margin-top:14px"><button class="herobtn" data-hgo="${esc(L[1].s)}" data-hdate="${L[1].date}">Continue workout</button></div></section>`}
+    hero=`<section class="hero" style="--c:${dayColor(L[1].s)};--on:${onC(dayColor(L[1].s))}"><div class="eyebrow"><span class="dot"></span>Workout in progress</div><h2>${esc(L[1].dn||day&&day.n||'Workout')}</h2><div class="hmeta"><span id="homelive">${mmss(age/1000)}</span> · ${Object.values(L[1].ex||{}).flat().length} sets logged</div><div style="margin-top:14px"><button class="herobtn" data-hgo="${esc(L[1].s)}" data-hdate="${L[1].date}" data-hw="${sW(L[1])}">Continue workout</button></div></section>`}
   else{
     const saveView={date:view.date,k:view.k,W:view.W};view.date=td;view.k=k;view.W=null;const P=curPlan().filter(x=>!x.skip&&!x.extra);view.date=saveView.date;view.k=saveView.k;view.W=saveView.W;
     const sets=P.reduce((a,x)=>a+(+x.sets||0),0),past=logged.filter(d=>d.s===k&&d.dur),mins=past.length?Math.round(past.reduce((a,d)=>a+d.dur,0)/past.length/5)*5:Math.max(20,Math.round(sets*2.6/5)*5);
@@ -1710,7 +1711,7 @@ $('#main').addEventListener('click',async e=>{
   if(b.id==='bwgoalsave'){await bwGoal();return}
   if(b.id==='bwgoalclr'){const p=Object.assign({},S.profile||{});delete p.cut;S.profile=p;flash='Goal cleared.';view.bwFlash=true;await putProfile({});return}
   if(b.dataset.bwdel){const d=b.dataset.bwdel;if(armed!=='bw'+d){armed='bw'+d;render();return}armed=null;flash='Weigh-in removed.';view.bwFlash=true;await putProfile({bw:bwRaw().filter(e=>!(e&&e.d===d))});return}
-  if(b.dataset.hgo){view.tab='today';view.W=null;view.date=b.dataset.hdate||iso(today());view.k=b.dataset.hgo;view.swap=null;render();window.scrollTo(0,0);return}
+  if(b.dataset.hgo){view.tab='today';view.W=+b.dataset.hw||null;view.date=b.dataset.hdate||iso(today());view.k=b.dataset.hgo;view.swap=null;render();window.scrollTo(0,0);return}
   if(b.dataset.hstart){view.tab='today';view.W=null;view.date=iso(today());view.k=b.dataset.hstart;view.swap=null;await startWorkout();window.scrollTo(0,0);return}
   if(b.dataset.wstart){await startWorkout();return}
   if(b.dataset.wend){const key=b.dataset.wend==='2'?'wend2':'wend';if(armed!==key){armed=key;render();return}
