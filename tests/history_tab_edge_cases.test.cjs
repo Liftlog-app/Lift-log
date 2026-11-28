@@ -89,7 +89,9 @@ const allErr=[];const done=(tag,w)=>{console.log('errors'+'',w.__e);allErr.push(
   c21.click();await sleep(10);
   const op=cards(d).filter(c=>c.classList.contains('open')).map(c=>c.dataset.hid).sort().join();
   ok(op==='2026-11-21_legsA,2026-11-21_pullA,2026-11-21_pushB','tapping a day with 3 sessions opens all 3 and collapses the rest');
-  ok(cardOf(d,'2026-11-10_pullB')&&/70 × 8/.test(cardOf(d,'2026-11-10_pullB').textContent),'old-format session (no updated, string numbers) renders');
+  // card bodies are built lazily on expand (round 2), so open the card before checking its sets
+  ok(cardOf(d,'2026-11-10_pullB'),'old-format session card is listed');cardOf(d,'2026-11-10_pullB').querySelector('[data-hx]').click();await sleep(10);
+  ok(/70 × 8/.test(cardOf(d,'2026-11-10_pullB').textContent),'old-format session (no updated, string numbers) renders');
   ok(JSON.stringify(stored(w))===b,'kg instance: sessions unchanged');
   done('kg',w)}
 
