@@ -522,6 +522,89 @@ button:disabled{cursor:default}
 .linkbtn{display:inline-flex;align-items:center;min-height:44px;margin-top:4px;padding:0;border:0;background:none;color:var(--pull);font:600 15px Barlow,sans-serif;cursor:pointer}
 #acct .btn{min-height:44px}
 #acct .btn.acalt{background:none;border:1px solid var(--line);color:var(--ink)}
+/* program tab */
+.phead{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:14px;padding:16px 14px 14px;margin:0 0 12px;box-shadow:inset 0 4px 0 var(--bc)}
+.phx{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.phx h2{margin:0;font-size:28px;line-height:1.05}
+.phx .meta{font-size:14px;line-height:1.35}
+.pey{font:700 13px Barlow,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.pnx{display:inline-flex;align-items:center;gap:7px;margin-top:6px;padding:4px 10px;border-radius:999px;background:var(--field);font:700 14px Barlow,sans-serif;color:var(--ink)}
+.pnx i{width:8px;height:8px;border-radius:50%;background:var(--nc)}
+.pring{flex:none;width:96px;height:96px;display:block}
+.pring circle{fill:none;stroke-width:10}
+.pring .prk{stroke:var(--field)}
+.pring .prf{stroke:var(--bc);stroke-linecap:round}
+.pring .prt{stroke:var(--card);stroke-width:3}
+.pring text{fill:var(--ink);font-family:"Barlow Condensed",Barlow,sans-serif}
+.pring .prw{font-size:12px;font-weight:700;fill:var(--mute);letter-spacing:.06em;text-transform:uppercase}
+.pring .prn{font-size:27px;font-weight:800}.pring .prd{font-size:17px;fill:var(--mute)}
+.ptlw{background:var(--card);border-radius:14px;padding:12px 0 10px;margin:0 0 4px}
+.ptl{position:relative;display:flex;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:3px 14px 2px;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12px,#000 calc(100% - 12px),transparent);mask-image:linear-gradient(90deg,transparent,#000 12px,#000 calc(100% - 12px),transparent)}
+.ptl::-webkit-scrollbar{display:none}
+.ptg{flex:none;display:flex;flex-direction:column;gap:7px}
+.ptgb{display:flex;gap:6px}
+.ptg>span{font:700 13px "Barlow Condensed",Barlow,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);border-top:3px solid var(--bc);padding-top:4px}
+[data-ptl]{flex:none;width:46px;min-width:44px;min-height:54px;padding:0;border:0;border-radius:12px;scroll-snap-align:center;background:color-mix(in srgb,var(--bc) 14%,var(--field));color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+[data-ptl] b{font:800 21px/1 "Barlow Condensed",Barlow,sans-serif}
+[data-ptl] small{font:700 10px/1 Barlow,sans-serif;letter-spacing:.03em;text-transform:uppercase;color:var(--mute)}
+[data-ptl].past{background:color-mix(in srgb,var(--bc) 30%,var(--field))}
+[data-ptl].now{box-shadow:inset 0 0 0 2.5px var(--ink)}
+[data-ptl].sel{background:var(--bc);color:var(--bon)}
+[data-ptl].sel small{color:var(--bon);opacity:.85}
+[data-ptl].sel.now{box-shadow:inset 0 0 0 2.5px var(--bon),0 0 0 2px var(--bc)}
+.pwh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 2px 10px}
+.pwh h2{margin:0;font-size:24px;line-height:1.1}
+.ptag{flex:none;padding:4px 10px;border-radius:999px;background:var(--card);color:var(--mute);font:700 13px Barlow,sans-serif}
+.pban{display:flex;align-items:center;gap:10px;padding:11px 14px;margin:0 0 12px;border-radius:14px;background:color-mix(in srgb,var(--bc) 16%,var(--card));font:700 16px Barlow,sans-serif}
+.pban i{flex:none;width:10px;height:10px;border-radius:3px;background:var(--bc)}
+.pday{background:var(--card);border-radius:14px;padding:14px 14px 6px;margin:0 0 12px;box-shadow:inset 0 4px 0 var(--c)}
+.pdh,.pedh{display:flex;align-items:center;gap:10px;margin:2px 0 6px}
+.pdot{flex:none;width:12px;height:12px;border-radius:4px;background:var(--c)}
+.pdh h3{flex:1;margin:0;font-size:23px;line-height:1.1}
+.pdm{flex:none;font-size:14px;color:var(--mute)}
+.pdone{color:var(--ok)}
+.prow{display:grid;grid-template-columns:48px minmax(0,1fr) 44px;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.pday .thumb.pth{width:48px!important;height:48px!important;border:0;border-radius:12px}
+.ptx{display:flex;flex-direction:column;min-width:0}
+.pxn{font-size:17px;line-height:1.2}
+.pxs{font:600 15px Barlow,sans-serif;color:var(--ink);opacity:.85}
+.pnote{font-size:13px;line-height:1.3;color:var(--mute)}
+.pchgs{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pchg{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;background:color-mix(in srgb,var(--c) 15%,var(--field));color:var(--ink);font:700 12px/1.1 Barlow,sans-serif;white-space:nowrap}
+.pchg i{font-style:normal;font-size:9px;opacity:.75}
+.pchg.out{background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--mute)}
+.pchg.new{background:var(--c);color:var(--on)}
+.pnewl{padding:10px 0 8px;border-top:1px solid var(--line);font-size:14px;color:var(--mute);line-height:1.6}
+.pnone{margin:6px 0 10px}
+[data-pswap],[data-pup],[data-pdown],.pib{flex:none;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:0;border-radius:12px;background:var(--field);color:var(--mute);display:grid;place-items:center;font:700 22px/1 Barlow,sans-serif;cursor:pointer}
+.pib.danger{color:var(--push)}
+.pib:disabled{opacity:.35}
+[data-pswap][aria-expanded=true]{background:var(--c);color:var(--on)}
+.pswp{margin:0 0 10px}
+.pswp .btn.primary{color:var(--on)}
+.pedt{margin-top:26px}
+.pedh input{flex:1;font:800 21px "Barlow Condensed",Barlow,sans-serif}
+.pedh .btn{flex:none}
+.pxrow{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.pxa{display:flex;align-items:center;gap:10px}
+.pxb{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px 44px 44px;gap:6px}
+.pedit .thumb.pth{width:44px!important;height:44px!important}
+.pfld{position:relative;display:block;margin:0;font-weight:400}
+.pfld small{position:absolute;left:10px;top:4px;font:700 10px/1 Barlow,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);pointer-events:none}
+.pfld input{padding:13px 10px 0;font-size:17px}
+.padd{width:100%;min-height:44px;margin:4px 0 8px;border:1.5px dashed color-mix(in srgb,var(--c) 55%,var(--line));border-radius:12px;background:none;color:var(--ink);font:600 15px Barlow,sans-serif;cursor:pointer}
+.pdayadd{width:100%}
+@media(prefers-reduced-motion:no-preference){
+.pweek.nx{animation:pwNx .2s ease-out both}.pweek.pv{animation:pwPv .2s ease-out both}
+@keyframes pwNx{from{opacity:0;transform:translateX(16px)}}
+@keyframes pwPv{from{opacity:0;transform:translateX(-16px)}}
+.pswp{overflow:hidden;animation:pswIn .24s ease-out both}
+@keyframes pswIn{from{opacity:0;max-height:0;padding-top:0;padding-bottom:0}to{opacity:1;max-height:1400px}}
+.pring .prf{transition:stroke-dashoffset .6s ease}
+.pring.fresh .prf{animation:prFill .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes prFill{from{stroke-dashoffset:var(--rc)}}
+}
+@media(prefers-reduced-motion:reduce){.pweek,.pswp,.pring .prf,[data-ptl],[data-pswap],.pib{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -1322,14 +1405,18 @@ function renderHome(){
 
 function renderProgram(){
   if(needsSetup())return renderSetup();
-  const p=prog();
-  let h=`<h2 style="margin:0;font-size:30px">${esc(p.name)}</h2><p class="meta">Edit names, sets and reps. Changes save as you go and apply to your next workouts.${p.ppl?' Editing this plan switches it to the general block pattern; your swaps are kept.':''}</p>`;
-  h+=p.days.map((d,di)=>`<section class="card" style="--c:${d.c}"><div class="ch"><input data-pd="${di}" value="${esc(d.n)}" aria-label="Day name" style="font:800 20px 'Barlow Condensed',sans-serif"><button class="btn danger" data-pdel="${di}">${armed==='day'+di?'Confirm':'Remove'}</button></div>
-    <div class="exrow meta" style="margin-top:10px"><span>Exercise</span><span>Sets</span><span>Reps</span><span></span><span></span></div>
-    ${(p.ppl?d.ex.map(e=>Object.assign({},e,{n:swaps()[d.k+'|'+e.n]||e.n})):d.ex).map((e,ei)=>`<div class="exrow"><input data-pe="${di}.${ei}" data-pf="n" value="${esc(e.n)}" list="exlist" aria-label="Exercise name"><input data-pe="${di}.${ei}" data-pf="sets" inputmode="numeric" value="${e.sets}" aria-label="Sets"><input data-pe="${di}.${ei}" data-pf="reps" value="${esc(e.reps)}" aria-label="Reps"><button class="small" data-pup="${di}.${ei}" aria-label="Move up"${ei?'':' disabled'}>↑</button><button class="small danger" data-pxdel="${di}.${ei}" aria-label="Remove exercise">×</button></div>`).join('')}
-    <button class="small" data-padd="${di}">+ Add exercise</button></section>`).join('');
-  h+=`<button class="btn" data-pdayadd="1">+ Add day</button><datalist id="exlist">${ALL.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>`;
+  const p=prog(),per=!!(p.ppl||p.periodize),now=progNowWk(),N=per?(progSel||now):1;
+  const old=document.getElementById('ptl'),prevX=old?old.scrollLeft:null;
+  let h=progHeadHTML(p,per,now);
+  if(per)h+=progTimelineHTML(now,N);
+  h+=progWeekHTML(p,per,N,now);
+  h+=progEditorHTML(p);
   $('#main').innerHTML=h;
+  progAnim='';progFresh=false;
+  const tl=document.getElementById('ptl'),sb=tl&&tl.querySelector('.sel');
+  if(tl&&sb){const l=sb.offsetLeft,r=l+sb.offsetWidth;
+    if(prevX==null)tl.scrollLeft=Math.max(0,l-(tl.clientWidth-sb.offsetWidth)/2);
+    else{tl.scrollLeft=prevX;if(l<prevX||r>prevX+tl.clientWidth){const x=Math.max(0,l-(tl.clientWidth-sb.offsetWidth)/2);try{tl.scrollTo({left:x,behavior:progCalm()?'auto':'smooth'})}catch(e){tl.scrollLeft=x}}}}
 }
 function editProg(fn){
   const p=JSON.parse(JSON.stringify(prog()));
@@ -1337,6 +1424,104 @@ function editProg(fn){
   fn(p);return putProfile({program:p});
 }
 
+/* ---------- program tab ---------- */
+// Current program week (1-15). swap to curW() after PR #10 merges
+const progNowWk=()=>wkOf(wOf(iso(today())));
+// Selected week in the timeline, open swap panel ("di.ei"), swap pick, dropdown open, week-change direction, first paint after opening the tab
+let progSel=null,progSwap=null,progPick=null,progDd=false,progAnim='',progFresh=true;
+const PBC=['','#d8342c','#2a63d4','#e0a800'];
+const progCalm=()=>!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+const progTag=wk=>wk===5||wk===10?'deload':wk===15?'test week':'';
+const progNext=wk=>({4:'Deload',5:'Strength block',9:'Deload',10:'Peak block',14:'Test week',15:'New cycle'})[wk]||'';
+// The plan for one day in one week: the same pure functions the Workout tab uses, without pain adjustments.
+const progRows=(p,d,wk)=>p.ppl&&B1[d.k]?pplPlan(wk,d.k):p.periodize?periodize(d.ex,wk):d.ex.map(e=>({n:e.n,sets:e.sets,reps:e.reps,rpe:null}));
+const progSetsTxt=x=>`${x.sets} × ${x.reps}${x.rpe?' · RPE '+x.rpe:''}`;
+const PSWAPIC='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 4L3 8l4 4M3 8h13M17 20l4-4-4-4M21 16H8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const PARR=d=>`<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="${d?'M12 5v14M6 13l6 6 6-6':'M12 19V5M6 11l6-6 6 6'}" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function progHeadHTML(p,per,now){
+  const nm=p.name.replace(/ · 15-week blocks/,'');
+  if(!per)return `<section class="phead" style="--bc:var(--ink)"><div class="phx"><span class="pey">Your plan</span><h2>${esc(nm)}</h2><div class="meta">${p.days.length} day${p.days.length===1?'':'s'} a week · same sets and reps every week</div></div></section>`;
+  const W=wOf(iso(today())),days=p.days.length||1,done=p.days.filter(d=>doneThisWeek(d.k,W)).length;
+  const f=Math.max(0,Math.min(1,(now-1+done/days)/15)),pct=Math.round(f*100),b=blk(now),bc=PBC[b],R=40,C=2*Math.PI*R;
+  const nb=now<5?{w:5,t:'Deload'}:now<6?{w:6,t:'Strength block'}:now<10?{w:10,t:'Deload'}:now<11?{w:11,t:'Peak block'}:now<15?{w:15,t:'Test week'}:{w:16,t:'New cycle'},left=nb.w-now;
+  const ticks=[1/3,2/3].map(t=>{const a=t*2*Math.PI-Math.PI/2;return `<line class="prt" x1="${(50+Math.cos(a)*34).toFixed(1)}" y1="${(50+Math.sin(a)*34).toFixed(1)}" x2="${(50+Math.cos(a)*46).toFixed(1)}" y2="${(50+Math.sin(a)*46).toFixed(1)}"/>`}).join('');
+  const ring=`<svg class="pring${progFresh?' fresh':''}" viewBox="0 0 100 100" role="img" aria-label="Week ${now} of 15, ${pct}% through the block" data-pct="${pct}" style="--rc:${C.toFixed(2)}"><circle class="prk" cx="50" cy="50" r="${R}"/><circle class="prf" cx="50" cy="50" r="${R}" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C*(1-f)).toFixed(2)}" transform="rotate(-90 50 50)"/>${ticks}<text x="50" y="41" text-anchor="middle" class="prw">Wk </text><text x="50" y="67" text-anchor="middle" class="prn"><tspan>${now}</tspan><tspan class="prd">/15</tspan></text></svg>`;
+  return `<section class="phead" style="--bc:${bc}">${ring}<div class="phx"><span class="pey">${BNAME[b]} block${progTag(now)?' · '+progTag(now):''}</span><h2>${esc(nm)}</h2>
+  <div class="meta">${done} of ${p.days.length} workouts done this week · ${pct}% of the 15 weeks</div>
+  <span class="pnx" style="--nc:${PBC[blk(nb.w>15?1:nb.w)]}"><i></i>${esc(nb.t)} ${left===1?'next week':'in '+left+' weeks'}</span></div></section>`;
+}
+function progTimelineHTML(now,N){
+  const grp=b=>{let s='';for(let w=b*5-4;w<=b*5;w++){const t=progTag(w),bc=PBC[b];
+    s+=`<button data-ptl="${w}" class="${w<now?'past':''}${w===now?' now':''}${w===N?' sel':''}" style="--bc:${bc};--bon:${onC(bc)}" aria-pressed="${w===N}" aria-label="Week ${w}, ${BNAME[b]}${t?' '+t:''}${w===now?', this week':''}"><b>${w}</b><small>${t==='deload'?'Deload':t?'Test':w===now?'Now':w<now?'✓':'&nbsp;'}</small></button>`}
+    return `<div class="ptg" style="--bc:${PBC[b]}"><div class="ptgb">${s}</div><span>${BNAME[b]}</span></div>`};
+  return `<section class="ptlw" aria-label="15-week timeline"><div class="ptl" id="ptl">${grp(1)}${grp(2)}${grp(3)}</div></section>`;
+}
+function progChips(x,nx){
+  if(!nx)return '';const y=nx.find(z=>z.n===x.n),o=[];
+  if(!y)o.push(['out','Not in next week']);
+  else{if(+x.sets!==+y.sets)o.push([+y.sets>+x.sets?'up':'dn',`Sets ${x.sets} → ${y.sets}`]);
+    if(String(x.reps)!==String(y.reps))o.push(['',`Reps ${x.reps} → ${y.reps}`]);
+    if(x.rpe&&y.rpe&&x.rpe!==y.rpe)o.push([y.rpe>x.rpe?'up':'dn',`RPE ${x.rpe} → ${y.rpe}`])}
+  return o.length?`<div class="pchgs">${o.map(([c,t])=>`<span class="pchg${c?' '+c:''}">${c==='up'?'<i aria-hidden="true">▲</i>':c==='dn'?'<i aria-hidden="true">▼</i>':''}${esc(t)}</span>`).join('')}</div>`:'';
+}
+function progSwapHTML(d,x){
+  const base=x.orig||x.n,opts=alts(base).filter(o=>o!==x.n),pick=progPick&&opts.includes(progPick)?progPick:opts[0],open=progDd;
+  const row=(o,tag)=>`<span class="thumb">${exPic(o)}</span><span class="ddtext"><b>${esc(o)}</b><span class="meta">${esc(equipOf(o)||'Exercise')}</span></span>${tag||''}`;
+  return `<div class="swap pswp"><div class="cmp"><figure><div class="big">${exPic(x.n,1)}</div><figcaption>Now: ${esc(x.n)}</figcaption></figure><span class="arrow" aria-hidden="true">→</span><figure><div class="big">${exPic(pick,1)}</div><figcaption>New: ${esc(pick)}</figcaption></figure></div>
+  <div class="ddwrap"><button class="dd" data-pdd="1" aria-expanded="${open}" aria-haspopup="listbox" aria-label="Replacement exercise: ${esc(pick)}">${row(pick,'<svg class="chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')}</button>
+  ${open?`<div class="ddlist" role="listbox" aria-label="Replacement exercises">${opts.map(o=>`<button role="option" aria-selected="${o===pick}" data-pddpick="${esc(o)}">${row(o,o===pick?'<span class="tick" aria-hidden="true">✓</span>':'')}</button>`).join('')}</div>`:''}</div>
+  <input id="pswcustom" maxlength="60" placeholder="Or type your own exercise" aria-label="Custom exercise name">
+  <div class="row" style="margin-top:8px"><button class="btn primary" data-pswgo="1">Use it</button>${x.orig?`<button class="btn" data-pswreset="1">Back to ${esc(x.orig)}</button>`:''}<button class="btn" data-pswcancel="1">Cancel</button></div>
+  <div class="meta" style="margin-top:8px">Changes this exercise in every ${esc(d.n)} workout. Past logs stay as they are.</div></div>`;
+}
+function progWeekHTML(p,per,N,now){
+  if(!p.days.length)return `<div class="empty">No days in your program yet. Add one below.</div>`;
+  const nxW=N===15?1:N+1,W=wOf(iso(today())),b=blk(N),t=progTag(N),nb=per?progNext(N):'';
+  const rel=N===now?'This week':N===now+1?'Next week':N>now?`In ${N-now} weeks`:N===now-1?'Last week':`${now-N} weeks ago`;
+  let h=`<div class="pweek${progAnim?' '+progAnim:''}" id="pweek">`;
+  h+=per?`<div class="pwh"><h2>Week ${N} · ${BNAME[b]}${t?' · '+t:''}</h2><span class="ptag">${rel}</span></div>`:`<div class="pwh"><h2>Your week</h2><span class="ptag">${p.days.length} day${p.days.length===1?'':'s'}</span></div>`;
+  if(nb)h+=`<div class="pban" role="status" style="--bc:${PBC[blk(nxW)]}"><i aria-hidden="true"></i>Next week: ${esc(nb)}</div>`;
+  h+=p.days.map((d,di)=>{
+    const rows=progRows(p,d,N),nx=per?progRows(p,d,nxW):null,sets=rows.reduce((a,x)=>a+(+x.sets||0),0);
+    const done=per&&N===now&&doneThisWeek(d.k,W),add=nx?nx.filter(y=>!rows.some(x=>x.n===y.n)):[];
+    return `<section class="pday" data-pday="${di}" style="--c:${d.c};--on:${onC(d.c)}"><div class="pdh"><span class="pdot" aria-hidden="true"></span><h3>${esc(d.n)}</h3><span class="pdm">${done?'<b class="pdone">Done ✓</b>':`${rows.length} lift${rows.length===1?'':'s'} · ${sets} sets`}</span></div>
+    ${rows.length?rows.map((x,ei)=>{const key=di+'.'+ei,op=progSwap===key;
+      return `<div class="prow${op?' open':''}"><span class="thumb pth">${exPic(x.n)}</span><div class="ptx"><b class="pxn">${esc(x.n)}</b><div class="pxs">${esc(progSetsTxt(x))}</div>${x.note?`<div class="pnote">${esc(x.note)}</div>`:''}${x.orig?`<div class="pnote">Swapped from ${esc(x.orig)}</div>`:''}${progChips(x,nx)}</div><button class="pib" data-pswap="${key}" aria-expanded="${op}" aria-label="Swap ${esc(x.n)}" title="Swap exercise">${PSWAPIC}</button></div>${op?progSwapHTML(d,x):''}`}).join(''):'<p class="meta pnone">No exercises yet. Add some below.</p>'}
+    ${add.length?`<div class="pnewl"><span class="pchg new">New lift next week</span> ${add.map(y=>esc(y.n)).join(', ')}</div>`:''}</section>`}).join('');
+  return h+'</div>';
+}
+function progEditorHTML(p){
+  let h=`<div class="pwh pedt"><h2>Edit plan</h2></div><p class="meta">Edit names, sets and reps. Changes save as you go and apply to your next workouts.${p.ppl?' Editing this plan switches it to the general block pattern; your swaps are kept.':''}</p>`;
+  h+=p.days.map((d,di)=>{const ex=p.ppl?d.ex.map(e=>Object.assign({},e,{n:swaps()[d.k+'|'+e.n]||e.n})):d.ex;
+    return `<section class="pday pedit" style="--c:${d.c};--on:${onC(d.c)}"><div class="pedh"><span class="pdot" aria-hidden="true"></span><input data-pd="${di}" value="${esc(d.n)}" aria-label="Day name"><button class="btn danger" data-pdel="${di}">${armed==='day'+di?'Confirm':'Remove'}</button></div>
+    ${ex.map((e,ei)=>`<div class="pxrow"><div class="pxa"><span class="thumb pth">${exPic(e.n)}</span><input data-pe="${di}.${ei}" data-pf="n" value="${esc(e.n)}" list="exlist" aria-label="Exercise name"></div>
+      <div class="pxb"><label class="pfld"><small>Sets</small><input data-pe="${di}.${ei}" data-pf="sets" inputmode="numeric" value="${esc(e.sets)}" aria-label="Sets"></label><label class="pfld"><small>Reps</small><input data-pe="${di}.${ei}" data-pf="reps" value="${esc(e.reps)}" aria-label="Reps"></label>
+      <button class="pib" data-pup="${di}.${ei}" aria-label="Move up"${ei?'':' disabled'}>${PARR(0)}</button><button class="pib" data-pdown="${di}.${ei}" aria-label="Move down"${ei<ex.length-1?'':' disabled'}>${PARR(1)}</button><button class="pib danger" data-pxdel="${di}.${ei}" aria-label="Remove exercise">×</button></div></div>`).join('')}
+    <button class="padd" data-padd="${di}">+ Add exercise</button></section>`}).join('');
+  return h+`<button class="btn pdayadd" data-pdayadd="1">+ Add day</button><datalist id="exlist">${ALL.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>`;
+}
+// Opening the Program tab starts on the current week with nothing open.
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-tab="program"],[data-gotab="program"]');if(t){progSel=null;progSwap=null;progPick=null;progDd=false;progAnim='';progFresh=true}},true);
+// Program-tab clicks (timeline, swaps, move down). Editor buttons data-pup/pxdel/padd/pdel/pdayadd stay in the main handler.
+$('#main').addEventListener('click',async e=>{
+  if(view.tab!=='program')return;const b=e.target.closest&&e.target.closest('button');if(!b||b.disabled)return;const ds=b.dataset;
+  if(ds.ptl){unfocus();const w=Math.max(1,Math.min(15,+ds.ptl)),cur=progSel||progNowWk();progAnim=w>cur?'nx':w<cur?'pv':'';progSel=w;progSwap=null;progDd=false;render();return}
+  if(ds.pswap){unfocus();progSwap=progSwap===ds.pswap?null:ds.pswap;progPick=null;progDd=false;render();return}
+  if(ds.pdd){progDd=!progDd;render();return}
+  if(ds.pddpick){progPick=ds.pddpick;progDd=false;render();return}
+  if(ds.pswcancel){progSwap=null;progPick=null;progDd=false;render();return}
+  if((ds.pswgo||ds.pswreset)&&progSwap){
+    const p=prog(),[di,ei]=progSwap.split('.').map(Number),d=p.days[di];if(!d)return;
+    const x=progRows(p,d,(p.ppl||p.periodize)?(progSel||progNowWk()):1)[ei];if(!x)return;
+    const base=x.orig||x.n,opts=alts(base).filter(o=>o!==x.n),ci=document.getElementById('pswcustom');
+    const name=ds.pswgo?(((ci&&ci.value)||'').trim().slice(0,60)||(progPick&&opts.includes(progPick)?progPick:opts[0])):base;
+    progSwap=null;progPick=null;progDd=false;flash='';unfocus();
+    if(p.ppl&&B1[d.k]){const sw=Object.assign({},swaps()),key=d.k+'|'+base;if(name!==base)sw[key]=name;else delete sw[key];await putProfile({swaps:sw})}
+    else if(name)await editProg(q=>{const z=q.days[di].ex.find(o=>o.n===x.n);if(z)z.n=name});
+    return}
+  if(ds.pdown){unfocus();const [di,ei]=ds.pdown.split('.').map(Number);await editProg(q=>{const a=q.days[di]&&q.days[di].ex;if(a&&ei>=0&&ei<a.length-1)[a[ei],a[ei+1]]=[a[ei+1],a[ei]]});return}
+});
+/* ---------- end program tab ---------- */
 /* ---------- bodyweight and cut tracker ---------- */
 const LB_PER_KG=2.20462;
 const bwRaw=()=>{const a=S.profile&&S.profile.bw;return Array.isArray(a)?a:[]};
