@@ -4,6 +4,7 @@ Nheil and testers: add a line here any time (newest at the top), or tell Claude 
 
 Format: `- YYYY-MM-DD · who · what happened or what you want · (status)`
 
+- 2026-11-27 · Nheil · Wants research on ways to monetize the app · (queued as roadmap item R for the Researcher in the 2026-11-28 run)
 - 2026-11-27 · Nheil · Only Week 1 workouts have a Start Workout button. After finishing every workout in a week, Home and Workout should move on to the next week · (queued as roadmap item 0 for the 2026-11-28 run, built first)
 - 2026-11-24 · Nheil · Hold off on the Marketer in every run until he says so · (active: Marketer paused)
 - 2026-11-24 · Nheil · Wants the team to turn Lift Log into the best app in the App Store and Google Play · (goal; drives the roadmap, read by Product Lead 2026-11-24)

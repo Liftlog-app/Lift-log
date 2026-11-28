@@ -79,6 +79,18 @@ Fix 1:
 
 **2026-11-28 run builds THREE PRs: item 0 (Start Workout bug, do it FIRST), then item 2 (Program tab) and item 4 (History tab). Item 3 waits for 2026-12-05.**
 
+R. **Research: ways to monetize Lift Log** (Nheil, 2026-11-27). **Researcher, in the 2026-11-28 run.** Research only, nothing gets built.
+   - **Write `ops/research/monetization.md`**, short and phone-friendly, with sources and dates for every number.
+   - **Cover:**
+     - how top lifting apps make money (Strong, Hevy, Fitbod, JEFIT, Boostcamp and others): free vs paid features, prices, trials and lifetime deals
+     - subscription vs one-time unlock vs freemium; typical conversion rates and what users complain about in reviews
+     - store rules and fees for Google Play and the App Store, including the small-business 15% rate
+     - how paid features would work when the app is one HTML file in Android and iPhone web views (Play Billing / StoreKit bridges vs web checkout)
+     - non-subscription income: the queued "PR Perks + partner cards" brand idea, affiliate links, paid programs or coaching, and tie-ins with Nheil's gym social media
+   - **Respect the app rules:** no tracking or third-party ad networks (CLAUDE.md rule 3). Ads go in only as "considered and why not", unless a privacy-safe option exists.
+   - **End with a recommendation:** the 2–3 best options for Lift Log, what to make free vs paid, a suggested price, and what has to exist first (accounts, store launch).
+   - Add any resulting ideas to `ops/ideas.md` with scores, so the Product Lead can plan them.
+
 0. **Bug: no Start Workout button after Week 1, and the app doesn't move on to the next week** (Nheil, 2026-11-27). Separate small PR, built first, before the Program and History tabs.
    - **What happens:** only Week 1 workouts have a Start Workout button. Workouts in any other week can't be started.
    - **What Nheil wants:**
