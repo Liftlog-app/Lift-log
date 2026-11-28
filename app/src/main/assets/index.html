@@ -328,6 +328,7 @@ h1{font-size:24px}
 .stp,.stp.good,.stp.warn,.stp.pain{flex:none;min-height:36px;border:0;background:var(--card);color:var(--mute);font-size:13px;white-space:nowrap}
 .stp.good{color:var(--ok)}.stp.warn{color:light-dark(#8a5200,#ffcf8a)}.stp.pain{color:light-dark(#b3261e,#ff9f99)}
 .stp.live{border:0;background:color-mix(in srgb,var(--ok) 16%,var(--card))}
+.stp[data-wtoday]{min-height:44px}.stp[data-wtoday] b{color:var(--ink);font-weight:700}
 .head{margin:0 0 10px}
 .head h2{font-size:32px}
 .hnav{gap:0}
@@ -982,8 +983,8 @@ function renderToday(){
   if(isToday&&!live&&!(saved&&saved.end)&&P.some(z=>!z.skip))h+=`<button class="startbtn" data-wstart="1" style="--c:${c};--on:${onC(c)}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>${saved?'Start timing this workout':'Start workout'}</button>`;
   h+='</section>';
   const st=[];
-  if(!isToday)st.push(`<button class="stp" data-wtoday="1">${view.date>iso(today())?`Looking ahead to ${fmtD(view.date)}`:`Viewing ${fmtD(view.date)}`} · back to today</button>`);
-  else if(W!==CW)st.push(`<button class="stp" data-wtoday="1">${W>CW?'Looking ahead to':'Viewing'} Week ${p.periodize?wk:W} · back to this week</button>`);
+  if(!isToday)st.push(`<button class="stp" data-wtoday="1">${view.date>iso(today())?`Looking ahead to ${fmtD(view.date)}`:`Viewing ${fmtD(view.date)}`} · <b>back to today</b></button>`);
+  else if(W!==CW)st.push(`<button class="stp" data-wtoday="1">${W>CW?'Looking ahead to':'Viewing'} Week ${p.periodize?wk:W} · <b>back to this week</b></button>`);
   if(rt&&isToday){const v=readyScore(rt),adj=readyAdj();st.push(`<button class="stp${v>=4.5?' good':adj<0?' warn':''}" data-rchange="1">Readiness ${v.toFixed(1)}/5 · ${adj<0?`targets −${-adj} RPE`:v>=4.5?'PR day':'normal targets'}</button>`)}
   {const td=today().getDay(),cw=wOf(iso(today())),rw=td===0?cw:cw-1;if((td===0||td===1)&&rw>=1&&isToday&&Object.values(S.sessions).some(d=>wOf(d.date)===rw))st.push(`<button class="stp good" data-report="${rw}">Week ${prog().periodize?wkOf(rw):rw} report ready →</button>`)}
   const act=Object.entries(pains()).filter(([k,v])=>v&&v.lvl>0).sort((a,b)=>b[1].lvl-a[1].lvl);
