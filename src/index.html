@@ -1623,7 +1623,7 @@ function histSync(){
   const l=$('#hday');if(l)l.innerHTML=histDayLine()}
 function histMonth(k){const [y,mo]=HV.m.split('-').map(Number),d=new Date(y,mo-1+k,1),m=iso(d).slice(0,7);
   if(m>iso(today()).slice(0,7))return;HV.m=m;HV.sel=null;HV.dir=k;haptic(5);render()}
-document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-tab="history"]');if(t&&view.tab!=='history'&&!t.closest('#main'))histReset()},true);
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-tab="history"],[data-gotab="history"]');if(t&&view.tab!=='history')histReset()},true);
 $('#main').addEventListener('click',e=>{if(view.tab!=='history')return;const b=e.target.closest&&e.target.closest('[data-hm],[data-hd],[data-hx],[data-hf]');if(!b||b.disabled)return;
   if(b.dataset.hm){histMonth(+b.dataset.hm);return}
   if(b.dataset.hx){const id=b.dataset.hx,o=!HV.open.has(id);if(o)HV.open.add(id);else HV.open.delete(id);histSync();haptic(6);return}
